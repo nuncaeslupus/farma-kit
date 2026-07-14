@@ -3,40 +3,16 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Farma-Kit</title>
-    <!-- Stable public entry point. Redirects to the current Apps Script /exec deployment.
-         If the deployment URL ever changes, edit ONLY the two URLs below. -->
-    <meta
-      http-equiv="refresh"
-      content="0; url=https://script.google.com/macros/s/AKfycby8xArkt2JmQIOoQ-Ei5vsrTmXVEMpwni-XsAGrjGDKSs2lHM9lRP6lxg2Nfe27jf9-/exec"
+    <title>Farma-Kit · Template editor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Serif:wght@400;500;600&display=swap"
+      rel="stylesheet"
     />
-    <script>
-      location.replace(
-        'https://script.google.com/macros/s/AKfycby8xArkt2JmQIOoQ-Ei5vsrTmXVEMpwni-XsAGrjGDKSs2lHM9lRP6lxg2Nfe27jf9-/exec'
-      );
-    </script>
-    <style>
-      body {
-        font-family: system-ui, sans-serif;
-        background: #14100a;
-        color: #dbd2bd;
-        display: grid;
-        place-items: center;
-        height: 100vh;
-        margin: 0;
-      }
-      a {
-        color: #5fc7c0;
-      }
-    </style>
   </head>
   <body>
-    <p>
-      Redirigiendo…
-      <a
-        href="https://script.google.com/macros/s/AKfycby8xArkt2JmQIOoQ-Ei5vsrTmXVEMpwni-XsAGrjGDKSs2lHM9lRP6lxg2Nfe27jf9-/exec"
-        >Abrir la aplicación</a
-      >
-    </p>
+    <editor-app></editor-app>
+    <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

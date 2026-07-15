@@ -329,7 +329,6 @@ export class GeneratorApp extends LitElement {
         `Adjunto el PDF del full oficial proporcionat pel ${col}.\n\nGràcies.`;
     const a = document.createElement('a');
     a.href = `mailto:${REQUEST_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    a.target = '_blank';
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -347,7 +346,6 @@ export class GeneratorApp extends LitElement {
       (colegio ? `\n${es ? 'Colegio' : 'Col·legi'}: ${colegio}\n` : '');
     const a = document.createElement('a');
     a.href = `mailto:${REQUEST_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    a.target = '_blank';
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -390,7 +388,10 @@ export class GeneratorApp extends LitElement {
     this.q('#gateHint').hidden = open;
     // collapse the instructions: they belong to a colegio, and leaving them open
     // would keep showing the previous colegio's steps and National Code.
-    if (!open) (this.querySelector('details.instr') as HTMLDetailsElement).open = false;
+    if (!open) {
+      const instr = this.querySelector<HTMLDetailsElement>('details.instr');
+      if (instr) instr.open = false;
+    }
   }
 
   // ---------- segell + pages ----------

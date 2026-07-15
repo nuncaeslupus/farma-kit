@@ -3,6 +3,7 @@ type Dict = Record<string, string | ((...a: string[]) => string)>;
 
 export const I18N: { ca: Dict; es: Dict } = {
   ca: {
+    docTitle: 'Farma-Kit - Emplenador de fulls de cupons',
     appTitle:
       'Emplenador de <span class="lo">fulls de cupons precinte</span><br>per a la recepta electrònica',
     intro:
@@ -71,6 +72,7 @@ export const I18N: { ca: Dict; es: Dict } = {
       'Del full ' + a + ' al ' + b + ' <span class="dim">· ' + n + ' fulls</span>',
   },
   es: {
+    docTitle: 'Farma-Kit - Rellenador de hojas de cupones',
     appTitle:
       'Rellenador de <span class="lo">hojas de cupones precinto</span><br>para la receta electrónica',
     intro:
@@ -148,6 +150,7 @@ export type Lang = 'ca' | 'es';
 export function applyLang(root: ParentNode, lang: Lang): void {
   const d = I18N[lang];
   document.documentElement.lang = lang;
+  if (typeof d.docTitle === 'string') document.title = d.docTitle;
   root.querySelectorAll<HTMLElement>('[data-i18n]').forEach((el) => {
     const k = el.getAttribute('data-i18n')!;
     const v = d[k];

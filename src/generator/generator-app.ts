@@ -13,6 +13,20 @@ const RKEY = 'cupons_remember';
 const COLEGI_KEY = 'cupons_colegi'; // remembered independently of Recorda'm
 const PBKEY = 'cupons_privacybar_hidden';
 
+/* Hand the mailto to the OS/webmail handler in a new tab: a same-tab mailto
+   navigates this page away, and a webmail handler would leave the user's
+   half-filled form behind. Cost: a browser with no handler may leave an empty
+   tab open — accepted, losing the form is worse. */
+function openMail(href: string): void {
+  const a = document.createElement('a');
+  a.href = href;
+  a.target = '_blank';
+  a.rel = 'noopener';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+
 // CP first-two-digits → province. Instant client-side province autofill.
 const CP2PROV: Record<string, string> = {
   '01': 'Araba / Álava', '02': 'Albacete', '03': 'Alicante', '04': 'Almería',
@@ -73,7 +87,7 @@ export class GeneratorApp extends LitElement {
   private provManual = false;
   private barDismissed = false;
   private activeIdx = -1;
-  private cpCities: Record<string, string[]> | null = null; // lazy postal data
+  private cpCitiesP: Promise<Record<string, string[]>> | null = null; // memoized postal fetch
   private q = (s: string) => this.querySelector(s) as HTMLElement;
   private i = (id: string) => this.querySelector('#' + id) as HTMLInputElement;
 
@@ -327,11 +341,9 @@ export class GeneratorApp extends LitElement {
         `· Camps a emplenar i els seus formats (o exemples): \n\n\n` +
         `· Em consta que aquest full és vàlid per als col·legis de: ${name}, \n\n` +
         `Adjunto el PDF del full oficial proporcionat pel ${col}.\n\nGràcies.`;
-    const a = document.createElement('a');
-    a.href = `mailto:${REQUEST_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
+    openMail(
+      `mailto:${REQUEST_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
+    );
   }
 
   /** General feedback ("this template doesn't fit", etc.) — same inbox as Demanar. */
@@ -344,11 +356,9 @@ export class GeneratorApp extends LitElement {
         ? 'Hola,\n\n(Escribe aquí tu consulta, problema o sugerencia. Por ejemplo: "uso esta plantilla pero no encaja bien".)\n'
         : 'Hola,\n\n(Escriu aquí la teva consulta, problema o suggeriment. Per exemple: "faig servir aquesta plantilla però no encaixa bé".)\n') +
       (colegio ? `\n${es ? 'Colegio' : 'Col·legi'}: ${colegio}\n` : '');
-    const a = document.createElement('a');
-    a.href = `mailto:${REQUEST_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
+    openMail(
+      `mailto:${REQUEST_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
+    );
   }
 
   // ---------- template-driven gate ----------
@@ -383,6 +393,10 @@ export class GeneratorApp extends LitElement {
   /** Enable/disable everything below the colegio picker (native `inert`). */
   private setGate(open: boolean) {
     const gated = this.q('#gated');
+    // The form just became fillable, so the CP field is a few seconds away:
+    // warm the postal data now instead of on the 5th digit, where the user
+    // waits on it.
+    if (open) void this.loadCpCities();
     gated.inert = !open;
     gated.toggleAttribute('data-locked', !open);
     this.q('#gateHint').hidden = open;
@@ -498,20 +512,29 @@ export class GeneratorApp extends LitElement {
     if (this.isSupported(c)) this.setProvincia(c);
     else (this.i('provincia') as unknown as HTMLSelectElement).value = '';
   }
+  /* Fetch the CP→cities map once. Memoizing the *promise* rather than the result
+     dedupes callers that race while it is in flight, and clearing it on failure
+     lets the next keystroke retry — caching {} left autofill dead for the whole
+     session after one blip. Prefetched from setGate(), so it is normally warm
+     long before the user reaches the CP field. */
+  private loadCpCities(): Promise<Record<string, string[]>> {
+    this.cpCitiesP ??= fetch(`${import.meta.env.BASE_URL}postal/cp-cities.json`)
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
+      .catch(() => {
+        this.cpCitiesP = null;
+        return {};
+      });
+    return this.cpCitiesP;
+  }
+
   private async lookupCity() {
     const cp = (this.i('cp').value || '').replace(/\D/g, '');
     if (cp.length !== 5) return;
-    if (!this.cpCities) {
-      try {
-        const res = await fetch(`${import.meta.env.BASE_URL}postal/cp-cities.json`);
-        this.cpCities = res.ok ? await res.json() : {};
-      } catch {
-        this.cpCities = {};
-      }
-    }
-    const cities = this.cpCities?.[cp];
+    const cities = (await this.loadCpCities())[cp];
+    // Rewrite unconditionally: an unknown CP must clear the previous CP's
+    // suggestions, not leave them on offer.
+    this.q('#pobles').innerHTML = (cities ?? []).map((c) => `<option value="${c}"></option>`).join('');
     if (!cities || !cities.length) return;
-    this.q('#pobles').innerHTML = cities.map((c) => `<option value="${c}"></option>`).join('');
     const pob = this.i('poblacio');
     if (!pob.value && cities.length === 1) pob.value = cities[0];
   }

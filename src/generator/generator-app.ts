@@ -5,8 +5,15 @@ import { I18N, applyLang, type Lang } from '../lib/i18n';
 import { slug, type Template } from '../lib/template';
 import { generatePdf } from '../lib/pdf/generate';
 
-// TODO(REQUEST_EMAIL): real inbox that forwards template requests to the maintainer.
-const REQUEST_EMAIL = 'plantilles@farma-kit.example';
+/* Base64 only to keep the address out of the bundle and the public repo as a
+   plain string, where email harvesters regex for it. It is a speed bump against
+   bulk scrapers, not a secret: anyone with DevTools reads it in seconds. */
+const REQUEST_EMAIL = atob('ZmFybWFraXRzdXBwb3J0QGdtYWlsLmNvbQ==');
+
+/* Language-independent tag on every subject this app generates. Mail that does
+   not carry it was not sent from here — filter on it to forward the real
+   requests on, and leave harvested spam behind. */
+const MAIL_TAG = '[farma-kit]';
 const LANG_KEY = 'cupons_lang';
 const THEME_KEY = 'cupons_theme';
 const RKEY = 'cupons_remember';
@@ -329,7 +336,7 @@ export class GeneratorApp extends LitElement {
     if (!name) return;
     const es = this.uiLang === 'es';
     const col = (es ? 'Colegio de Farmacéuticos de ' : 'Col·legi de Farmacèutics de ') + name;
-    const subject = (es ? 'Pedir plantilla para el ' : 'Demanar plantilla per al ') + col;
+    const subject = `${MAIL_TAG} ` + (es ? 'Pedir plantilla para el ' : 'Demanar plantilla per al ') + col;
     const body = es
       ? `Hola,\n\nNecesito la plantilla para el ${col}. Adjunto la máxima información posible sobre el modelo de hoja:\n\n` +
         `· CN de las hojas (para pedirlas al mayorista): \n` +
@@ -350,7 +357,7 @@ export class GeneratorApp extends LitElement {
   private contactar() {
     const es = this.uiLang === 'es';
     const colegio = this.i('colegi').value;
-    const subject = es ? 'Contacto — Farma-Kit' : 'Contacte — Farma-Kit';
+    const subject = `${MAIL_TAG} ` + (es ? 'Contacto — Farma-Kit' : 'Contacte — Farma-Kit');
     const body =
       (es
         ? 'Hola,\n\n(Escribe aquí tu consulta, problema o sugerencia. Por ejemplo: "uso esta plantilla pero no encaja bien".)\n'

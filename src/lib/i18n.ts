@@ -16,7 +16,7 @@ export const I18N: { ca: Dict; es: Dict } = {
     instr: 'Instruccions',
     step1: 'Posa a la impressora el número de papers (fulls de cupons) que necessitis imprimir.',
     step2:
-      'Omple el formulari següent. Per fer una prova posa el número <span class="kbd">1</span> al camp <em>Número de fulls</em>.',
+      'Omple el formulari següent. Per fer una prova posa el número <span class="kbd">1</span> al camp <em>Quantitat de fulls</em>.',
     step3: 'Genera el document i imprimeix-lo <em>sobre</em> els fulls de cupons.',
     oblig: 'Informació general',
     obligSub: 'Per omplir la capçalera dels fulls.',
@@ -87,7 +87,7 @@ export const I18N: { ca: Dict; es: Dict } = {
     instr: 'Instrucciones',
     step1: 'Pon en la impresora el número de papeles (hojas de cupones) que necesites imprimir.',
     step2:
-      'Rellena el formulario siguiente. Para hacer una prueba pon el número <span class="kbd">1</span> en el campo <em>Número de hojas</em>.',
+      'Rellena el formulario siguiente. Para hacer una prueba pon el número <span class="kbd">1</span> en el campo <em>Cantidad de hojas</em>.',
     step3: 'Genera el documento e imprímelo <em>sobre</em> las hojas de cupones.',
     oblig: 'Información general',
     obligSub: 'Para rellenar la cabecera de las hojas.',

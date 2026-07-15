@@ -357,7 +357,7 @@ export class GeneratorApp extends LitElement {
   private contactar() {
     const es = this.uiLang === 'es';
     const colegio = this.i('colegi').value;
-    const subject = `${MAIL_TAG} ` + (es ? 'Contacto — Farma-Kit' : 'Contacte — Farma-Kit');
+    const subject = `${MAIL_TAG} ` + (es ? 'Contacto' : 'Contacte');
     const body =
       (es
         ? 'Hola,\n\n(Escribe aquí tu consulta, problema o sugerencia. Por ejemplo: "uso esta plantilla pero no encaja bien".)\n'

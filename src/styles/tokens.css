@@ -1,0 +1,39 @@
+/* Farma-Kit design tokens — single source of truth, shared by every component
+   and (later) the pharmacy-facing app. Mirrors the current site palette. */
+:root {
+  --paper: #f4efe6;
+  --surface: #fbf8f2;
+  --surface-2: #f0ebe0;
+  --ink: #201d18;
+  --muted: #6d665a;
+  --faint: #938b7c;
+  --line: #ddd5c6;
+  --line-2: #e7e0d2;
+  --accent: #0f5d5c;
+  --accent-ink: #0b4746;
+  --accent-soft: #dfeae8;
+  --field-bg: #ffffff;
+  --field-line: #cfc7b6;
+  --danger: #b23b2e;
+
+  --font-head: 'Space Grotesk', sans-serif;
+  --font-body: 'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+
+  --radius: 8px;
+}
+
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+body {
+  font-family: var(--font-body);
+  color: var(--ink);
+  background: var(--paper);
+  font-size: 13px;
+}

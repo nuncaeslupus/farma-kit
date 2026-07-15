@@ -1,12 +1,16 @@
 import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import './generator/generator-app';
-import './editor/editor-app';
+
+// The template editor is a maintainer-only, OFFLINE tool: it lives in the repo
+// but is never shipped online. This dynamic import is dead code in a production
+// build (import.meta.env.DEV is statically false), so the bundler drops the
+// editor entirely — the deployed site has no #editor route at all.
+if (import.meta.env.DEV) void import('./editor/editor-app');
 
 /**
  * Root router. Default view is the pharmacy-facing generator. The template
- * editor is a maintainer-only tool reachable ONLY via the unlinked #editor
- * hash (obscurity, no login — it holds no secrets and only emits JSON).
+ * editor is reachable only when running the dev server (`npm run dev` → #editor).
  */
 @customElement('fk-root')
 export class FkRoot extends LitElement {
@@ -30,7 +34,7 @@ export class FkRoot extends LitElement {
   }
 
   render() {
-    return this.route.startsWith('#editor')
+    return import.meta.env.DEV && this.route.startsWith('#editor')
       ? html`<editor-app></editor-app>`
       : html`<generator-app></generator-app>`;
   }

@@ -22,7 +22,7 @@ const CSS_PPP = 96 / 72;
 export class EditorApp extends LitElement {
   @state() private fields: Field[] = [];
   @state() private selected: Field | null = null;
-  @state() private name = 'Barcelona';
+  @state() private name = ''; // blank until picked
   @state() private fileName = '';
   @state() private zoomPct = 100;
   @state() private addKey = FIELD_PRESETS[0].key;
@@ -371,6 +371,7 @@ export class EditorApp extends LitElement {
             <div class="filename" title=${this.fileName}>${this.fileName || 'No file selected'}</div>
             <label class="fld">Colegio</label>
             <select .value=${this.name} @change=${(e: Event) => (this.name = (e.target as HTMLSelectElement).value)}>
+              <option value="">—</option>
               ${COLEGIOS.map(
                 (g) => html`<optgroup label=${g.region}>
                   ${g.colegios.map((c) => html`<option value=${c}>${c}</option>`)}

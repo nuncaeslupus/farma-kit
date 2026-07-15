@@ -10,8 +10,8 @@ const REQUEST_EMAIL = 'plantilles@farma-kit.example';
 const LANG_KEY = 'cupons_lang';
 const THEME_KEY = 'cupons_theme';
 const RKEY = 'cupons_remember';
-const DKEY = 'cupons_disclaimer_hidden';
 const COLEGI_KEY = 'cupons_colegi'; // remembered independently of Recorda'm
+const PBKEY = 'cupons_privacybar_hidden';
 
 // CP first-two-digits → province. Instant client-side province autofill.
 const CP2PROV: Record<string, string> = {
@@ -71,6 +71,7 @@ export class GeneratorApp extends LitElement {
   private templateMap: Record<string, string> = {}; // colegio slug → template file slug
   private tpl: Template | null = null; // template of the currently-chosen colegio
   private provManual = false;
+  private barDismissed = false;
   private activeIdx = -1;
   private cpCities: Record<string, string[]> | null = null; // lazy postal data
   private q = (s: string) => this.querySelector(s) as HTMLElement;
@@ -114,7 +115,6 @@ export class GeneratorApp extends LitElement {
     this.wireProvinceCity();
     this.wireValidation();
     this.wireWarn();
-    this.wireDisclaimer();
     this.wireRemember();
     this.defaultMonth();
     this.wireGenerate();
@@ -141,12 +141,10 @@ export class GeneratorApp extends LitElement {
     this.querySelectorAll<HTMLButtonElement>('.seg button').forEach((b) =>
       b.setAttribute('aria-pressed', b.dataset.lang === this.uiLang ? 'true' : 'false'),
     );
-    const tl = this.querySelector('#themeLbl');
-    if (tl)
-      tl.textContent =
-        document.documentElement.getAttribute('data-theme') === 'dark'
-          ? (I18N[this.uiLang].theme_light as string)
-          : (I18N[this.uiLang].theme_dark as string);
+    this.querySelector('#themeBtn')?.setAttribute(
+      'aria-checked',
+      document.documentElement.getAttribute('data-theme') === 'dark' ? 'true' : 'false',
+    );
   }
   private wireLang() {
     this.querySelectorAll<HTMLButtonElement>('.seg button').forEach((b) =>
@@ -322,11 +320,31 @@ export class GeneratorApp extends LitElement {
       ? `Hola,\n\nNecesito la plantilla para el ${col}. Adjunto la máxima información posible sobre el modelo de hoja:\n\n` +
         `· CN de las hojas (para pedirlas al mayorista): \n` +
         `· Campos a rellenar y sus formatos (o ejemplos): \n\n\n` +
+        `· Me consta que esta hoja es válida para los colegios de: ${name}, \n\n` +
         `Adjunto el PDF de la hoja oficial proporcionada por el ${col}.\n\nGracias.`
       : `Hola,\n\nNecessito la plantilla per al ${col}. Adjunto la màxima informació possible sobre el model de full:\n\n` +
         `· CN dels fulls (per demanar-los al majorista): \n` +
         `· Camps a emplenar i els seus formats (o exemples): \n\n\n` +
+        `· Em consta que aquest full és vàlid per als col·legis de: ${name}, \n\n` +
         `Adjunto el PDF del full oficial proporcionat pel ${col}.\n\nGràcies.`;
+    const a = document.createElement('a');
+    a.href = `mailto:${REQUEST_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    a.target = '_blank';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
+  /** General feedback ("this template doesn't fit", etc.) — same inbox as Demanar. */
+  private contactar() {
+    const es = this.uiLang === 'es';
+    const colegio = this.i('colegi').value;
+    const subject = es ? 'Contacto — Farma-Kit' : 'Contacte — Farma-Kit';
+    const body =
+      (es
+        ? 'Hola,\n\n(Escribe aquí tu consulta, problema o sugerencia. Por ejemplo: "uso esta plantilla pero no encaja bien".)\n'
+        : 'Hola,\n\n(Escriu aquí la teva consulta, problema o suggeriment. Per exemple: "faig servir aquesta plantilla però no encaixa bé".)\n') +
+      (colegio ? `\n${es ? 'Colegio' : 'Col·legi'}: ${colegio}\n` : '');
     const a = document.createElement('a');
     a.href = `mailto:${REQUEST_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     a.target = '_blank';
@@ -370,6 +388,9 @@ export class GeneratorApp extends LitElement {
     gated.inert = !open;
     gated.toggleAttribute('data-locked', !open);
     this.q('#gateHint').hidden = open;
+    // collapse the instructions: they belong to a colegio, and leaving them open
+    // would keep showing the previous colegio's steps and National Code.
+    if (!open) (this.querySelector('details.instr') as HTMLDetailsElement).open = false;
   }
 
   // ---------- segell + pages ----------
@@ -559,10 +580,30 @@ export class GeneratorApp extends LitElement {
       void this.generate();
     });
     this.q('#warnCancel').addEventListener('click', () => this.showWarn(false));
+    this.q('#barX').addEventListener('click', () => {
+      this.barDismissed = true;
+      this.q('#privacyBar').hidden = true;
+      try {
+        localStorage.setItem(PBKEY, '1');
+      } catch {
+        /* ignore */
+      }
+    });
+    try {
+      if (localStorage.getItem(PBKEY) === '1') {
+        this.barDismissed = true;
+        this.q('#privacyBar').hidden = true;
+      }
+    } catch {
+      /* ignore */
+    }
   }
   private showWarn(on: boolean) {
     this.q('#warnConfirm').hidden = !on;
     this.q('#privacyMsg').hidden = on; // bar shows either privacy OR the warning
+    // the warning must appear even if the bar was dismissed; on cancel/ok,
+    // return the bar to its dismissed state.
+    this.q('#privacyBar').hidden = on ? false : this.barDismissed;
   }
   private mesPhrase(y: number, m: number) {
     const name = new Date(y, m, 1).toLocaleDateString(this.uiLang === 'es' ? 'es-ES' : 'ca-ES', {
@@ -590,29 +631,6 @@ export class GeneratorApp extends LitElement {
     if (sel === cur && full === 1 && nearEnd)
       return (t.warnCurrent as (m: string) => string)(this.mesPhrase(cy, cm));
     return null;
-  }
-
-  // ---------- disclaimer ----------
-  private wireDisclaimer() {
-    const banner = this.q('#disclaimer');
-    const show = this.q('#showDisclaimer');
-    const set = (hidden: boolean) => {
-      banner.hidden = hidden;
-      show.hidden = !hidden;
-      try {
-        if (hidden) localStorage.setItem(DKEY, '1');
-        else localStorage.removeItem(DKEY);
-      } catch {
-        /* ignore */
-      }
-    };
-    this.q('#disclaimerX').addEventListener('click', () => set(true));
-    show.addEventListener('click', () => set(false));
-    try {
-      if (localStorage.getItem(DKEY) === '1') set(true);
-    } catch {
-      /* ignore */
-    }
   }
 
   // ---------- Recorda'm ----------
@@ -783,12 +801,6 @@ export class GeneratorApp extends LitElement {
     const provinces = COLEGIOS.flatMap((g) => g.colegios).sort((a, b) => a.localeCompare(b));
     return html`
       <main class="wrap">
-        <div class="banner" id="disclaimer">
-          <span class="banner-text"><strong data-i18n="alertLabel">Alerta!</strong>
-            <span data-i18n="alertText">Aquesta pàgina no és oficial i no pertany a cap Col·legi de Farmacèutics.</span></span>
-          <button type="button" class="banner-x" id="disclaimerX" data-i18n="dismiss">No mostrar més</button>
-        </div>
-
         <header>
           <div class="brand">
             <svg class="logo" viewBox="0 0 44 56" role="img" aria-label="Full de cupons">
@@ -815,7 +827,12 @@ export class GeneratorApp extends LitElement {
               <button type="button" data-lang="ca" aria-pressed="false">Català</button>
               <button type="button" data-lang="es" aria-pressed="true">Español</button>
             </div>
-            <button type="button" class="theme-btn" id="themeBtn" aria-label="Tema"><span id="themeLbl">Fosc</span></button>
+            <button type="button" class="theme-switch" id="themeBtn" role="switch" aria-checked="false" aria-label="Tema clar / fosc">
+              <span class="ts-knob">
+                <svg class="glyph glyph-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
+                <svg class="glyph glyph-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg>
+              </span>
+            </button>
           </div>
         </header>
 
@@ -854,7 +871,7 @@ export class GeneratorApp extends LitElement {
               <li data-i18n="step2" data-i18n-html>Omple el formulari.</li>
               <li data-i18n="step3" data-i18n-html>Genera i imprimeix sobre els fulls.</li>
             </ol>
-            <p class="cn-line" id="cnLine" hidden><span data-i18n="cnLabel">Codi Nacional del full (CN)</span>: <b id="cnCode"></b></p>
+            <p class="cn-line" id="cnLine" hidden><span data-i18n="cnLabel">Codi Nacional dels fulls</span>: <b id="cnCode"></b></p>
           </details>
 
           <form class="card" id="form" autocomplete="off" novalidate>
@@ -914,8 +931,8 @@ export class GeneratorApp extends LitElement {
           </div>
         </div>
 
-        <div class="reshow-wrap">
-          <button type="button" class="reshow" id="showDisclaimer" data-i18n="showAgain" hidden>Mostra l'avís legal</button>
+        <div class="page-foot">
+          <button type="button" class="linklike" id="contactBtn" data-i18n="contact" @click=${() => this.contactar()}>Contactar</button>
         </div>
 
         <div class="modal-overlay" id="genModal" hidden>
@@ -939,12 +956,13 @@ export class GeneratorApp extends LitElement {
       </main>
 
       <div class="privacy-bar" id="privacyBar">
-        <p class="privacy-msg" id="privacyMsg">
-          <strong data-i18n="alertLabel">Alerta!</strong>
-          <span data-i18n="alertText">Aquesta pàgina no és oficial i no pertany a cap Col·legi de Farmacèutics.</span>
+        <div class="privacy-msg" id="privacyMsg">
+          <span data-i18n="alertText">Aquesta pàgina no pertany a cap Col·legi de Farmacèutics</span>
           <span class="dot" aria-hidden="true">·</span>
-          <span data-i18n="privacy">Les teves dades es processen al teu ordinador i no s'envien ni s'emmagatzemen enlloc.</span>
-        </p>
+          <span data-i18n="privacy">Les dades es processen al teu ordinador i no s'envien enlloc</span>
+          <span class="dot" aria-hidden="true">·</span>
+          <span data-i18n="noCookies">El lloc no fa servir cookies</span>
+        </div>
         <div class="warn-confirm" id="warnConfirm" hidden>
           <p class="warn-confirm-msg" id="warnMsg"></p>
           <div class="warn-confirm-actions">
@@ -952,6 +970,7 @@ export class GeneratorApp extends LitElement {
             <button type="button" class="btn" id="warnOk" data-i18n="continuar">Continuar</button>
           </div>
         </div>
+        <button type="button" class="bar-x" id="barX" aria-label="Tancar / Cerrar">×</button>
       </div>
     `;
   }

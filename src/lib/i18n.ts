@@ -9,9 +9,9 @@ export const I18N: { ca: Dict; es: Dict } = {
       "Aquesta utilitat et permetrà omplir de manera senzilla, ràpida i econòmica la capçalera dels fulls de cupons precinte de la teva farmàcia. Només s'imprimiran les dades de la farmàcia sobre els fulls oficials de cupons, disponibles a través del majorista.",
     chooseFirst: 'Tria el teu Col·legi de Farmacèutics',
     gateHint: 'Selecciona un col·legi amb plantilla disponible per continuar.',
-    cnLabel: 'Codi Nacional del full (CN)',
-    privacy:
-      "Les teves dades es processen al teu ordinador i no s'envien ni s'emmagatzemen enlloc.",
+    cnLabel: 'Codi Nacional dels fulls',
+    privacy: "Les dades es processen al teu ordinador i no s'envien enlloc",
+    noCookies: 'El lloc no fa servir cookies',
     instr: 'Instruccions',
     step1: 'Posa a la impressora el número de papers (fulls de cupons) que necessitis imprimir.',
     step2:
@@ -42,6 +42,7 @@ export const I18N: { ca: Dict; es: Dict } = {
     provincia: 'Província',
     provinciaPh: '—',
     remember: "Recorda'm",
+    contact: 'Contactar',
     generar: 'Generar Document',
     errUp: 'Ha de ser un número de 5 xifres.',
     errNat: 'Introdueix un número enter més gran que 0.',
@@ -59,7 +60,7 @@ export const I18N: { ca: Dict; es: Dict } = {
       mes +
       '</strong>, que està acabant. És correcte?',
     alertLabel: 'Alerta!',
-    alertText: 'Aquesta pàgina no és oficial i no pertany a cap Col·legi de Farmacèutics.',
+    alertText: 'Aquesta pàgina no pertany a cap Col·legi de Farmacèutics',
     theme_dark: 'Fosc',
     theme_light: 'Clar',
     genTitle: 'Generant el document…',
@@ -76,9 +77,9 @@ export const I18N: { ca: Dict; es: Dict } = {
       'Esta utilidad te permitirá rellenar de forma sencilla, rápida y económica la cabecera de las hojas de cupones precinto de tu farmacia. Solo se imprimirán los datos de la farmacia sobre las hojas oficiales de cupones, disponibles a través del mayorista.',
     chooseFirst: 'Elige tu Colegio de Farmacéuticos',
     gateHint: 'Selecciona un colegio con plantilla disponible para continuar.',
-    cnLabel: 'Código Nacional de la hoja (CN)',
-    privacy:
-      'Tus datos se procesan en tu ordenador y no se envían ni se almacenan en ningún sitio.',
+    cnLabel: 'Código nacional de las hojas',
+    privacy: 'Los datos se procesan en tu ordenador y no se envían a ningún sitio',
+    noCookies: 'El sitio no usa cookies',
     instr: 'Instrucciones',
     step1: 'Pon en la impresora el número de papeles (hojas de cupones) que necesites imprimir.',
     step2:
@@ -109,6 +110,7 @@ export const I18N: { ca: Dict; es: Dict } = {
     provincia: 'Provincia',
     provinciaPh: '—',
     remember: 'Recuérdame',
+    contact: 'Contactar',
     generar: 'Generar Documento',
     errUp: 'Debe ser un número de 5 cifras.',
     errNat: 'Introduce un número entero mayor que 0.',
@@ -128,7 +130,7 @@ export const I18N: { ca: Dict; es: Dict } = {
       mes +
       '</strong>, que está terminando. ¿Es correcto?',
     alertLabel: '¡Atención!',
-    alertText: 'Esta página no es oficial y no pertenece a ningún Colegio de Farmacéuticos.',
+    alertText: 'Esta página no pertenece a ningún Colegio de Farmacéuticos',
     theme_dark: 'Oscuro',
     theme_light: 'Claro',
     genTitle: 'Generando el documento…',

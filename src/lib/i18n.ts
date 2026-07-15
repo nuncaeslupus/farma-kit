@@ -12,7 +12,7 @@ export const I18N: { ca: Dict; es: Dict } = {
     gateHint: 'Selecciona un col·legi amb plantilla disponible per continuar.',
     cnLabel: 'Codi Nacional dels fulls',
     privacy: "Les dades es processen al teu ordinador i no s'envien enlloc",
-    noCookies: 'El lloc no fa servir cookies',
+    noCookies: 'No es fan servir cookies',
     instr: 'Instruccions',
     step1: 'Posa a la impressora el número de papers (fulls de cupons) que necessitis imprimir.',
     step2:
@@ -81,7 +81,7 @@ export const I18N: { ca: Dict; es: Dict } = {
     gateHint: 'Selecciona un colegio con plantilla disponible para continuar.',
     cnLabel: 'Código nacional de las hojas',
     privacy: 'Los datos se procesan en tu ordenador y no se envían a ningún sitio',
-    noCookies: 'El sitio no usa cookies',
+    noCookies: 'No se usan cookies',
     instr: 'Instrucciones',
     step1: 'Pon en la impresora el número de papeles (hojas de cupones) que necesites imprimir.',
     step2:

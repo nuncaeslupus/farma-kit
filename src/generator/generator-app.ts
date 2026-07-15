@@ -534,8 +534,13 @@ export class GeneratorApp extends LitElement {
     // Rewrite unconditionally: an unknown CP must clear the previous CP's
     // suggestions, not leave them on offer.
     this.q('#pobles').innerHTML = (cities ?? []).map((c) => `<option value="${c}"></option>`).join('');
-    if (!cities || !cities.length) return;
+    if (!cities || !cities.length) return; // unknown CP: we know nothing, leave the field alone
     const pob = this.i('poblacio');
+    // A city left over from a previous CP is stale: it would print a wrong
+    // address, and because <datalist> filters its options by the field's text,
+    // it also hides every suggestion for the new CP. Only drop it when this CP
+    // is known and cannot have it.
+    if (pob.value && !cities.includes(pob.value)) pob.value = '';
     if (!pob.value && cities.length === 1) pob.value = cities[0];
   }
 
@@ -908,13 +913,18 @@ export class GeneratorApp extends LitElement {
                 <input id="up" name="up" type="text" inputmode="numeric" maxlength="5" class="numr" placeholder="10000" />
                 <span class="field-err" id="err-up"></span>
               </div>
+              <!-- name="mes"/"num" + type="month" made Chrome read this as a card
+                   expiry next to a card number, so it offered credit-card autofill
+                   on "Número de fulls". Form-level autocomplete="off" is ignored for
+                   that heuristic; names it cannot match are not. Names are inert
+                   here — every lookup is by id. -->
               <div class="field">
                 <label for="mes" data-i18n="mes">Mes i any</label>
-                <input id="mes" name="mes" type="month" />
+                <input id="mes" name="sheet-period" type="month" autocomplete="off" />
               </div>
               <div class="two-up">
                 <div class="field"><label for="full" data-i18n="full">Full inicial</label><input id="full" name="full" type="text" inputmode="numeric" maxlength="4" class="numr" placeholder="1" /><span class="field-err" id="err-full"></span></div>
-                <div class="field"><label for="num" data-i18n="num">Número de fulls</label><input id="num" name="num" type="text" inputmode="numeric" maxlength="4" class="numr" placeholder="50" /><span class="field-err" id="err-num"></span></div>
+                <div class="field"><label for="num" data-i18n="num">Número de fulls</label><input id="num" name="sheet-count" type="text" inputmode="numeric" maxlength="4" class="numr" placeholder="50" autocomplete="off" /><span class="field-err" id="err-num"></span></div>
               </div>
 
               <div class="pages-line" aria-live="polite">

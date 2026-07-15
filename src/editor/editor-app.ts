@@ -13,6 +13,7 @@ import {
 } from '../lib/template';
 import { CanvasEngine } from './canvas-engine';
 import { generatePdf } from '../lib/pdf/generate';
+import { COLEGIOS } from '../lib/colegios';
 
 const round = (n: number) => Math.round(n * 100) / 100;
 const CSS_PPP = 96 / 72;
@@ -40,6 +41,11 @@ export class EditorApp extends LitElement {
     });
     this.engine.setFields(this.fields);
     this.fit();
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this.engine?.destroy();
   }
 
   // ---- zoom ----
@@ -113,7 +119,7 @@ export class EditorApp extends LitElement {
     if (!this.fields.length) return;
     this.status = 'Generating…';
     const data = Object.fromEntries(this.fields.map((f) => [f.key, f.sample ?? '']));
-    const bytes = await generatePdf(this.template(), data, this.pdfBytes ? this.pdfBytes.slice(0) : null);
+    const bytes = await generatePdf(this.template(), [data], this.pdfBytes ? this.pdfBytes.slice(0) : null);
     window.open(URL.createObjectURL(new Blob([bytes as BlobPart], { type: 'application/pdf' })), '_blank');
     this.status = 'Test PDF opened in a new tab.';
   }
@@ -139,10 +145,12 @@ export class EditorApp extends LitElement {
 
   private onExport() {
     const json = JSON.stringify(this.template(), null, 2);
+    const url = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
     const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
+    a.href = url;
     a.download = `${slug(this.name) || 'template'}.json`;
     a.click();
+    URL.revokeObjectURL(url);
     this.status = `Exported ${a.download}`;
   }
 
@@ -361,8 +369,14 @@ export class EditorApp extends LitElement {
               <span class="fake">Upload PDF…</span>
             </label>
             <div class="filename" title=${this.fileName}>${this.fileName || 'No file selected'}</div>
-            <label class="fld">Name</label>
-            <input type="text" .value=${this.name} @input=${(e: Event) => (this.name = (e.target as HTMLInputElement).value)} />
+            <label class="fld">Colegio</label>
+            <select .value=${this.name} @change=${(e: Event) => (this.name = (e.target as HTMLSelectElement).value)}>
+              ${COLEGIOS.map(
+                (g) => html`<optgroup label=${g.region}>
+                  ${g.colegios.map((c) => html`<option value=${c}>${c}</option>`)}
+                </optgroup>`,
+              )}
+            </select>
           </div>
 
           <h2 class="workbench">Fields</h2>
@@ -410,10 +424,10 @@ export class EditorApp extends LitElement {
     return html`
       <div class="selname">${f.label}</div>
       <div class="g2">
-        <div><label class="fld">X</label><input type="number" step="0.5" .value=${round(f.box.x)} @input=${(e: Event) => this.edit(() => (f.box.x = this.num(e)))} /></div>
-        <div><label class="fld">Y</label><input type="number" step="0.5" .value=${round(f.box.y)} @input=${(e: Event) => this.edit(() => (f.box.y = this.num(e)))} /></div>
-        <div><label class="fld">Width</label><input type="number" step="0.5" .value=${round(f.box.w)} @input=${(e: Event) => this.edit(() => (f.box.w = Math.max(6, this.num(e))))} /></div>
-        <div><label class="fld">Height</label><input type="number" step="0.5" .value=${round(f.box.h)} @input=${(e: Event) => this.edit(() => (f.box.h = Math.max(6, this.num(e))))} /></div>
+        <div><label class="fld">X</label><input type="number" step="0.5" .value=${round(f.box.x)} @change=${(e: Event) => this.edit(() => (f.box.x = this.num(e)))} /></div>
+        <div><label class="fld">Y</label><input type="number" step="0.5" .value=${round(f.box.y)} @change=${(e: Event) => this.edit(() => (f.box.y = this.num(e)))} /></div>
+        <div><label class="fld">Width</label><input type="number" step="0.5" .value=${round(f.box.w)} @change=${(e: Event) => this.edit(() => (f.box.w = Math.max(6, this.num(e))))} /></div>
+        <div><label class="fld">Height</label><input type="number" step="0.5" .value=${round(f.box.h)} @change=${(e: Event) => this.edit(() => (f.box.h = Math.max(6, this.num(e))))} /></div>
       </div>
       <label class="fld">Placeholder</label>
       <input type="text" .value=${f.sample ?? ''} @input=${(e: Event) => this.edit(() => (f.sample = (e.target as HTMLInputElement).value))} />
@@ -426,7 +440,7 @@ export class EditorApp extends LitElement {
             <option value="serif">Serif</option>
           </select>
         </div>
-        <div><label class="fld">Size</label><input type="number" step="0.5" .value=${f.style.size} @input=${(e: Event) => this.edit(() => (f.style.size = this.num(e) || 12))} /></div>
+        <div><label class="fld">Size</label><input type="number" step="0.5" .value=${f.style.size} @change=${(e: Event) => this.edit(() => (f.style.size = this.num(e) || 12))} /></div>
       </div>
       <div class="checks">
         <label><input type="checkbox" .checked=${f.style.bold} @change=${(e: Event) => this.edit(() => (f.style.bold = (e.target as HTMLInputElement).checked))} /> Bold</label>
@@ -452,7 +466,7 @@ export class EditorApp extends LitElement {
         </div>
       </div>
       <label class="fld">Cells</label>
-      <input type="number" min="1" step="1" .value=${f.cells} @input=${(e: Event) => this.edit(() => (f.cells = Math.max(1, parseInt((e.target as HTMLInputElement).value) || 1)))} />
+      <input type="number" min="1" step="1" .value=${f.cells} @change=${(e: Event) => this.edit(() => (f.cells = Math.max(1, parseInt((e.target as HTMLInputElement).value) || 1)))} />
       <fk-button variant="ghost" style="margin-top:12px;width:100%" @click=${() => this.removeField(f)}>Delete field</fk-button>
     `;
   }

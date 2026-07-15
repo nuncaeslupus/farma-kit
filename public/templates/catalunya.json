@@ -1,0 +1,190 @@
+{
+  "name": "Catalunya",
+  "cn": "140663",
+  "sheet": {
+    "w": 595,
+    "h": 842
+  },
+  "fields": [
+    {
+      "key": "up",
+      "label": "UP",
+      "box": {
+        "x": 52.634998208607634,
+        "y": 55.580998925164586,
+        "w": 82.14399808918147,
+        "h": 18
+      },
+      "cells": 5,
+      "style": {
+        "font": "mono",
+        "size": 17.5,
+        "bold": true,
+        "italic": false,
+        "halign": "left",
+        "valign": "middle"
+      },
+      "sample": "12345"
+    },
+    {
+      "key": "month",
+      "label": "Month",
+      "box": {
+        "x": 157.7090237658053,
+        "y": 55.580998925164586,
+        "w": 29.616998447459935,
+        "h": 17.999999999999993
+      },
+      "cells": 2,
+      "style": {
+        "font": "mono",
+        "size": 17.5,
+        "bold": true,
+        "italic": false,
+        "halign": "left",
+        "valign": "middle"
+      },
+      "sample": "07"
+    },
+    {
+      "key": "year",
+      "label": "Year",
+      "box": {
+        "x": 200.91703427530717,
+        "y": 55.580998925164586,
+        "w": 35.50899988057384,
+        "h": 17.999999999999993
+      },
+      "cells": 2,
+      "style": {
+        "font": "mono",
+        "size": 17.5,
+        "bold": true,
+        "italic": false,
+        "halign": "left",
+        "valign": "middle"
+      },
+      "sample": "26"
+    },
+    {
+      "key": "page",
+      "label": "Page number",
+      "box": {
+        "x": 256.40004777046295,
+        "y": 55.580998925164586,
+        "w": 65.1259983280338,
+        "h": 17.999999999999993
+      },
+      "cells": 4,
+      "style": {
+        "font": "mono",
+        "size": 17.5,
+        "bold": true,
+        "italic": false,
+        "halign": "left",
+        "valign": "middle"
+      },
+      "sample": "0005"
+    },
+    {
+      "key": "titular",
+      "label": "Titular",
+      "box": {
+        "x": 403.7000835983102,
+        "y": 53.12599832803378,
+        "w": 140.31100250794947,
+        "h": 20.455000597130798
+      },
+      "cells": 1,
+      "style": {
+        "font": "sans",
+        "size": 8,
+        "bold": true,
+        "italic": false,
+        "halign": "center",
+        "valign": "top"
+      },
+      "sample": "RUBINAT I PERFUMAT, AMADEU"
+    },
+    {
+      "key": "nif",
+      "label": "NIF",
+      "box": {
+        "x": 448.8720945855166,
+        "y": 75,
+        "w": 48.984980294683965,
+        "h": 10.10799856688611
+      },
+      "cells": 1,
+      "style": {
+        "font": "sans",
+        "size": 6,
+        "bold": false,
+        "italic": false,
+        "halign": "center",
+        "valign": "middle"
+      },
+      "sample": "12345678Z"
+    },
+    {
+      "key": "address",
+      "label": "Address",
+      "box": {
+        "x": 403.7000835983102,
+        "y": 87.08999880573842,
+        "w": 140.31100250794947,
+        "h": 18.946000716556952
+      },
+      "cells": 1,
+      "style": {
+        "font": "sans",
+        "size": 7,
+        "bold": false,
+        "italic": false,
+        "halign": "center",
+        "valign": "top"
+      },
+      "sample": "C/ Poltergeist, 5"
+    },
+    {
+      "key": "cpCity",
+      "label": "CP City",
+      "box": {
+        "x": 403.7000835983102,
+        "y": 114.01001313687732,
+        "w": 68.62498507173035,
+        "h": 22.383001552540037
+      },
+      "cells": 1,
+      "style": {
+        "font": "sans",
+        "size": 7,
+        "bold": false,
+        "italic": false,
+        "halign": "left",
+        "valign": "top"
+      },
+      "sample": "08080  Barcelona"
+    },
+    {
+      "key": "province",
+      "label": "Province",
+      "box": {
+        "x": 474.895100915103,
+        "y": 114.01001313687732,
+        "w": 69.11598519115665,
+        "h": 22.383001552540037
+      },
+      "cells": 1,
+      "style": {
+        "font": "sans",
+        "size": 7.5,
+        "bold": false,
+        "italic": false,
+        "halign": "right",
+        "valign": "top"
+      },
+      "sample": "BARCELONA"
+    }
+  ]
+}

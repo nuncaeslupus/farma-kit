@@ -4,32 +4,34 @@ import type { Field, Template } from '../template';
 import { embedFont, registerFonts } from './fonts';
 
 /**
- * Build the filled PDF entirely client-side. When `basePdf` is given the data is
- * drawn over the official sheet (a visual test); for real printing the app would
- * pass none and print the data-only overlay onto physical paper.
+ * Build the filled PDF entirely client-side — one page per entry in `pages`
+ * (each a key→value map). When `basePdf` is given the data is drawn over the
+ * official sheet (a visual test); for real printing pass none and print the
+ * data-only overlay onto physical paper.
  */
 export async function generatePdf(
   tpl: Template,
-  data: Record<string, string>,
+  pages: Record<string, string>[],
   basePdf?: ArrayBuffer | null,
 ): Promise<Uint8Array> {
   const doc = await PDFDocument.create();
   registerFonts(doc);
-
-  let page: PDFPage;
-  if (basePdf) {
-    const src = await PDFDocument.load(basePdf);
-    const [pg] = await doc.copyPages(src, [0]);
-    doc.addPage(pg);
-    page = doc.getPage(0);
-  } else {
-    page = doc.addPage([tpl.sheet.w, tpl.sheet.h]);
-  }
-
+  const baseDoc = basePdf ? await PDFDocument.load(basePdf) : null;
   const cache = new Map<string, PDFFont>();
-  for (const f of tpl.fields) {
-    const font = await embedFont(doc, f.style.font, f.style.bold, f.style.italic, cache);
-    drawField(page, tpl.sheet.h, font, f, data[f.key] ?? f.sample ?? '');
+
+  for (const pageData of pages) {
+    let page: PDFPage;
+    if (baseDoc) {
+      const [pg] = await doc.copyPages(baseDoc, [0]);
+      doc.addPage(pg);
+      page = pg;
+    } else {
+      page = doc.addPage([tpl.sheet.w, tpl.sheet.h]);
+    }
+    for (const f of tpl.fields) {
+      const font = await embedFont(doc, f.style.font, f.style.bold, f.style.italic, cache);
+      drawField(page, tpl.sheet.h, font, f, pageData[f.key] ?? f.sample ?? '');
+    }
   }
   return doc.save();
 }

@@ -39,6 +39,10 @@ export interface Template {
   name: string; // template id → templates/<slug>.json; mapped to colegios by a registry
   sheet: { w: number; h: number };
   fields: Field[];
+  // Per-colegio config (forward-compatible; all optional). A colegio's sheet may
+  // carry a different national code, and some may not offer the stamp section.
+  cn?: string; // National Code printed on the official sheet (e.g. "140663" for Catalunya)
+  segell?: boolean; // whether the stamp ("segell") data section applies — default true
 }
 
 export interface FieldPreset {

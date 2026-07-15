@@ -26,7 +26,7 @@ const bytesCache = new Map<string, Promise<ArrayBuffer>>();
 function loadBytes(file: string): Promise<ArrayBuffer> {
   let p = bytesCache.get(file);
   if (!p) {
-    p = fetch(`fonts/${file}`).then((r) => {
+    p = fetch(`${import.meta.env.BASE_URL}fonts/${file}`).then((r) => {
       if (!r.ok) throw new Error(`font ${file} (${r.status})`);
       return r.arrayBuffer();
     });

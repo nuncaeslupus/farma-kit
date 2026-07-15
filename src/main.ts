@@ -1,2 +1,3 @@
 import './styles/tokens.css';
-import './editor/editor-app';
+import './styles/app.css';
+import './app-root';

@@ -1,7 +1,8 @@
 import { defineConfig } from 'vite';
 
-// base './' keeps asset URLs relative so it works under the GitHub Pages
-// subpath (nuncaeslupus.github.io/farma-kit/) without extra config.
+// Absolute base for the GitHub Pages project site so runtime fetches
+// (fonts, templates) resolve correctly even when the URL has no trailing
+// slash. import.meta.env.BASE_URL === '/farma-kit/' at runtime.
 export default defineConfig({
-  base: './',
+  base: '/farma-kit/',
 });

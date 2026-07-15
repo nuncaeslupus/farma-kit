@@ -30,7 +30,9 @@ export const I18N: { ca: Dict; es: Dict } = {
     up: 'UP de la farmàcia',
     mes: 'Mes i any',
     full: 'Full inicial',
-    num: 'Número de fulls',
+    // Not "Número de…": Chrome reads «Número» next to the name/address fields as
+    // a card number and offers credit-card autofill. Verified by bisection.
+    num: 'Quantitat de fulls',
     pages: 'Pàgines a imprimir',
     dismiss: 'No mostrar més',
     segell: 'Generar també les dades del segell',
@@ -99,7 +101,7 @@ export const I18N: { ca: Dict; es: Dict } = {
     up: 'UP de la farmacia',
     mes: 'Mes y año',
     full: 'Hoja inicial',
-    num: 'Número de hojas',
+    num: 'Cantidad de hojas',
     pages: 'Páginas a imprimir',
     dismiss: 'No mostrar más',
     segell: 'Generar también los datos del sello',

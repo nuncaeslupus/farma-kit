@@ -920,18 +920,13 @@ export class GeneratorApp extends LitElement {
                 <input id="up" name="up" type="text" inputmode="numeric" maxlength="5" class="numr" placeholder="10000" />
                 <span class="field-err" id="err-up"></span>
               </div>
-              <!-- name="mes"/"num" + type="month" made Chrome read this as a card
-                   expiry next to a card number, so it offered credit-card autofill
-                   on "Número de fulls". Form-level autocomplete="off" is ignored for
-                   that heuristic; names it cannot match are not. Names are inert
-                   here — every lookup is by id. -->
               <div class="field">
                 <label for="mes" data-i18n="mes">Mes i any</label>
-                <input id="mes" name="sheet-period" type="month" autocomplete="off" />
+                <input id="mes" name="mes" type="month" />
               </div>
               <div class="two-up">
                 <div class="field"><label for="full" data-i18n="full">Full inicial</label><input id="full" name="full" type="text" inputmode="numeric" maxlength="4" class="numr" placeholder="1" /><span class="field-err" id="err-full"></span></div>
-                <div class="field"><label for="num" data-i18n="num">Número de fulls</label><input id="num" name="sheet-count" type="text" inputmode="numeric" maxlength="4" class="numr" placeholder="50" autocomplete="off" /><span class="field-err" id="err-num"></span></div>
+                <div class="field"><label for="num" data-i18n="num">Quantitat de fulls</label><input id="num" name="num" type="text" inputmode="numeric" maxlength="4" class="numr" placeholder="50" /><span class="field-err" id="err-num"></span></div>
               </div>
 
               <div class="pages-line" aria-live="polite">

@@ -217,6 +217,14 @@ export class GeneratorApp extends LitElement {
   disconnectedCallback() {
     document.removeEventListener('click', this.onDocClick);
     document.removeEventListener('keydown', this.onDocKey);
+    // Release the last PDF: generate() only revokes the previous one on the next
+    // run, so an unmount in between would strand it. Reachable only in dev (the
+    // #editor route; prod drops the editor and never leaves the generator), but it
+    // belongs with the other teardown rather than as a special case.
+    if (this.pdfUrl) {
+      URL.revokeObjectURL(this.pdfUrl);
+      this.pdfUrl = null;
+    }
     super.disconnectedCallback();
   }
 

@@ -73,6 +73,30 @@ describe('wrapTitular', () => {
   test('trims surrounding whitespace off the one-line result', () => {
     expect(wrapTitular(measure, '  GARCIA, ANA  ', 20)).toEqual(['GARCIA, ANA']);
   });
+
+  test('a short "SURNAMES, NAME" stays on one line', () => {
+    // 'TOUS PUIG, PERE' is 15 chars — must not break at 20.
+    expect(wrapTitular(measure, 'TOUS PUIG, PERE', 20)).toEqual(['TOUS PUIG, PERE']);
+  });
+
+  test('never splits a multi-word name across lines', () => {
+    // Plain word-wrap of "CA, PERE PAU" at 9 would give ["CA, PERE","PAU"] — the
+    // name must instead drop whole to its own line.
+    expect(wrapTitular(measure, 'CA, PERE PAU', 9)).toEqual(['CA,', 'PERE PAU']);
+  });
+
+  test('splits surnames and lets the tail share a line with the name', () => {
+    // "PUIG DE LA GRAN, AL" (19) at 12: surnames must break, and the tail
+    // ("GRAN,") has room for the name on the same line.
+    expect(wrapTitular(measure, 'PUIG DE LA GRAN, AL', 12)).toEqual(['PUIG DE LA', 'GRAN, AL']);
+  });
+
+  test('surnames that fit one line keep the name below (comma break)', () => {
+    expect(wrapTitular(measure, 'RUBINAT I PERFUMAT, PERE PAU', 19)).toEqual([
+      'RUBINAT I PERFUMAT,',
+      'PERE PAU',
+    ]);
+  });
 });
 
 describe('fitWrapped', () => {

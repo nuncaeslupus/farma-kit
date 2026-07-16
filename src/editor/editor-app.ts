@@ -23,6 +23,8 @@ export class EditorApp extends LitElement {
   @state() private fields: Field[] = [];
   @state() private selected: Field | null = null;
   @state() private name = ''; // blank until picked
+  @state() private cn = ''; // national code printed on the sheet; '' → omitted
+  @state() private segell = true; // sheet has a stamp area; true is the model default
   @state() private fileName = '';
   @state() private zoomPct = 100;
   @state() private addKey = FIELD_PRESETS[0].key;
@@ -109,8 +111,15 @@ export class EditorApp extends LitElement {
 
   // ---- output ----
   private template(): Template {
+    // cn/segell are template-level config the editor must round-trip: dropping them
+    // silently hides the national code line (and the stamp section) in the app.
+    // Both are optional in the model, so only emit what differs from the default —
+    // keeps re-exports byte-comparable with hand-written templates.
+    const cn = this.cn.trim();
     return {
       name: this.name,
+      ...(cn ? { cn } : {}),
+      ...(this.segell ? {} : { segell: false }),
       sheet: { w: round(this.engine.sheet.w), h: round(this.engine.sheet.h) },
       fields: this.fields.map((f) => ({ ...f, box: { ...f.box } })),
     };
@@ -130,6 +139,8 @@ export class EditorApp extends LitElement {
     try {
       const tpl = JSON.parse(await file.text()) as Template;
       this.name = tpl.name ?? this.name;
+      this.cn = tpl.cn ?? '';
+      this.segell = tpl.segell !== false; // absent → true, per the model default
       this.fields = (tpl.fields ?? []).map(normalizeField);
       this.engine.setSheetSize(tpl.sheet?.w ?? 595.28, tpl.sheet?.h ?? 841.89);
       this.engine.setFields(this.fields);
@@ -378,6 +389,24 @@ export class EditorApp extends LitElement {
                 </optgroup>`,
               )}
             </select>
+            <label class="fld">National Code (CN)</label>
+            <input
+              type="text"
+              placeholder="e.g. 140663 — blank to hide"
+              .value=${this.cn}
+              @change=${(e: Event) => (this.cn = (e.target as HTMLInputElement).value)}
+            />
+            <div class="checks">
+              <label
+                title="Does this colegio's sheet have a stamp area? Unticked hides the whole stamp section (titular, NIF, address…) in the app."
+                ><input
+                  type="checkbox"
+                  .checked=${this.segell}
+                  @change=${(e: Event) => (this.segell = (e.target as HTMLInputElement).checked)}
+                />
+                Sheet has stamp (segell) area</label
+              >
+            </div>
           </div>
 
           <h2 class="workbench">Fields</h2>

@@ -841,7 +841,6 @@ export class GeneratorApp extends LitElement {
     const t = this.q('.modal-title.gen');
     t.dataset.i18n = key;
     t.textContent = I18N[this.uiLang][key] as string;
-    t.classList.toggle('is-done', key !== 'genTitle');
   }
 
   render() {

@@ -2,6 +2,11 @@ import { PDFDocument, rgb } from 'pdf-lib';
 import type { PDFFont, PDFPage } from 'pdf-lib';
 import type { Field, Template } from '../template';
 import { embedFont, registerFonts } from './fonts';
+import { wrapLines, wrapTitular, fitWrapped } from './wrap';
+
+// Font floor for shrink-to-fit: below this a coupon sheet is unreadable anyway,
+// so we stop shrinking and accept minimal overflow rather than vanishing text.
+const MIN_FONT_SIZE = 4;
 
 /**
  * Build the filled PDF entirely client-side — one page per entry in `pages`
@@ -41,9 +46,6 @@ export async function generatePdf(
 }
 
 function drawField(page: PDFPage, sheetH: number, font: PDFFont, f: Field, value: string): void {
-  const n = f.cells > 1 ? f.cells : 1;
-  const cellW = f.box.w / n; // equal subdivision, no gap
-  const chars = n > 1 ? [...String(value)] : [String(value)];
   const size = f.style.size;
 
   // font metrics for vertical placement
@@ -54,30 +56,82 @@ function drawField(page: PDFPage, sheetH: number, font: PDFFont, f: Field, value
   const boxBottom = sheetH - (f.box.y + f.box.h); // pdf-lib origin is bottom-left
   const boxTop = sheetH - f.box.y;
 
-  let baseline: number;
-  switch (f.style.valign) {
-    case 'top':
-      baseline = boxTop - ascent;
-      break;
-    case 'bottom':
-      baseline = boxBottom + descent;
-      break;
-    case 'baseline':
-      baseline = boxBottom;
-      break;
-    default: // middle
-      baseline = boxBottom + (f.box.h - full) / 2 + descent;
+  // Multi-cell fields (up/month/year/page) are fixed character grids: one glyph
+  // per cell, never wrapped.
+  if (f.cells > 1) {
+    const n = f.cells;
+    const cellW = f.box.w / n; // equal subdivision, no gap
+    const chars = [...String(value)];
+    let baseline: number;
+    switch (f.style.valign) {
+      case 'top':
+        baseline = boxTop - ascent;
+        break;
+      case 'bottom':
+        baseline = boxBottom + descent;
+        break;
+      case 'baseline':
+        baseline = boxBottom;
+        break;
+      default: // middle
+        baseline = boxBottom + (f.box.h - full) / 2 + descent;
+    }
+    for (let i = 0; i < n; i++) {
+      const str = chars[i] ?? '';
+      if (str === '') continue;
+      const cellX = f.box.x + i * cellW;
+      const tw = font.widthOfTextAtSize(str, size);
+      let x = cellX;
+      if (f.style.halign === 'center') x = cellX + (cellW - tw) / 2;
+      else if (f.style.halign === 'right') x = cellX + cellW - tw;
+      page.drawText(str, { x, y: baseline, size, font, color: rgb(0, 0, 0) });
+    }
+    return;
   }
 
-  for (let i = 0; i < n; i++) {
-    const str = chars[i] ?? '';
-    if (str === '') continue;
-    const cellX = f.box.x + i * cellW;
-    const tw = font.widthOfTextAtSize(str, size);
-    const align = f.style.halign; // applies within each cell (multi) or the whole box (single)
-    let x = cellX;
-    if (align === 'center') x = cellX + (cellW - tw) / 2;
-    else if (align === 'right') x = cellX + cellW - tw;
-    page.drawText(str, { x, y: baseline, size, font, color: rgb(0, 0, 0) });
+  // Single text field: wrap to the box width so long values break onto new lines,
+  // and shrink the font if the wrapped block is taller than the box, so text never
+  // spills into the field below. Values that already fit keep their configured size.
+  const str = String(value);
+  if (str === '') return;
+  const wrapAt = (sz: number): string[] => {
+    const measure = (s: string) => font.widthOfTextAtSize(s, sz);
+    return f.key === 'titular'
+      ? wrapTitular(measure, str, f.box.w) // surnames above, name below
+      : wrapLines(measure, str, f.box.w);
+  };
+  const { size: fitSize, lines } = fitWrapped({
+    startSize: size,
+    minSize: MIN_FONT_SIZE,
+    step: 0.5,
+    boxH: f.box.h,
+    wrapAt,
+    lineHeightAt: (sz) => font.heightAtSize(sz),
+  });
+  if (lines.length === 0) return;
+
+  const fitAscent = font.heightAtSize(fitSize, { descender: false });
+  const fitFull = font.heightAtSize(fitSize);
+  const fitDescent = fitFull - fitAscent;
+  const lineH = fitFull;
+  const blockH = lines.length * lineH;
+  let firstBaseline: number;
+  switch (f.style.valign) {
+    case 'bottom':
+      firstBaseline = boxBottom + fitDescent + (lines.length - 1) * lineH;
+      break;
+    case 'middle':
+      firstBaseline = boxTop - (f.box.h - blockH) / 2 - fitAscent;
+      break;
+    default: // top / baseline: fill downward from the top of the box
+      firstBaseline = boxTop - fitAscent;
   }
+
+  lines.forEach((line, i) => {
+    const tw = font.widthOfTextAtSize(line, fitSize);
+    let x = f.box.x;
+    if (f.style.halign === 'center') x = f.box.x + (f.box.w - tw) / 2;
+    else if (f.style.halign === 'right') x = f.box.x + f.box.w - tw;
+    page.drawText(line, { x, y: firstBaseline - i * lineH, size: fitSize, font, color: rgb(0, 0, 0) });
+  });
 }

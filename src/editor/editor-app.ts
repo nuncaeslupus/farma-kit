@@ -14,7 +14,6 @@ import {
 } from '../lib/template';
 import { CanvasEngine } from './canvas-engine';
 import { generatePdf } from '../lib/pdf/generate';
-import { COLEGIOS } from '../lib/colegios';
 
 const round = (n: number) => Math.round(n * 100) / 100;
 const CSS_PPP = 96 / 72;
@@ -433,15 +432,18 @@ export class EditorApp extends LitElement {
               <span class="fake">Upload PDF…</span>
             </label>
             <div class="filename" title=${this.fileName}>${this.fileName || 'No file selected'}</div>
-            <label class="fld">Colegio</label>
-            <select .value=${this.name} @change=${(e: Event) => (this.name = (e.target as HTMLSelectElement).value)}>
-              <option value="">—</option>
-              ${COLEGIOS.map(
-                (g) => html`<optgroup label=${g.region}>
-                  ${g.colegios.map((c) => html`<option value=${c}>${c}</option>`)}
-                </optgroup>`,
-              )}
-            </select>
+            <label class="fld">Template name</label>
+            <input
+              type="text"
+              placeholder="e.g. Catalunya"
+              .value=${this.name}
+              @change=${(e: Event) => (this.name = (e.target as HTMLInputElement).value)}
+            />
+            <div class="muted">
+              Exports as
+              <b>templates/${slug(this.name) || 'template'}.json</b>. One sheet can serve several
+              colegios — map them to it in <b>templates/index.json</b>.
+            </div>
             <label class="fld">National Code (CN)</label>
             <input
               type="text"

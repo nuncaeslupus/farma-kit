@@ -30,7 +30,11 @@ export async function generatePdf(
     }
     for (const f of tpl.fields) {
       const font = await embedFont(doc, f.style.font, f.style.bold, f.style.italic, cache);
-      drawField(page, tpl.sheet.h, font, f, pageData[f.key] ?? f.sample ?? '');
+      // NEVER fall back to f.sample: samples are the editor's preview placeholders,
+      // so a field the caller omitted — the stamp data when the user did not ask
+      // for it — would print a stranger's name, NIF and address onto a real
+      // official sheet. Callers wanting samples pass them in; the editor does.
+      drawField(page, tpl.sheet.h, font, f, pageData[f.key] ?? '');
     }
   }
   return doc.save();

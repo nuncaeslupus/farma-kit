@@ -931,7 +931,9 @@ select[aria-invalid='true']:focus {
   background: var(--surface-2);
   border: 1px solid var(--line-2);
   overflow: hidden;
-  margin: 4px 0 12px;
+  /* No bottom gap: progress and the result/error blocks are mutually exclusive,
+     so it only left dead space under an 8px bar. */
+  margin: 4px 0 0;
 }
 .progress-fill {
   height: 100%;

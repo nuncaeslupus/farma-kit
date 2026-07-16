@@ -154,8 +154,16 @@ export class EditorApp extends LitElement {
       this.name = typeof tpl?.name === 'string' ? tpl.name : this.name;
       this.cn = typeof tpl?.cn === 'string' ? tpl.cn : '';
       this.segell = tpl?.segell !== false; // absent → true, per the model default
-      this.fields = (Array.isArray(tpl?.fields) ? tpl.fields : []).map(normalizeField);
-      this.engine.setSheetSize(Number(tpl?.sheet?.w) || 595.28, Number(tpl?.sheet?.h) || 841.89);
+      // Drop junk entries rather than feed them to normalizeField, which reads
+      // f.style and dies on a null — the throw would be caught below and reported
+      // as "Could not read that JSON", burying the real errors we just collected.
+      this.fields = (Array.isArray(tpl?.fields) ? tpl.fields : [])
+        .filter((f) => !!f && typeof f === 'object')
+        .map(normalizeField);
+      // A negative/zero sheet is already reported; don't hand it to the canvas.
+      const sw = Number(tpl?.sheet?.w);
+      const sh = Number(tpl?.sheet?.h);
+      this.engine.setSheetSize(sw > 0 ? sw : 595.28, sh > 0 ? sh : 841.89);
       this.engine.setFields(this.fields);
       this.engine.setSelected(null);
       this.fit();

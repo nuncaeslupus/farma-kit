@@ -53,6 +53,8 @@ export class GeneratorApp extends LitElement {
   private provManual = false;
   private barDismissed = false;
   private activeIdx = -1;
+  private monthNative?: boolean; // cached: does this browser implement type="month"?
+  private pdfUrl: string | null = null; // last generated blob URL, revoked on the next run
   private cpCitiesP: Promise<Record<string, string[]>> | null = null; // memoized postal fetch
   private q = (s: string) => this.querySelector(s) as HTMLElement;
   private i = (id: string) => this.querySelector('#' + id) as HTMLInputElement;
@@ -95,6 +97,7 @@ export class GeneratorApp extends LitElement {
     this.wireWarn();
     this.wireRemember();
     this.defaultMonth();
+    this.syncMonthHint();
     this.wireGenerate();
     applyLang(this, this.uiLang);
     this.setLangButtons();
@@ -134,6 +137,8 @@ export class GeneratorApp extends LitElement {
           /* ignore */
         }
         applyLang(this, this.uiLang);
+        this.syncColegiLabel(); // applyLang just wiped the picked colegio back to the placeholder
+        this.syncMonthHint(); // the month example is language-dependent
         this.setLangButtons();
         this.updatePages();
       }),
@@ -212,6 +217,14 @@ export class GeneratorApp extends LitElement {
   disconnectedCallback() {
     document.removeEventListener('click', this.onDocClick);
     document.removeEventListener('keydown', this.onDocKey);
+    // Release the last PDF: generate() only revokes the previous one on the next
+    // run, so an unmount in between would strand it. Reachable only in dev (the
+    // #editor route; prod drops the editor and never leaves the generator), but it
+    // belongs with the other teardown rather than as a special case.
+    if (this.pdfUrl) {
+      URL.revokeObjectURL(this.pdfUrl);
+      this.pdfUrl = null;
+    }
     super.disconnectedCallback();
   }
 
@@ -262,11 +275,21 @@ export class GeneratorApp extends LitElement {
       gr.style.display = any ? '' : 'none';
     });
   }
-  private async selectColegi(val: string) {
-    this.i('colegi').value = val;
+  /**
+   * Render the combo label from the current value: the chosen colegio (a proper
+   * noun, same in both languages) or the placeholder in the active language.
+   * Must re-run after applyLang(), which resets #colegiVal to the placeholder
+   * because the span carries data-i18n="colegiPh".
+   */
+  private syncColegiLabel() {
+    const val = this.i('colegi').value;
     const valEl = this.q('#colegiVal');
     valEl.textContent = val || (I18N[this.uiLang].colegiPh as string);
     valEl.classList.toggle('placeholder', !val);
+  }
+  private async selectColegi(val: string) {
+    this.i('colegi').value = val;
+    this.syncColegiLabel();
     this.openColegi(false);
     try {
       if (val) localStorage.setItem(COLEGI_KEY, val);
@@ -411,6 +434,32 @@ export class GeneratorApp extends LitElement {
       out.textContent = '—';
       out.classList.add('empty');
     }
+  }
+  /**
+   * Chrome renders type="month" as a localized picker ("julio de 2026"), where a
+   * raw-format hint would be plain wrong. Firefox/Safari don't implement it at all:
+   * the field degrades to a text box showing "2026-07" with no clue about the
+   * format — which matters, because month and year are sliced out of that value by
+   * position. So hint only where the fallback is actually in play, with a live
+   * example ("p. ej. 2026-07") rather than an abstract mask.
+   * Re-run after applyLang(): the example is language-dependent.
+   */
+  private syncMonthHint() {
+    if (this.monthNative === undefined) {
+      const probe = document.createElement('input');
+      probe.setAttribute('type', 'month');
+      this.monthNative = probe.type === 'month';
+    }
+    const fmt = this.q('#mesFmt');
+    if (this.monthNative) {
+      fmt.hidden = true; // native picker — a format hint would mislead
+      return;
+    }
+    const now = new Date();
+    const eg = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    fmt.hidden = false;
+    fmt.textContent = (I18N[this.uiLang].mesEg as (ym: string) => string)(eg);
+    this.i('mes').placeholder = eg; // greyed example once the field is cleared
   }
   private defaultMonth() {
     const now = new Date();
@@ -729,7 +778,10 @@ export class GeneratorApp extends LitElement {
     bar.style.width = '30%';
 
     try {
-      const mes = this.i('mes').value;
+      // .trim() like every other field below: validateField trims before testing,
+      // so " 2026-07 " passes validation — but month/year are sliced out of this
+      // by position, and the untrimmed value would print month "-0", year "02".
+      const mes = this.i('mes').value.trim();
       const segell = this.i('segell').checked;
       const v = (id: string) => this.i(id).value.trim();
 
@@ -779,9 +831,41 @@ export class GeneratorApp extends LitElement {
 
       bar.style.width = '70%';
       const bytes = await generatePdf(tpl, pages, null);
-      const url = URL.createObjectURL(new Blob([bytes as BlobPart], { type: 'application/pdf' }));
+      // Release the previous document's blob: each run allocates a new one and the
+      // browser holds it until revoked. Safe by now — an earlier tab has long since
+      // loaded its copy, and revoking only invalidates the URL, not a loaded doc.
+      if (this.pdfUrl) URL.revokeObjectURL(this.pdfUrl);
+      this.pdfUrl = URL.createObjectURL(new Blob([bytes as BlobPart], { type: 'application/pdf' }));
+      const url = this.pdfUrl;
       bar.style.width = '100%';
       (this.q('#genDownload') as HTMLAnchorElement).href = url;
+
+      // Success: hand the PDF straight to a new tab and get out of the way — one
+      // click, not two. Generation is async but keeps the click's transient
+      // activation, so the tab is allowed; a slow run (many pages) can outlive
+      // that window and get refused, and open() returns null then — fall back to
+      // the modal's link rather than leave the user with nothing.
+      // NB: no 'noopener' feature — it makes open() return null even on success,
+      // which would break that check. Sever the opener on the handle instead.
+      // open() can also *throw* (sandboxed iframe, some WebViews) — that must not
+      // reach the outer catch and cry "could not generate" over a PDF that is
+      // sitting right there. Treat it like a refusal and fall back.
+      // Severing the opener can throw too (restricted contexts), and a PDF that
+      // opened fine must not be reported as a failure over it — so it shares the
+      // try. `tab` stays set, so a throw here still counts as opened.
+      let tab: Window | null = null;
+      try {
+        tab = window.open(url, '_blank');
+        if (tab) tab.opener = null;
+      } catch {
+        /* refused — fall through to the modal link */
+      }
+      if (tab) {
+        this.q('#genModal').hidden = true;
+        this.q('#genProgress').hidden = true;
+        this.setGenTitle('genTitle'); // reset for the next run
+        return;
+      }
       this.q('#genProgress').hidden = true;
       this.setGenTitle('genDone');
       result.hidden = false;
@@ -888,8 +972,14 @@ export class GeneratorApp extends LitElement {
                 <span class="field-err" id="err-up"></span>
               </div>
               <div class="field">
-                <label for="mes" data-i18n="mes">Mes i any</label>
+                <!-- data-i18n sits on the inner span, not the label: applyLang
+                     replaces textContent, which would eat the format hint. -->
+                <label for="mes"
+                  ><span data-i18n="mes">Mes i any</span
+                  ><span class="mes-fmt" id="mesFmt" hidden></span></label
+                >
                 <input id="mes" name="mes" type="month" />
+                <span class="field-err" id="err-mes"></span>
               </div>
               <div class="two-up">
                 <div class="field"><label for="full" data-i18n="full">Full inicial</label><input id="full" name="full" type="text" inputmode="numeric" maxlength="4" class="numr" placeholder="1" /><span class="field-err" id="err-full"></span></div>

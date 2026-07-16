@@ -842,14 +842,17 @@ export class GeneratorApp extends LitElement {
       // open() can also *throw* (sandboxed iframe, some WebViews) — that must not
       // reach the outer catch and cry "could not generate" over a PDF that is
       // sitting right there. Treat it like a refusal and fall back.
+      // Severing the opener can throw too (restricted contexts), and a PDF that
+      // opened fine must not be reported as a failure over it — so it shares the
+      // try. `tab` stays set, so a throw here still counts as opened.
       let tab: Window | null = null;
       try {
         tab = window.open(url, '_blank');
+        if (tab) tab.opener = null;
       } catch {
         /* refused — fall through to the modal link */
       }
       if (tab) {
-        tab.opener = null;
         this.q('#genModal').hidden = true;
         this.q('#genProgress').hidden = true;
         this.setGenTitle('genTitle'); // reset for the next run

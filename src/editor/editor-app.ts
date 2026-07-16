@@ -160,10 +160,14 @@ export class EditorApp extends LitElement {
       this.fields = (Array.isArray(tpl?.fields) ? tpl.fields : [])
         .filter((f) => !!f && typeof f === 'object')
         .map(normalizeField);
-      // A negative/zero sheet is already reported; don't hand it to the canvas.
-      const sw = Number(tpl?.sheet?.w);
-      const sh = Number(tpl?.sheet?.h);
-      this.engine.setSheetSize(sw > 0 ? sw : 595.28, sh > 0 ? sh : 841.89);
+      // A bad sheet is already reported; don't hand it to the canvas as well.
+      // `> 0` alone is not enough: JSON.parse('1e309') yields Infinity, which
+      // passes that check and then sizes the canvas to Infinity.
+      const dim = (v: unknown, fallback: number) => {
+        const n = Number(v);
+        return Number.isFinite(n) && n > 0 ? n : fallback;
+      };
+      this.engine.setSheetSize(dim(tpl?.sheet?.w, 595.28), dim(tpl?.sheet?.h, 841.89));
       this.engine.setFields(this.fields);
       this.engine.setSelected(null);
       this.fit();

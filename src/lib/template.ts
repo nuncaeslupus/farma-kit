@@ -92,7 +92,7 @@ export function validateTemplate(tpl: unknown): string[] {
   const errs: string[] = [];
   const num = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? v : 0);
 
-  if (typeof t.name !== 'string' || !t.name.trim()) errs.push('Colegio (name) is required.');
+  if (typeof t.name !== 'string' || !t.name.trim()) errs.push('Template name is required.');
   // cn is optional — a colegio may have no code — but a present one must be well formed.
   if (t.cn !== undefined && (typeof t.cn !== 'string' || !isValidCn(t.cn)))
     errs.push(
@@ -123,11 +123,16 @@ export function validateTemplate(tpl: unknown): string[] {
     if (!(bw > 0) || !(bh > 0)) errs.push(`Field "${at}": box must have positive width and height.`);
     if (!(num(f.style?.size) > 0)) errs.push(`Field "${at}": font size must be positive.`);
     if (!(num(f.cells) >= 1)) errs.push(`Field "${at}": cells must be at least 1.`);
-    // A box off the sheet simply never prints — always a mistake.
+    // A box off the sheet simply never prints — always a mistake. Tolerate a
+    // hair of float drift: coordinates come from dragging, so a box flush to the
+    // edge can land on 595.2800000001 > 595.28 and — since a failed check blocks
+    // export — lock the user out of a template that is perfectly fine. EPS is far
+    // below print resolution, so nothing real hides under it.
     if (w > 0 && h > 0 && f.box) {
+      const EPS = 0.01;
       const x = num(f.box.x);
       const y = num(f.box.y);
-      if (x < 0 || y < 0 || x + bw > w || y + bh > h)
+      if (x < -EPS || y < -EPS || x + bw > w + EPS || y + bh > h + EPS)
         errs.push(`Field "${at}": box falls outside the ${Math.round(w)}×${Math.round(h)} sheet.`);
     }
   }

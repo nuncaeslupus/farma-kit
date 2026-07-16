@@ -108,7 +108,7 @@ describe('validateTemplate', () => {
   test('name is required', () => {
     const t = ok();
     t.name = '  ';
-    expect(validateTemplate(t).join(' ')).toMatch(/name.*required|required/i);
+    expect(validateTemplate(t).join(' ')).toMatch(/Template name is required/);
   });
 
   test('duplicate field keys are reported', () => {
@@ -126,6 +126,24 @@ describe('validateTemplate', () => {
   test('a box off the sheet is reported', () => {
     const t = ok();
     t.fields[0].box.x = 560; // 560 + 80 > 595
+    expect(validateTemplate(t).join(' ')).toMatch(/outside the .* sheet/);
+  });
+
+  test('a box flush to the edge survives float drift', () => {
+    // Box coords come from dragging, so a right-aligned box can land on
+    // 595.2800000001 > 595.28. A failed check blocks export, so a false reject
+    // would lock the user out of a perfectly good template.
+    const t = ok();
+    t.sheet = { w: 595.28, h: 841.89 };
+    t.fields[0].box = { x: 1e-10, y: 0, w: 595.28, h: 20 };
+    expect(1e-10 + 595.28 > 595.28).toBe(true); // the drift is real
+    expect(validateTemplate(t)).toEqual([]); // but must not be reported
+  });
+
+  test('the epsilon does not hide a genuinely off-sheet box', () => {
+    const t = ok();
+    t.sheet = { w: 595.28, h: 841.89 };
+    t.fields[0].box = { x: 500, y: 0, w: 100, h: 20 }; // 600 — over by ~4.7pt
     expect(validateTemplate(t).join(' ')).toMatch(/outside the .* sheet/);
   });
 
@@ -166,6 +184,12 @@ describe('validateTemplate', () => {
       const errs = validateTemplate(input);
       expect(Array.isArray(errs)).toBe(true);
       expect(errs.length).toBeGreaterThan(0);
+    });
+
+    test('non-finite sheet sizes are reported (JSON allows 1e309 -> Infinity)', () => {
+      expect(validateTemplate({ name: 'X', sheet: { w: 1e309, h: 1e309 }, fields: [] }).join(' ')).toMatch(
+        /Sheet size must be positive/,
+      );
     });
 
     test('a numeric cn is reported, not coerced into looking valid', () => {

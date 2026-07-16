@@ -30,13 +30,16 @@ export class EditorApp extends LitElement {
   // second one will want (stamp? titular only?) isn't known. Add a control when it is.
   @state() private segell = true;
   @state() private fileName = '';
+  @state() private includeSheet = true; // draw the test PDF over the official sheet
   @state() private zoomPct = 100;
   @state() private addKey = FIELD_PRESETS[0].key;
   @state() private snap = true;
   @state() private status = 'Upload the official sheet PDF to begin.';
 
   private engine!: CanvasEngine;
-  private pdfBytes: ArrayBuffer | null = null;
+  // Reactive: the "Include official sheet" control enables/disables on it, and it is
+  // assigned after an await in onUpload — a plain field would leave the UI stale.
+  @state() private pdfBytes: ArrayBuffer | null = null;
 
   firstUpdated() {
     const host = this.renderRoot.querySelector('#canvas-host') as HTMLElement;
@@ -132,9 +135,11 @@ export class EditorApp extends LitElement {
     if (!this.fields.length) return;
     this.status = 'Generating…';
     const data = Object.fromEntries(this.fields.map((f) => [f.key, f.sample ?? '']));
-    const bytes = await generatePdf(this.template(), [data], this.pdfBytes ? this.pdfBytes.slice(0) : null);
+    // With the sheet: checks alignment. Without: exactly what prints onto the paper.
+    const base = this.includeSheet && this.pdfBytes ? this.pdfBytes.slice(0) : null;
+    const bytes = await generatePdf(this.template(), [data], base);
     window.open(URL.createObjectURL(new Blob([bytes as BlobPart], { type: 'application/pdf' })), '_blank');
-    this.status = 'Test PDF opened in a new tab.';
+    this.status = base ? 'Test PDF (over the sheet) opened in a new tab.' : 'Test PDF (data only) opened in a new tab.';
   }
   private async onImport(e: Event) {
     const input = e.target as HTMLInputElement;
@@ -365,6 +370,26 @@ export class EditorApp extends LitElement {
       color: var(--faint);
       margin-top: 8px;
     }
+    .incl {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-right: 10px;
+      font-size: 12px;
+      color: var(--ink);
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .incl input {
+      margin: 0;
+      cursor: pointer;
+    }
+    /* no sheet uploaded → nothing to include */
+    .incl.off,
+    .incl.off input {
+      color: var(--faint);
+      cursor: not-allowed;
+    }
   `;
 
   render() {
@@ -378,6 +403,19 @@ export class EditorApp extends LitElement {
           <fk-button variant="ghost" @click=${() => this.fit()}>Fit</fk-button>
         </div>
         <div class="tbar-right">
+          <label
+            class="incl ${this.pdfBytes ? '' : 'off'}"
+            title=${this.pdfBytes
+              ? 'Draw the data over the official sheet (alignment check). Untick for the data only — what actually prints onto the physical sheet.'
+              : 'Upload the official sheet PDF first.'}
+            ><input
+              type="checkbox"
+              .checked=${this.includeSheet && !!this.pdfBytes}
+              ?disabled=${!this.pdfBytes}
+              @change=${(e: Event) => (this.includeSheet = (e.target as HTMLInputElement).checked)}
+            />
+            Include official sheet</label
+          >
           <fk-button @click=${() => this.onGenerate()}>Generate test PDF</fk-button>
           <input type="file" accept="application/json,.json" id="jsonInput" style="display:none" @change=${this.onImport} />
           <fk-button variant="ghost" @click=${() => (this.renderRoot.querySelector('#jsonInput') as HTMLElement).click()}>Import JSON</fk-button>

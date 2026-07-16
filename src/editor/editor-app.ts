@@ -115,9 +115,10 @@ export class EditorApp extends LitElement {
     // silently hides the national code line (and the stamp section) in the app.
     // Both are optional in the model, so only emit what differs from the default —
     // keeps re-exports byte-comparable with hand-written templates.
+    const cn = this.cn.trim();
     return {
       name: this.name,
-      ...(this.cn.trim() ? { cn: this.cn.trim() } : {}),
+      ...(cn ? { cn } : {}),
       ...(this.segell ? {} : { segell: false }),
       sheet: { w: round(this.engine.sheet.w), h: round(this.engine.sheet.h) },
       fields: this.fields.map((f) => ({ ...f, box: { ...f.box } })),

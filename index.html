@@ -5,8 +5,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <!-- Matches lang="es" above and the app's Spanish default; applyLang()
-         swaps it to Catalan at runtime when that's the chosen language. -->
-    <title>Farma-Kit - Rellenador de hojas de cupones</title>
+         swaps it (and document.title) to Catalan at runtime when chosen. -->
+    <title>Farma-Kit - Rellenador de hojas de cupones precinto</title>
+    <meta
+      name="description"
+      content="Rellena la cabecera de las hojas de cupones precinto para la receta electrónica. Gratis, sin registro y sin enviar datos: todo se procesa en tu navegador."
+    />
+    <!-- The page is one client-rendered app; without this, /farma-kit,
+         /farma-kit/ and /farma-kit/index.html look like three pages. -->
+    <link rel="canonical" href="https://nuncaeslupus.github.io/farma-kit/" />
+
+    <!-- Link previews (WhatsApp/Telegram is how this actually gets passed around,
+         and those scrapers run no JS — they read these tags, never the app).
+         URLs must be absolute: scrapers don't resolve relative paths. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Farma-Kit" />
+    <meta property="og:url" content="https://nuncaeslupus.github.io/farma-kit/" />
+    <meta property="og:title" content="Farma-Kit · Rellenador de hojas de cupones precinto" />
+    <meta
+      property="og:description"
+      content="Rellena la cabecera de las hojas de cupones precinto para la receta electrónica. Gratis, sin registro y sin enviar datos: todo se procesa en tu navegador."
+    />
+    <meta property="og:image" content="https://nuncaeslupus.github.io/farma-kit/og-card.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Farma-Kit — rellenador de hojas de cupones precinto" />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:locale:alternate" content="ca_ES" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Farma-Kit · Rellenador de hojas de cupones precinto" />
+    <meta
+      name="twitter:description"
+      content="Rellena la cabecera de las hojas de cupones precinto para la receta electrónica. Gratis, sin registro y sin enviar datos."
+    />
+    <meta name="twitter:image" content="https://nuncaeslupus.github.io/farma-kit/og-card.png" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -16,6 +49,23 @@
   </head>
   <body>
     <fk-root></fk-root>
+    <!-- Real text for crawlers that don't run JS (Google does; most others don't).
+         It lives in <noscript> deliberately: Lit renders fk-root in LIGHT DOM and
+         does NOT clear pre-existing children, so the same markup placed inside
+         fk-root would stay on screen underneath the app. Verified. -->
+    <noscript>
+      <h1>Farma-Kit — Rellenador de hojas de cupones precinto</h1>
+      <p>
+        Utilidad gratuita para rellenar la cabecera de las hojas de cupones precinto (talonarios de
+        recetas) de una farmacia: UP, mes y año, numeración de las hojas y los datos del sello del
+        titular. Genera un PDF listo para imprimir sobre las hojas oficiales del Colegio de
+        Farmacéuticos.
+      </p>
+      <p>
+        Necesita JavaScript, porque el documento se genera en tu propio navegador: tus datos no se
+        envían a ningún servidor. Disponible en español y catalán.
+      </p>
+    </noscript>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

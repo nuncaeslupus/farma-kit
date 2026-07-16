@@ -3,7 +3,7 @@ type Dict = Record<string, string | ((...a: string[]) => string)>;
 
 export const I18N: { ca: Dict; es: Dict } = {
   ca: {
-    docTitle: 'Farma-Kit - Emplenador de fulls de cupons',
+    docTitle: 'Farma-Kit - Emplenador de fulls de cupons precinte',
     appTitle:
       'Emplenador de <span class="lo">fulls de cupons precinte</span><br>per a la recepta electrònica',
     intro:
@@ -81,7 +81,7 @@ export const I18N: { ca: Dict; es: Dict } = {
       'Del full ' + a + ' al ' + b + ' <span class="dim">· ' + n + ' fulls</span>',
   },
   es: {
-    docTitle: 'Farma-Kit - Rellenador de hojas de cupones',
+    docTitle: 'Farma-Kit - Rellenador de hojas de cupones precinto',
     appTitle:
       'Rellenador de <span class="lo">hojas de cupones precinto</span><br>para la receta electrónica',
     intro:

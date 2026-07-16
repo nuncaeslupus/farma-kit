@@ -54,6 +54,7 @@ export class GeneratorApp extends LitElement {
   private barDismissed = false;
   private activeIdx = -1;
   private monthNative?: boolean; // cached: does this browser implement type="month"?
+  private pdfUrl: string | null = null; // last generated blob URL, revoked on the next run
   private cpCitiesP: Promise<Record<string, string[]>> | null = null; // memoized postal fetch
   private q = (s: string) => this.querySelector(s) as HTMLElement;
   private i = (id: string) => this.querySelector('#' + id) as HTMLInputElement;
@@ -769,7 +770,10 @@ export class GeneratorApp extends LitElement {
     bar.style.width = '30%';
 
     try {
-      const mes = this.i('mes').value;
+      // .trim() like every other field below: validateField trims before testing,
+      // so " 2026-07 " passes validation — but month/year are sliced out of this
+      // by position, and the untrimmed value would print month "-0", year "02".
+      const mes = this.i('mes').value.trim();
       const segell = this.i('segell').checked;
       const v = (id: string) => this.i(id).value.trim();
 
@@ -819,7 +823,12 @@ export class GeneratorApp extends LitElement {
 
       bar.style.width = '70%';
       const bytes = await generatePdf(tpl, pages, null);
-      const url = URL.createObjectURL(new Blob([bytes as BlobPart], { type: 'application/pdf' }));
+      // Release the previous document's blob: each run allocates a new one and the
+      // browser holds it until revoked. Safe by now — an earlier tab has long since
+      // loaded its copy, and revoking only invalidates the URL, not a loaded doc.
+      if (this.pdfUrl) URL.revokeObjectURL(this.pdfUrl);
+      this.pdfUrl = URL.createObjectURL(new Blob([bytes as BlobPart], { type: 'application/pdf' }));
+      const url = this.pdfUrl;
       bar.style.width = '100%';
       (this.q('#genDownload') as HTMLAnchorElement).href = url;
 
@@ -830,7 +839,15 @@ export class GeneratorApp extends LitElement {
       // the modal's link rather than leave the user with nothing.
       // NB: no 'noopener' feature — it makes open() return null even on success,
       // which would break that check. Sever the opener on the handle instead.
-      const tab = window.open(url, '_blank');
+      // open() can also *throw* (sandboxed iframe, some WebViews) — that must not
+      // reach the outer catch and cry "could not generate" over a PDF that is
+      // sitting right there. Treat it like a refusal and fall back.
+      let tab: Window | null = null;
+      try {
+        tab = window.open(url, '_blank');
+      } catch {
+        /* refused — fall through to the modal link */
+      }
       if (tab) {
         tab.opener = null;
         this.q('#genModal').hidden = true;

@@ -962,7 +962,7 @@ export class GeneratorApp extends LitElement {
         <div class="privacy-msg" id="privacyMsg">
           <span data-i18n="alertText">Aquesta pàgina no pertany a cap Col·legi de Farmacèutics</span>
           <span class="dot" aria-hidden="true">·</span>
-          <span data-i18n="privacy">Les dades es processen al teu ordinador i no s'envien enlloc</span>
+          <span data-i18n="privacy">Les dades es processen al teu navegador i no s'envien enlloc</span>
           <span class="dot" aria-hidden="true">·</span>
           <span data-i18n="noCookies">El lloc no fa servir cookies</span>
         </div>

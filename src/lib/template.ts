@@ -71,6 +71,49 @@ export function defaultStyle(font: FontFamily = 'sans'): FieldStyle {
   return { font, size: 12, bold: false, italic: false, halign: 'left', valign: 'middle' };
 }
 
+/** National Code as printed on the sheet: six digits, optional check digit — 140663 or 140663.7. */
+export const CN_RE = /^\d{6}(\.\d)?$/;
+
+export function isValidCn(cn: string): boolean {
+  return CN_RE.test(cn);
+}
+
+/**
+ * Structural problems with a template, as human-readable messages ([] = valid).
+ * Deliberately small: it only catches what silently breaks the app or the printed
+ * sheet — a mistyped code, a duplicate/blank key, a box that can't print. It is
+ * NOT a style guide.
+ */
+export function validateTemplate(tpl: Template): string[] {
+  const errs: string[] = [];
+  if (!tpl.name?.trim()) errs.push('Colegio (name) is required.');
+  // cn is optional — a colegio may have no code — but a present one must be well formed.
+  if (tpl.cn !== undefined && !isValidCn(tpl.cn))
+    errs.push(`National Code "${tpl.cn}" must be 6 digits with an optional check digit (140663 or 140663.7).`);
+
+  const w = tpl.sheet?.w ?? 0;
+  const h = tpl.sheet?.h ?? 0;
+  if (!(w > 0) || !(h > 0)) errs.push('Sheet size must be positive.');
+  if (!tpl.fields?.length) errs.push('Template has no fields.');
+
+  const seen = new Set<string>();
+  for (const f of tpl.fields ?? []) {
+    const at = f.key?.trim() || '(blank key)';
+    if (!f.key?.trim()) errs.push('A field has a blank key.');
+    else if (seen.has(f.key)) errs.push(`Duplicate field key "${f.key}".`);
+    else seen.add(f.key);
+
+    if (!(f.box?.w > 0) || !(f.box?.h > 0)) errs.push(`Field "${at}": box must have positive width and height.`);
+    if (!(f.style?.size > 0)) errs.push(`Field "${at}": font size must be positive.`);
+    if (!(f.cells >= 1)) errs.push(`Field "${at}": cells must be at least 1.`);
+    // A box off the sheet simply never prints — always a mistake.
+    if (w > 0 && h > 0 && f.box)
+      if (f.box.x < 0 || f.box.y < 0 || f.box.x + f.box.w > w || f.box.y + f.box.h > h)
+        errs.push(`Field "${at}": box falls outside the ${Math.round(w)}×${Math.round(h)} sheet.`);
+  }
+  return errs;
+}
+
 export function slug(s: string): string {
   return s
     .toLowerCase()

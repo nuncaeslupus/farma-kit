@@ -7,6 +7,7 @@ import {
   FIELD_PRESETS,
   defaultStyle,
   slug,
+  validateTemplate,
   type Field,
   type Template,
   type FontFamily,
@@ -24,7 +25,10 @@ export class EditorApp extends LitElement {
   @state() private selected: Field | null = null;
   @state() private name = ''; // blank until picked
   @state() private cn = ''; // national code printed on the sheet; '' → omitted
-  @state() private segell = true; // sheet has a stamp area; true is the model default
+  // Round-tripped only: carried from import to export so a hand-written segell:false
+  // survives a re-export. Deliberately no UI — no colegio needs it yet, and what a
+  // second one will want (stamp? titular only?) isn't known. Add a control when it is.
+  @state() private segell = true;
   @state() private fileName = '';
   @state() private zoomPct = 100;
   @state() private addKey = FIELD_PRESETS[0].key;
@@ -147,7 +151,11 @@ export class EditorApp extends LitElement {
       this.engine.setSelected(null);
       this.fit();
       this.addKey = FIELD_PRESETS.filter((p) => !this.fields.some((x) => x.key === p.key))[0]?.key ?? '__custom';
-      this.status = `Imported ${this.fields.length} fields. Re-upload the sheet PDF to see them over it.`;
+      // Report problems but still load it — the editor is where you come to fix them.
+      const errs = validateTemplate(this.template());
+      this.status = errs.length
+        ? `Imported ${this.fields.length} fields, but: ${errs.join(' ')}`
+        : `Imported ${this.fields.length} fields. Re-upload the sheet PDF to see them over it.`;
     } catch {
       this.status = 'Could not read that JSON.';
     }
@@ -155,6 +163,13 @@ export class EditorApp extends LitElement {
   }
 
   private onExport() {
+    // Refuse to write a template that can't work: an exported file goes straight
+    // into the repo and drives real printing, so a bad one is worse than no file.
+    const errs = validateTemplate(this.template());
+    if (errs.length) {
+      this.status = `Not exported — ${errs.join(' ')}`;
+      return;
+    }
     const json = JSON.stringify(this.template(), null, 2);
     const url = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
     const a = document.createElement('a');
@@ -396,17 +411,6 @@ export class EditorApp extends LitElement {
               .value=${this.cn}
               @change=${(e: Event) => (this.cn = (e.target as HTMLInputElement).value)}
             />
-            <div class="checks">
-              <label
-                title="Does this colegio's sheet have a stamp area? Unticked hides the whole stamp section (titular, NIF, address…) in the app."
-                ><input
-                  type="checkbox"
-                  .checked=${this.segell}
-                  @change=${(e: Event) => (this.segell = (e.target as HTMLInputElement).checked)}
-                />
-                Sheet has stamp (segell) area</label
-              >
-            </div>
           </div>
 
           <h2 class="workbench">Fields</h2>

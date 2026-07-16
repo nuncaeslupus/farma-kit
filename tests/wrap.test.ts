@@ -69,6 +69,10 @@ describe('wrapTitular', () => {
       'AMADEU',
     ]);
   });
+
+  test('trims surrounding whitespace off the one-line result', () => {
+    expect(wrapTitular(measure, '  GARCIA, ANA  ', 20)).toEqual(['GARCIA, ANA']);
+  });
 });
 
 describe('fitWrapped', () => {

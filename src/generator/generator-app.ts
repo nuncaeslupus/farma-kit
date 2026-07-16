@@ -53,6 +53,7 @@ export class GeneratorApp extends LitElement {
   private provManual = false;
   private barDismissed = false;
   private activeIdx = -1;
+  private monthNative?: boolean; // cached: does this browser implement type="month"?
   private cpCitiesP: Promise<Record<string, string[]>> | null = null; // memoized postal fetch
   private q = (s: string) => this.querySelector(s) as HTMLElement;
   private i = (id: string) => this.querySelector('#' + id) as HTMLInputElement;
@@ -95,7 +96,7 @@ export class GeneratorApp extends LitElement {
     this.wireWarn();
     this.wireRemember();
     this.defaultMonth();
-    this.hintMonthFormat();
+    this.syncMonthHint();
     this.wireGenerate();
     applyLang(this, this.uiLang);
     this.setLangButtons();
@@ -136,6 +137,7 @@ export class GeneratorApp extends LitElement {
         }
         applyLang(this, this.uiLang);
         this.syncColegiLabel(); // applyLang just wiped the picked colegio back to the placeholder
+        this.syncMonthHint(); // the month example is language-dependent
         this.setLangButtons();
         this.updatePages();
       }),
@@ -425,20 +427,30 @@ export class GeneratorApp extends LitElement {
     }
   }
   /**
-   * Chrome renders type="month" as a localized picker ("julio de 2026"), where an
-   * "AAAA-MM" hint would be plain wrong. Firefox/Safari don't implement it at all:
-   * the field degrades to a text box showing the raw "2026-07" with no clue about
-   * the format — which matters, because month and year are sliced out of that value
-   * by position. So show the hint only where the fallback is actually in play.
-   * (The placeholder alone wouldn't do: defaultMonth() always pre-fills the field,
-   * and placeholders only show when empty.)
+   * Chrome renders type="month" as a localized picker ("julio de 2026"), where a
+   * raw-format hint would be plain wrong. Firefox/Safari don't implement it at all:
+   * the field degrades to a text box showing "2026-07" with no clue about the
+   * format — which matters, because month and year are sliced out of that value by
+   * position. So hint only where the fallback is actually in play, with a live
+   * example ("p. ej. 2026-07") rather than an abstract mask.
+   * Re-run after applyLang(): the example is language-dependent.
    */
-  private hintMonthFormat() {
-    const probe = document.createElement('input');
-    probe.setAttribute('type', 'month');
-    if (probe.type === 'month') return; // native picker — the hint would mislead
-    this.q('#mesFmt').hidden = false;
-    this.i('mes').placeholder = 'AAAA-MM'; // for when it is cleared to retype
+  private syncMonthHint() {
+    if (this.monthNative === undefined) {
+      const probe = document.createElement('input');
+      probe.setAttribute('type', 'month');
+      this.monthNative = probe.type === 'month';
+    }
+    const fmt = this.q('#mesFmt');
+    if (this.monthNative) {
+      fmt.hidden = true; // native picker — a format hint would mislead
+      return;
+    }
+    const now = new Date();
+    const eg = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    fmt.hidden = false;
+    fmt.textContent = (I18N[this.uiLang].mesEg as (ym: string) => string)(eg);
+    this.i('mes').placeholder = eg; // greyed example once the field is cleared
   }
   private defaultMonth() {
     const now = new Date();
@@ -936,7 +948,7 @@ export class GeneratorApp extends LitElement {
                      replaces textContent, which would eat the format hint. -->
                 <label for="mes"
                   ><span data-i18n="mes">Mes i any</span
-                  ><span class="mes-fmt" id="mesFmt" hidden> (AAAA-MM)</span></label
+                  ><span class="mes-fmt" id="mesFmt" hidden></span></label
                 >
                 <input id="mes" name="mes" type="month" />
                 <span class="field-err" id="err-mes"></span>

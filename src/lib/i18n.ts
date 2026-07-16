@@ -48,6 +48,10 @@ export const I18N: { ca: Dict; es: Dict } = {
     contact: 'Contactar',
     generar: 'Generar Document',
     errUp: 'Ha de ser un número de 5 xifres.',
+    // Shown next to the "Mes i any" label only where type="month" has no native
+    // picker (Firefox/Safari) and the raw value must be typed. `ym` is the current
+    // year-month, so the example is always live.
+    mesEg: (ym: string) => ` (p. ex. ${ym})`,
     errMes: 'Format del mes: AAAA-MM (per exemple, 2026-07).',
     errNat: 'Introdueix un número enter més gran que 0.',
     errNif: 'NIF no vàlid.',
@@ -120,6 +124,7 @@ export const I18N: { ca: Dict; es: Dict } = {
     contact: 'Contactar',
     generar: 'Generar Documento',
     errUp: 'Debe ser un número de 5 cifras.',
+    mesEg: (ym: string) => ` (p. ej. ${ym})`,
     errMes: 'Formato del mes: AAAA-MM (por ejemplo, 2026-07).',
     errNat: 'Introduce un número entero mayor que 0.',
     errNif: 'NIF no válido.',

@@ -782,6 +782,22 @@ export class GeneratorApp extends LitElement {
       const url = URL.createObjectURL(new Blob([bytes as BlobPart], { type: 'application/pdf' }));
       bar.style.width = '100%';
       (this.q('#genDownload') as HTMLAnchorElement).href = url;
+
+      // Success: hand the PDF straight to a new tab and get out of the way — one
+      // click, not two. Generation is async but keeps the click's transient
+      // activation, so the tab is allowed; a slow run (many pages) can outlive
+      // that window and get refused, and open() returns null then — fall back to
+      // the modal's link rather than leave the user with nothing.
+      // NB: no 'noopener' feature — it makes open() return null even on success,
+      // which would break that check. Sever the opener on the handle instead.
+      const tab = window.open(url, '_blank');
+      if (tab) {
+        tab.opener = null;
+        this.q('#genModal').hidden = true;
+        this.q('#genProgress').hidden = true;
+        this.setGenTitle('genTitle'); // reset for the next run
+        return;
+      }
       this.q('#genProgress').hidden = true;
       this.setGenTitle('genDone');
       result.hidden = false;

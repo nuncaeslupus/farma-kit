@@ -84,32 +84,52 @@ export function isValidCn(cn: string): boolean {
  * sheet — a mistyped code, a duplicate/blank key, a box that can't print. It is
  * NOT a style guide.
  */
-export function validateTemplate(tpl: Template): string[] {
+export function validateTemplate(tpl: unknown): string[] {
+  // `unknown`, not Template: this runs on freshly-parsed JSON from a file the user
+  // picked, where any field may be missing or the wrong type. Claiming Template
+  // here would be a lie that costs a TypeError on the first junk value.
+  const t = (tpl ?? {}) as Partial<Template>;
   const errs: string[] = [];
-  if (!tpl.name?.trim()) errs.push('Colegio (name) is required.');
-  // cn is optional — a colegio may have no code — but a present one must be well formed.
-  if (tpl.cn !== undefined && !isValidCn(tpl.cn))
-    errs.push(`National Code "${tpl.cn}" must be 6 digits with an optional check digit (140663 or 140663.7).`);
+  const num = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? v : 0);
 
-  const w = tpl.sheet?.w ?? 0;
-  const h = tpl.sheet?.h ?? 0;
+  if (typeof t.name !== 'string' || !t.name.trim()) errs.push('Colegio (name) is required.');
+  // cn is optional — a colegio may have no code — but a present one must be well formed.
+  if (t.cn !== undefined && (typeof t.cn !== 'string' || !isValidCn(t.cn)))
+    errs.push(
+      `National Code "${String(t.cn)}" must be 6 digits with an optional check digit (140663 or 140663.7).`,
+    );
+
+  const w = num(t.sheet?.w);
+  const h = num(t.sheet?.h);
   if (!(w > 0) || !(h > 0)) errs.push('Sheet size must be positive.');
-  if (!tpl.fields?.length) errs.push('Template has no fields.');
+
+  const fields = Array.isArray(t.fields) ? t.fields : [];
+  if (!fields.length) errs.push('Template has no fields.');
 
   const seen = new Set<string>();
-  for (const f of tpl.fields ?? []) {
-    const at = f.key?.trim() || '(blank key)';
-    if (!f.key?.trim()) errs.push('A field has a blank key.');
-    else if (seen.has(f.key)) errs.push(`Duplicate field key "${f.key}".`);
-    else seen.add(f.key);
+  for (const f of fields) {
+    if (!f || typeof f !== 'object') {
+      errs.push('A field is not an object.');
+      continue;
+    }
+    const key = typeof f.key === 'string' ? f.key.trim() : '';
+    const at = key || '(blank key)';
+    if (!key) errs.push('A field has a blank key.');
+    else if (seen.has(key)) errs.push(`Duplicate field key "${key}".`);
+    else seen.add(key);
 
-    if (!(f.box?.w > 0) || !(f.box?.h > 0)) errs.push(`Field "${at}": box must have positive width and height.`);
-    if (!(f.style?.size > 0)) errs.push(`Field "${at}": font size must be positive.`);
-    if (!(f.cells >= 1)) errs.push(`Field "${at}": cells must be at least 1.`);
+    const bw = num(f.box?.w);
+    const bh = num(f.box?.h);
+    if (!(bw > 0) || !(bh > 0)) errs.push(`Field "${at}": box must have positive width and height.`);
+    if (!(num(f.style?.size) > 0)) errs.push(`Field "${at}": font size must be positive.`);
+    if (!(num(f.cells) >= 1)) errs.push(`Field "${at}": cells must be at least 1.`);
     // A box off the sheet simply never prints — always a mistake.
-    if (w > 0 && h > 0 && f.box)
-      if (f.box.x < 0 || f.box.y < 0 || f.box.x + f.box.w > w || f.box.y + f.box.h > h)
+    if (w > 0 && h > 0 && f.box) {
+      const x = num(f.box.x);
+      const y = num(f.box.y);
+      if (x < 0 || y < 0 || x + bw > w || y + bh > h)
         errs.push(`Field "${at}": box falls outside the ${Math.round(w)}×${Math.round(h)} sheet.`);
+    }
   }
   return errs;
 }

@@ -148,4 +148,29 @@ describe('validateTemplate', () => {
     // Guards the real template that drives printing — a bad edit fails CI.
     expect(validateTemplate(catalunya as Template)).toEqual([]);
   });
+
+  // It runs on freshly-parsed JSON the user picked, so junk must come back as
+  // errors — never as a TypeError the caller then reports as "unreadable JSON".
+  describe('malformed input is reported, not thrown', () => {
+    test.each([
+      ['null', null],
+      ['undefined', undefined],
+      ['a number', 42],
+      ['a string', 'nope'],
+      ['an empty object', {}],
+      ['name as a number', { name: 7, sheet: { w: 595, h: 842 }, fields: [] }],
+      ['fields not an array', { name: 'X', sheet: { w: 595, h: 842 }, fields: 'nope' }],
+      ['a null field', { name: 'X', sheet: { w: 595, h: 842 }, fields: [null] }],
+      ['sheet sizes as strings', { name: 'X', sheet: { w: '595', h: '842' }, fields: [] }],
+    ])('%s', (_label, input) => {
+      const errs = validateTemplate(input);
+      expect(Array.isArray(errs)).toBe(true);
+      expect(errs.length).toBeGreaterThan(0);
+    });
+
+    test('a numeric cn is reported, not coerced into looking valid', () => {
+      const errs = validateTemplate({ name: 'X', cn: 140663, sheet: { w: 595, h: 842 }, fields: [] });
+      expect(errs.join(' ')).toMatch(/National Code/);
+    });
+  });
 });

@@ -146,17 +146,21 @@ export class EditorApp extends LitElement {
     if (!file) return;
     try {
       const tpl = JSON.parse(await file.text()) as Template;
-      this.name = tpl.name ?? this.name;
-      this.cn = tpl.cn ?? '';
-      this.segell = tpl.segell !== false; // absent → true, per the model default
-      this.fields = (tpl.fields ?? []).map(normalizeField);
-      this.engine.setSheetSize(tpl.sheet?.w ?? 595.28, tpl.sheet?.h ?? 841.89);
+      // Validate the FILE, before the fallbacks below mask its problems: a template
+      // with no name would inherit the editor's current one and then "validate"
+      // clean. Type-guard the raw values too, so junk can't reach state and turn
+      // template() into a landmine.
+      const errs = validateTemplate(tpl);
+      this.name = typeof tpl?.name === 'string' ? tpl.name : this.name;
+      this.cn = typeof tpl?.cn === 'string' ? tpl.cn : '';
+      this.segell = tpl?.segell !== false; // absent → true, per the model default
+      this.fields = (Array.isArray(tpl?.fields) ? tpl.fields : []).map(normalizeField);
+      this.engine.setSheetSize(Number(tpl?.sheet?.w) || 595.28, Number(tpl?.sheet?.h) || 841.89);
       this.engine.setFields(this.fields);
       this.engine.setSelected(null);
       this.fit();
       this.addKey = FIELD_PRESETS.filter((p) => !this.fields.some((x) => x.key === p.key))[0]?.key ?? '__custom';
       // Report problems but still load it — the editor is where you come to fix them.
-      const errs = validateTemplate(this.template());
       this.status = errs.length
         ? `Imported ${this.fields.length} fields, but: ${errs.join(' ')}`
         : `Imported ${this.fields.length} fields. Re-upload the sheet PDF to see them over it.`;
@@ -437,7 +441,7 @@ export class EditorApp extends LitElement {
               type="text"
               placeholder="e.g. Catalunya"
               .value=${this.name}
-              @change=${(e: Event) => (this.name = (e.target as HTMLInputElement).value)}
+              @input=${(e: Event) => (this.name = (e.target as HTMLInputElement).value)}
             />
             <div class="muted">
               Exports as

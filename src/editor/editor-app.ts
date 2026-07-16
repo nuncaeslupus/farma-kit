@@ -7,13 +7,13 @@ import {
   FIELD_PRESETS,
   defaultStyle,
   slug,
+  validateTemplate,
   type Field,
   type Template,
   type FontFamily,
 } from '../lib/template';
 import { CanvasEngine } from './canvas-engine';
 import { generatePdf } from '../lib/pdf/generate';
-import { COLEGIOS } from '../lib/colegios';
 
 const round = (n: number) => Math.round(n * 100) / 100;
 const CSS_PPP = 96 / 72;
@@ -24,15 +24,21 @@ export class EditorApp extends LitElement {
   @state() private selected: Field | null = null;
   @state() private name = ''; // blank until picked
   @state() private cn = ''; // national code printed on the sheet; '' → omitted
-  @state() private segell = true; // sheet has a stamp area; true is the model default
+  // Round-tripped only: carried from import to export so a hand-written segell:false
+  // survives a re-export. Deliberately no UI — no colegio needs it yet, and what a
+  // second one will want (stamp? titular only?) isn't known. Add a control when it is.
+  @state() private segell = true;
   @state() private fileName = '';
+  @state() private includeSheet = true; // draw the test PDF over the official sheet
   @state() private zoomPct = 100;
   @state() private addKey = FIELD_PRESETS[0].key;
   @state() private snap = true;
   @state() private status = 'Upload the official sheet PDF to begin.';
 
   private engine!: CanvasEngine;
-  private pdfBytes: ArrayBuffer | null = null;
+  // Reactive: the "Include official sheet" control enables/disables on it, and it is
+  // assigned after an await in onUpload — a plain field would leave the UI stale.
+  @state() private pdfBytes: ArrayBuffer | null = null;
 
   firstUpdated() {
     const host = this.renderRoot.querySelector('#canvas-host') as HTMLElement;
@@ -128,9 +134,11 @@ export class EditorApp extends LitElement {
     if (!this.fields.length) return;
     this.status = 'Generating…';
     const data = Object.fromEntries(this.fields.map((f) => [f.key, f.sample ?? '']));
-    const bytes = await generatePdf(this.template(), [data], this.pdfBytes ? this.pdfBytes.slice(0) : null);
+    // With the sheet: checks alignment. Without: exactly what prints onto the paper.
+    const base = this.includeSheet && this.pdfBytes ? this.pdfBytes.slice(0) : null;
+    const bytes = await generatePdf(this.template(), [data], base);
     window.open(URL.createObjectURL(new Blob([bytes as BlobPart], { type: 'application/pdf' })), '_blank');
-    this.status = 'Test PDF opened in a new tab.';
+    this.status = base ? 'Test PDF (over the sheet) opened in a new tab.' : 'Test PDF (data only) opened in a new tab.';
   }
   private async onImport(e: Event) {
     const input = e.target as HTMLInputElement;
@@ -138,16 +146,36 @@ export class EditorApp extends LitElement {
     if (!file) return;
     try {
       const tpl = JSON.parse(await file.text()) as Template;
-      this.name = tpl.name ?? this.name;
-      this.cn = tpl.cn ?? '';
-      this.segell = tpl.segell !== false; // absent → true, per the model default
-      this.fields = (tpl.fields ?? []).map(normalizeField);
-      this.engine.setSheetSize(tpl.sheet?.w ?? 595.28, tpl.sheet?.h ?? 841.89);
+      // Validate the FILE, before the fallbacks below mask its problems: a template
+      // with no name would inherit the editor's current one and then "validate"
+      // clean. Type-guard the raw values too, so junk can't reach state and turn
+      // template() into a landmine.
+      const errs = validateTemplate(tpl);
+      this.name = typeof tpl?.name === 'string' ? tpl.name : this.name;
+      this.cn = typeof tpl?.cn === 'string' ? tpl.cn : '';
+      this.segell = tpl?.segell !== false; // absent → true, per the model default
+      // Drop junk entries rather than feed them to normalizeField, which reads
+      // f.style and dies on a null — the throw would be caught below and reported
+      // as "Could not read that JSON", burying the real errors we just collected.
+      this.fields = (Array.isArray(tpl?.fields) ? tpl.fields : [])
+        .filter((f) => !!f && typeof f === 'object')
+        .map(normalizeField);
+      // A bad sheet is already reported; don't hand it to the canvas as well.
+      // `> 0` alone is not enough: JSON.parse('1e309') yields Infinity, which
+      // passes that check and then sizes the canvas to Infinity.
+      const dim = (v: unknown, fallback: number) => {
+        const n = Number(v);
+        return Number.isFinite(n) && n > 0 ? n : fallback;
+      };
+      this.engine.setSheetSize(dim(tpl?.sheet?.w, 595.28), dim(tpl?.sheet?.h, 841.89));
       this.engine.setFields(this.fields);
       this.engine.setSelected(null);
       this.fit();
       this.addKey = FIELD_PRESETS.filter((p) => !this.fields.some((x) => x.key === p.key))[0]?.key ?? '__custom';
-      this.status = `Imported ${this.fields.length} fields. Re-upload the sheet PDF to see them over it.`;
+      // Report problems but still load it — the editor is where you come to fix them.
+      this.status = errs.length
+        ? `Imported ${this.fields.length} fields, but: ${errs.join(' ')}`
+        : `Imported ${this.fields.length} fields. Re-upload the sheet PDF to see them over it.`;
     } catch {
       this.status = 'Could not read that JSON.';
     }
@@ -155,6 +183,13 @@ export class EditorApp extends LitElement {
   }
 
   private onExport() {
+    // Refuse to write a template that can't work: an exported file goes straight
+    // into the repo and drives real printing, so a bad one is worse than no file.
+    const errs = validateTemplate(this.template());
+    if (errs.length) {
+      this.status = `Not exported — ${errs.join(' ')}`;
+      return;
+    }
     const json = JSON.stringify(this.template(), null, 2);
     const url = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
     const a = document.createElement('a');
@@ -350,6 +385,26 @@ export class EditorApp extends LitElement {
       color: var(--faint);
       margin-top: 8px;
     }
+    .incl {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-right: 10px;
+      font-size: 12px;
+      color: var(--ink);
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .incl input {
+      margin: 0;
+      cursor: pointer;
+    }
+    /* no sheet uploaded → nothing to include */
+    .incl.off,
+    .incl.off input {
+      color: var(--faint);
+      cursor: not-allowed;
+    }
   `;
 
   render() {
@@ -363,6 +418,19 @@ export class EditorApp extends LitElement {
           <fk-button variant="ghost" @click=${() => this.fit()}>Fit</fk-button>
         </div>
         <div class="tbar-right">
+          <label
+            class="incl ${this.pdfBytes ? '' : 'off'}"
+            title=${this.pdfBytes
+              ? 'Draw the data over the official sheet (alignment check). Untick for the data only — what actually prints onto the physical sheet.'
+              : 'Upload the official sheet PDF first.'}
+            ><input
+              type="checkbox"
+              .checked=${this.includeSheet && !!this.pdfBytes}
+              ?disabled=${!this.pdfBytes}
+              @change=${(e: Event) => (this.includeSheet = (e.target as HTMLInputElement).checked)}
+            />
+            Include official sheet</label
+          >
           <fk-button @click=${() => this.onGenerate()}>Generate test PDF</fk-button>
           <input type="file" accept="application/json,.json" id="jsonInput" style="display:none" @change=${this.onImport} />
           <fk-button variant="ghost" @click=${() => (this.renderRoot.querySelector('#jsonInput') as HTMLElement).click()}>Import JSON</fk-button>
@@ -380,15 +448,18 @@ export class EditorApp extends LitElement {
               <span class="fake">Upload PDF…</span>
             </label>
             <div class="filename" title=${this.fileName}>${this.fileName || 'No file selected'}</div>
-            <label class="fld">Colegio</label>
-            <select .value=${this.name} @change=${(e: Event) => (this.name = (e.target as HTMLSelectElement).value)}>
-              <option value="">—</option>
-              ${COLEGIOS.map(
-                (g) => html`<optgroup label=${g.region}>
-                  ${g.colegios.map((c) => html`<option value=${c}>${c}</option>`)}
-                </optgroup>`,
-              )}
-            </select>
+            <label class="fld">Template name</label>
+            <input
+              type="text"
+              placeholder="e.g. Catalunya"
+              .value=${this.name}
+              @input=${(e: Event) => (this.name = (e.target as HTMLInputElement).value)}
+            />
+            <div class="muted">
+              Exports as
+              <b>templates/${slug(this.name) || 'template'}.json</b>. One sheet can serve several
+              colegios — map them to it in <b>templates/index.json</b>.
+            </div>
             <label class="fld">National Code (CN)</label>
             <input
               type="text"
@@ -396,17 +467,6 @@ export class EditorApp extends LitElement {
               .value=${this.cn}
               @change=${(e: Event) => (this.cn = (e.target as HTMLInputElement).value)}
             />
-            <div class="checks">
-              <label
-                title="Does this colegio's sheet have a stamp area? Unticked hides the whole stamp section (titular, NIF, address…) in the app."
-                ><input
-                  type="checkbox"
-                  .checked=${this.segell}
-                  @change=${(e: Event) => (this.segell = (e.target as HTMLInputElement).checked)}
-                />
-                Sheet has stamp (segell) area</label
-              >
-            </div>
           </div>
 
           <h2 class="workbench">Fields</h2>

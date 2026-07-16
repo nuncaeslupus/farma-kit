@@ -71,6 +71,74 @@ export function defaultStyle(font: FontFamily = 'sans'): FieldStyle {
   return { font, size: 12, bold: false, italic: false, halign: 'left', valign: 'middle' };
 }
 
+/** National Code as printed on the sheet: six digits, optional check digit — 140663 or 140663.7. */
+export const CN_RE = /^\d{6}(\.\d)?$/;
+
+export function isValidCn(cn: string): boolean {
+  return CN_RE.test(cn);
+}
+
+/**
+ * Structural problems with a template, as human-readable messages ([] = valid).
+ * Deliberately small: it only catches what silently breaks the app or the printed
+ * sheet — a mistyped code, a duplicate/blank key, a box that can't print. It is
+ * NOT a style guide.
+ */
+export function validateTemplate(tpl: unknown): string[] {
+  // `unknown`, not Template: this runs on freshly-parsed JSON from a file the user
+  // picked, where any field may be missing or the wrong type. Claiming Template
+  // here would be a lie that costs a TypeError on the first junk value.
+  const t = (tpl ?? {}) as Partial<Template>;
+  const errs: string[] = [];
+  const num = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? v : 0);
+
+  if (typeof t.name !== 'string' || !t.name.trim()) errs.push('Template name is required.');
+  // cn is optional — a colegio may have no code — but a present one must be well formed.
+  if (t.cn !== undefined && (typeof t.cn !== 'string' || !isValidCn(t.cn)))
+    errs.push(
+      `National Code "${String(t.cn)}" must be 6 digits with an optional check digit (140663 or 140663.7).`,
+    );
+
+  const w = num(t.sheet?.w);
+  const h = num(t.sheet?.h);
+  if (!(w > 0) || !(h > 0)) errs.push('Sheet size must be positive.');
+
+  const fields = Array.isArray(t.fields) ? t.fields : [];
+  if (!fields.length) errs.push('Template has no fields.');
+
+  const seen = new Set<string>();
+  for (const f of fields) {
+    if (!f || typeof f !== 'object') {
+      errs.push('A field is not an object.');
+      continue;
+    }
+    const key = typeof f.key === 'string' ? f.key.trim() : '';
+    const at = key || '(blank key)';
+    if (!key) errs.push('A field has a blank key.');
+    else if (seen.has(key)) errs.push(`Duplicate field key "${key}".`);
+    else seen.add(key);
+
+    const bw = num(f.box?.w);
+    const bh = num(f.box?.h);
+    if (!(bw > 0) || !(bh > 0)) errs.push(`Field "${at}": box must have positive width and height.`);
+    if (!(num(f.style?.size) > 0)) errs.push(`Field "${at}": font size must be positive.`);
+    if (!(num(f.cells) >= 1)) errs.push(`Field "${at}": cells must be at least 1.`);
+    // A box off the sheet simply never prints — always a mistake. Tolerate a
+    // hair of float drift: coordinates come from dragging, so a box flush to the
+    // edge can land on 595.2800000001 > 595.28 and — since a failed check blocks
+    // export — lock the user out of a template that is perfectly fine. EPS is far
+    // below print resolution, so nothing real hides under it.
+    if (w > 0 && h > 0 && f.box) {
+      const EPS = 0.01;
+      const x = num(f.box.x);
+      const y = num(f.box.y);
+      if (x < -EPS || y < -EPS || x + bw > w + EPS || y + bh > h + EPS)
+        errs.push(`Field "${at}": box falls outside the ${Math.round(w)}×${Math.round(h)} sheet.`);
+    }
+  }
+  return errs;
+}
+
 export function slug(s: string): string {
   return s
     .toLowerCase()

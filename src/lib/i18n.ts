@@ -3,6 +3,7 @@ type Dict = Record<string, string | ((...a: string[]) => string)>;
 
 export const I18N: { ca: Dict; es: Dict } = {
   ca: {
+    docTitle: 'Farma-Kit - Emplenador de fulls de cupons',
     appTitle:
       'Emplenador de <span class="lo">fulls de cupons precinte</span><br>per a la recepta electrònica',
     intro:
@@ -11,11 +12,11 @@ export const I18N: { ca: Dict; es: Dict } = {
     gateHint: 'Selecciona un col·legi amb plantilla disponible per continuar.',
     cnLabel: 'Codi Nacional dels fulls',
     privacy: "Les dades es processen al teu ordinador i no s'envien enlloc",
-    noCookies: 'El lloc no fa servir cookies',
+    noCookies: 'No es fan servir cookies',
     instr: 'Instruccions',
     step1: 'Posa a la impressora el número de papers (fulls de cupons) que necessitis imprimir.',
     step2:
-      'Omple el formulari següent. Per fer una prova posa el número <span class="kbd">1</span> al camp <em>Número de fulls</em>.',
+      'Omple el formulari següent. Per fer una prova posa el número <span class="kbd">1</span> al camp <em>Quantitat de fulls</em>.',
     step3: 'Genera el document i imprimeix-lo <em>sobre</em> els fulls de cupons.',
     oblig: 'Informació general',
     obligSub: 'Per omplir la capçalera dels fulls.',
@@ -29,7 +30,9 @@ export const I18N: { ca: Dict; es: Dict } = {
     up: 'UP de la farmàcia',
     mes: 'Mes i any',
     full: 'Full inicial',
-    num: 'Número de fulls',
+    // Not "Número de…": Chrome reads «Número» next to the name/address fields as
+    // a card number and offers credit-card autofill. Verified by bisection.
+    num: 'Quantitat de fulls',
     pages: 'Pàgines a imprimir',
     dismiss: 'No mostrar més',
     segell: 'Generar també les dades del segell',
@@ -71,6 +74,7 @@ export const I18N: { ca: Dict; es: Dict } = {
       'Del full ' + a + ' al ' + b + ' <span class="dim">· ' + n + ' fulls</span>',
   },
   es: {
+    docTitle: 'Farma-Kit - Rellenador de hojas de cupones',
     appTitle:
       'Rellenador de <span class="lo">hojas de cupones precinto</span><br>para la receta electrónica',
     intro:
@@ -79,11 +83,11 @@ export const I18N: { ca: Dict; es: Dict } = {
     gateHint: 'Selecciona un colegio con plantilla disponible para continuar.',
     cnLabel: 'Código nacional de las hojas',
     privacy: 'Los datos se procesan en tu ordenador y no se envían a ningún sitio',
-    noCookies: 'El sitio no usa cookies',
+    noCookies: 'No se usan cookies',
     instr: 'Instrucciones',
     step1: 'Pon en la impresora el número de papeles (hojas de cupones) que necesites imprimir.',
     step2:
-      'Rellena el formulario siguiente. Para hacer una prueba pon el número <span class="kbd">1</span> en el campo <em>Número de hojas</em>.',
+      'Rellena el formulario siguiente. Para hacer una prueba pon el número <span class="kbd">1</span> en el campo <em>Cantidad de hojas</em>.',
     step3: 'Genera el documento e imprímelo <em>sobre</em> las hojas de cupones.',
     oblig: 'Información general',
     obligSub: 'Para rellenar la cabecera de las hojas.',
@@ -97,7 +101,7 @@ export const I18N: { ca: Dict; es: Dict } = {
     up: 'UP de la farmacia',
     mes: 'Mes y año',
     full: 'Hoja inicial',
-    num: 'Número de hojas',
+    num: 'Cantidad de hojas',
     pages: 'Páginas a imprimir',
     dismiss: 'No mostrar más',
     segell: 'Generar también los datos del sello',
@@ -148,6 +152,7 @@ export type Lang = 'ca' | 'es';
 export function applyLang(root: ParentNode, lang: Lang): void {
   const d = I18N[lang];
   document.documentElement.lang = lang;
+  if (typeof d.docTitle === 'string') document.title = d.docTitle;
   root.querySelectorAll<HTMLElement>('[data-i18n]').forEach((el) => {
     const k = el.getAttribute('data-i18n')!;
     const v = d[k];

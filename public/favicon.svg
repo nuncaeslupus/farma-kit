@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 56" role="img" aria-label="Farma-Kit">
+  <!-- The header logo (a coupon sheet), simplified for 16px: heavier stroke and
+       solid coupon fills, since hairlines and opacity vanish at favicon size. -->
+  <rect x="2" y="2" width="40" height="52" rx="4" fill="#ffffff" stroke="#0f5d5c" stroke-width="2.6" />
+  <rect x="6" y="6" width="32" height="7" rx="1.6" fill="#0f5d5c" />
+  <rect x="8.5" y="8.7" width="16" height="1.8" rx=".9" fill="#fbf8f2" />
+  <g fill="#c3bcae">
+    <rect x="6" y="17" width="8.6" height="6.5" rx="1.2" />
+    <rect x="17.7" y="17" width="8.6" height="6.5" rx="1.2" />
+    <rect x="29.4" y="17" width="8.6" height="6.5" rx="1.2" />
+    <rect x="6" y="26" width="8.6" height="6.5" rx="1.2" />
+    <rect x="17.7" y="26" width="8.6" height="6.5" rx="1.2" />
+    <rect x="29.4" y="26" width="8.6" height="6.5" rx="1.2" />
+    <rect x="6" y="35" width="8.6" height="6.5" rx="1.2" />
+    <rect x="17.7" y="35" width="8.6" height="6.5" rx="1.2" />
+    <rect x="29.4" y="35" width="8.6" height="6.5" rx="1.2" />
+    <rect x="6" y="44" width="8.6" height="6.5" rx="1.2" />
+    <rect x="17.7" y="44" width="8.6" height="6.5" rx="1.2" />
+    <rect x="29.4" y="44" width="8.6" height="6.5" rx="1.2" />
+  </g>
+</svg>

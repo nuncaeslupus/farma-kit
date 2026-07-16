@@ -768,6 +768,7 @@ export class GeneratorApp extends LitElement {
     error.hidden = true;
     this.q('#genProgress').hidden = false;
     modal.hidden = false;
+    this.setGenTitle('genTitle');
     bar.style.width = '30%';
 
     try {
@@ -825,12 +826,22 @@ export class GeneratorApp extends LitElement {
       bar.style.width = '100%';
       (this.q('#genDownload') as HTMLAnchorElement).href = url;
       this.q('#genProgress').hidden = true;
+      this.setGenTitle('genDone');
       result.hidden = false;
     } catch {
       this.q('#genProgress').hidden = true;
+      this.setGenTitle('genErrTitle');
       this.q('#genErrMsg').textContent = I18N[this.uiLang].genErrGeneric as string;
       error.hidden = false;
     }
+  }
+
+  /** Retarget the modal title's i18n key so it also survives a language switch. */
+  private setGenTitle(key: 'genTitle' | 'genDone' | 'genErrTitle') {
+    const t = this.q('.modal-title.gen');
+    t.dataset.i18n = key;
+    t.textContent = I18N[this.uiLang][key] as string;
+    t.classList.toggle('is-done', key !== 'genTitle');
   }
 
   render() {

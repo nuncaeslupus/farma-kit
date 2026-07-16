@@ -62,6 +62,12 @@ describe('titleCase', () => {
     ['maria del carmen', 'Maria Del Carmen'],
     ['CARRER MAJOR', 'Carrer Major'],
     ['  josep  ', 'Josep'],
+    // Accented first letters — the ASCII \b\w version mangled these to "NúñEz".
+    ['álvaro', 'Álvaro'],
+    ['núñez', 'Núñez'],
+    ['ÓSCAR', 'Óscar'],
+    ['maria àngels', 'Maria Àngels'],
+    ["l'hospitalet", "L'Hospitalet"],
     ['', ''],
   ])('titleCase(%p) -> %p', (input, expected) => {
     expect(titleCase(input)).toBe(expected);

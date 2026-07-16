@@ -23,8 +23,14 @@ export const CP2PROV: Record<string, string> = {
   '49': 'Zamora', '50': 'Zaragoza', '51': 'Ceuta', '52': 'Melilla',
 };
 
+// Unicode-aware: \b\w is ASCII-only, so accented Spanish/Catalan names (Núñez,
+// Óscar, Àngels) capitalized wrong ("NúñEz"). Match the first letter at a string
+// start or after any non-letter/non-number instead.
 export const titleCase = (s: string): string =>
-  s.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase()).trim();
+  s
+    .toLowerCase()
+    .replace(/(?<=^|[^\p{L}\p{N}])\p{L}/gu, (c) => c.toUpperCase())
+    .trim();
 
 export function isNif(v: string): boolean {
   v = (v || '').toUpperCase();

@@ -95,6 +95,7 @@ export class GeneratorApp extends LitElement {
     this.wireWarn();
     this.wireRemember();
     this.defaultMonth();
+    this.hintMonthFormat();
     this.wireGenerate();
     applyLang(this, this.uiLang);
     this.setLangButtons();
@@ -422,6 +423,22 @@ export class GeneratorApp extends LitElement {
       out.textContent = '—';
       out.classList.add('empty');
     }
+  }
+  /**
+   * Chrome renders type="month" as a localized picker ("julio de 2026"), where an
+   * "AAAA-MM" hint would be plain wrong. Firefox/Safari don't implement it at all:
+   * the field degrades to a text box showing the raw "2026-07" with no clue about
+   * the format — which matters, because month and year are sliced out of that value
+   * by position. So show the hint only where the fallback is actually in play.
+   * (The placeholder alone wouldn't do: defaultMonth() always pre-fills the field,
+   * and placeholders only show when empty.)
+   */
+  private hintMonthFormat() {
+    const probe = document.createElement('input');
+    probe.setAttribute('type', 'month');
+    if (probe.type === 'month') return; // native picker — the hint would mislead
+    this.q('#mesFmt').hidden = false;
+    this.i('mes').placeholder = 'AAAA-MM'; // for when it is cleared to retype
   }
   private defaultMonth() {
     const now = new Date();
@@ -915,8 +932,14 @@ export class GeneratorApp extends LitElement {
                 <span class="field-err" id="err-up"></span>
               </div>
               <div class="field">
-                <label for="mes" data-i18n="mes">Mes i any</label>
+                <!-- data-i18n sits on the inner span, not the label: applyLang
+                     replaces textContent, which would eat the format hint. -->
+                <label for="mes"
+                  ><span data-i18n="mes">Mes i any</span
+                  ><span class="mes-fmt" id="mesFmt" hidden> (AAAA-MM)</span></label
+                >
                 <input id="mes" name="mes" type="month" />
+                <span class="field-err" id="err-mes"></span>
               </div>
               <div class="two-up">
                 <div class="field"><label for="full" data-i18n="full">Full inicial</label><input id="full" name="full" type="text" inputmode="numeric" maxlength="4" class="numr" placeholder="1" /><span class="field-err" id="err-full"></span></div>

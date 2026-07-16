@@ -93,6 +93,25 @@ describe('VAL field rules', () => {
     expect(ok('num', '-3')).toBe(false);
   });
 
+  test('mes must be ISO YYYY-MM', () => {
+    // Load-bearing: month/year are sliced out of this by position, and
+    // Firefox/Safari render type="month" as a free text box. "2026-7" would
+    // silently print month "7" instead of "07".
+    for (const good of ['2026-07', '2026-01', '2026-12', '1999-10']) expect(ok('mes', good)).toBe(true);
+    for (const bad of [
+      '2026-7', // single-digit month
+      '2026-00',
+      '2026-13',
+      '26-07', // 2-digit year
+      '07-2026', // reversed
+      '2026/07',
+      'julio 2026',
+      '2026-07-01',
+      '',
+    ])
+      expect(ok('mes', bad), bad).toBe(false);
+  });
+
   test('cp accepts 01–52 prefixes only', () => {
     for (const good of ['08001', '52999', '01000']) expect(ok('cp', good)).toBe(true);
     for (const bad of ['00123', '53000', '8001', '']) expect(ok('cp', bad)).toBe(false);

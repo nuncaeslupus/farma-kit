@@ -394,6 +394,13 @@ details[open] .chev {
   color: var(--muted);
   margin-bottom: 5px;
 }
+/* Format hint next to a label — shown only where a native input type is missing
+   and the user has to type the raw value (see hintMonthFormat). Secondary to the
+   label itself, so it reads as guidance rather than part of the field name. */
+.mes-fmt {
+  font-weight: 500;
+  color: var(--faint);
+}
 /* text-ish fields only. Checkboxes must NOT inherit this: the background +
    transition made them animate and re-render non-natively on theme change,
    which shifted them sideways. They keep their native look (accent-color). */

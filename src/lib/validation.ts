@@ -53,6 +53,10 @@ export type ValRule = {
 
 export const VAL: Record<string, ValRule> = {
   up: { id: 'up', msg: 'errUp', test: (v) => /^\d{5}$/.test(v) },
+  // The month/year printed on the sheet are sliced out of this value by position,
+  // so the ISO shape is load-bearing. type="month" guarantees it in Chrome, but
+  // Firefox/Safari fall back to a free text box — "2026-7" would print month "7".
+  mes: { id: 'mes', msg: 'errMes', test: (v) => /^\d{4}-(0[1-9]|1[0-2])$/.test(v) },
   full: { id: 'full', msg: 'errNat', test: (v) => /^\d+$/.test(v) && +v >= 1 },
   num: { id: 'num', msg: 'errNat', test: (v) => /^\d+$/.test(v) && +v >= 1 },
   cognoms: { id: 'cognoms', segell: true },

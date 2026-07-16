@@ -123,7 +123,11 @@ function drawField(page: PDFPage, sheetH: number, font: PDFFont, f: Field, value
     case 'middle':
       firstBaseline = boxTop - (f.box.h - blockH) / 2 - fitAscent;
       break;
-    default: // top / baseline: fill downward from the top of the box
+    case 'baseline':
+      // last line's baseline sits on the box bottom, earlier lines stack above it
+      firstBaseline = boxBottom + (lines.length - 1) * lineH;
+      break;
+    default: // top: fill downward from the top of the box
       firstBaseline = boxTop - fitAscent;
   }
 

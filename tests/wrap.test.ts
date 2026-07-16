@@ -62,6 +62,13 @@ describe('wrapTitular', () => {
   test('falls back to plain word-wrap when there is no comma', () => {
     expect(wrapTitular(measure, 'SINGLENAME HERE', 8)).toEqual(wrapLines(measure, 'SINGLENAME HERE', 8));
   });
+
+  test('normalizes a space before the comma so it never strands the comma', () => {
+    expect(wrapTitular(measure, 'RUBINAT I PERFUMAT , AMADEU', 20)).toEqual([
+      'RUBINAT I PERFUMAT,',
+      'AMADEU',
+    ]);
+  });
 });
 
 describe('fitWrapped', () => {

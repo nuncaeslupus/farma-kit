@@ -81,6 +81,9 @@ export function wrapTitular(
   text: string,
   maxWidth: number,
 ): string[] {
+  // Drop any space before the comma so "SURNAMES , NAME" can't strand the comma
+  // on its own line when the surnames part is split.
+  text = text.replace(/\s+,/g, ',');
   if (measure(text) <= maxWidth) return [text];
   const i = text.indexOf(',');
   if (i < 0) return wrapLines(measure, text, maxWidth);

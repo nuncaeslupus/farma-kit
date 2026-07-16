@@ -65,7 +65,7 @@ export function fitWrapped(opts: {
   let size = opts.startSize;
   let lines = opts.wrapAt(size);
   while (size > opts.minSize && lines.length * opts.lineHeightAt(size) > opts.boxH) {
-    size = Math.max(opts.minSize, +(size - opts.step).toFixed(2));
+    size = Math.max(opts.minSize, +(size - opts.step).toFixed(4));
     lines = opts.wrapAt(size);
   }
   return { size, lines };

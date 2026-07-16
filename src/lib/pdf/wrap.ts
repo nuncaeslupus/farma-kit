@@ -2,6 +2,49 @@
    (which pulls in pdf-lib/fontkit) so it stays a pure, unit-testable function:
    width is supplied via `measure`, not a live font. */
 
+const words = (s: string): string[] => s.split(/\s+/).filter(Boolean);
+
+/**
+ * The shared greedy packer. Fills lines with `list`, starting from `cur`, and
+ * returns the completed lines plus the still-open last line — leaving it open is
+ * what lets wrapTitular append the name to the trailing surname line.
+ * A word wider than maxWidth is split by character; a single char that overflows
+ * on its own is still emitted (can't be split further) rather than looping forever.
+ */
+function pack(
+  measure: (s: string) => number,
+  list: string[],
+  maxWidth: number,
+  cur = '',
+): { lines: string[]; cur: string } {
+  const fits = (s: string) => measure(s) <= maxWidth;
+  const lines: string[] = [];
+  for (const word of list) {
+    const candidate = cur ? cur + ' ' + word : word;
+    if (fits(candidate)) {
+      cur = candidate;
+      continue;
+    }
+    if (cur) {
+      lines.push(cur);
+      cur = '';
+    }
+    if (fits(word)) {
+      cur = word;
+      continue;
+    }
+    for (const ch of word) {
+      if (cur && !fits(cur + ch)) {
+        lines.push(cur);
+        cur = ch;
+      } else {
+        cur += ch;
+      }
+    }
+  }
+  return { lines, cur };
+}
+
 /**
  * Break `text` into lines that each measure <= `maxWidth`. Wraps on whitespace;
  * a single word wider than maxWidth is split by character so nothing can overflow
@@ -12,38 +55,7 @@ export function wrapLines(
   text: string,
   maxWidth: number,
 ): string[] {
-  const fits = (s: string) => measure(s) <= maxWidth;
-  const lines: string[] = [];
-  let cur = '';
-
-  // Emit whole chunks of an over-long word; return the trailing remainder to
-  // keep filling the current line. A char that overflows on its own is still
-  // emitted (can't be split further) rather than looping forever.
-  const breakWord = (word: string): string => {
-    let chunk = '';
-    for (const ch of word) {
-      if (chunk && !fits(chunk + ch)) {
-        lines.push(chunk);
-        chunk = ch;
-      } else {
-        chunk += ch;
-      }
-    }
-    return chunk;
-  };
-
-  for (const word of text.split(/\s+/).filter(Boolean)) {
-    const candidate = cur ? cur + ' ' + word : word;
-    if (fits(candidate)) {
-      cur = candidate;
-      continue;
-    }
-    if (cur) {
-      lines.push(cur);
-      cur = '';
-    }
-    cur = fits(word) ? word : breakWord(word);
-  }
+  const { lines, cur } = pack(measure, words(text), maxWidth);
   if (cur) lines.push(cur);
   return lines;
 }
@@ -96,53 +108,29 @@ export function wrapTitular(
   if (i < 0) return wrapLines(measure, text, maxWidth);
   const surnames = text.slice(0, i + 1).trim(); // keeps the comma
   const name = text.slice(i + 1).trim();
-
   const fits = (s: string) => measure(s) <= maxWidth;
-  const lines: string[] = [];
-  let cur = '';
-  const flush = () => {
-    if (cur) {
-      lines.push(cur);
-      cur = '';
-    }
-  };
-  const place = (tok: string): boolean => {
-    const cand = cur ? cur + ' ' + tok : tok;
-    if (!fits(cand)) return false;
-    cur = cand;
-    return true;
-  };
 
-  // surname words — breakable
-  for (const w of surnames.split(/\s+/).filter(Boolean)) {
-    if (place(w)) continue;
-    flush();
-    if (fits(w)) {
-      cur = w;
+  // Pack the surname words, leaving the last line open so the name can join it.
+  const { lines, cur } = pack(measure, words(surnames), maxWidth);
+  let tail = cur;
+
+  // The name is one atomic unit: append it to the open line, else drop it whole to
+  // the next line. Only a name wider than the box itself gets wrapped.
+  if (name) {
+    const joined = tail ? tail + ' ' + name : name;
+    if (fits(joined)) {
+      tail = joined;
     } else {
-      for (const ch of w) {
-        if (cur && !fits(cur + ch)) {
-          lines.push(cur);
-          cur = ch;
-        } else {
-          cur += ch;
-        }
+      if (tail) lines.push(tail);
+      if (fits(name)) {
+        tail = name;
+      } else {
+        const nl = wrapLines(measure, name, maxWidth);
+        lines.push(...nl.slice(0, -1));
+        tail = nl[nl.length - 1] ?? '';
       }
     }
   }
-
-  // name — one atomic unit: attach to the current line, else drop it whole to the
-  // next line; only wrap it if it is itself wider than the box.
-  if (name && !place(name)) {
-    flush();
-    if (fits(name)) {
-      cur = name;
-    } else {
-      const nl = wrapLines(measure, name, maxWidth);
-      lines.push(...nl.slice(0, -1));
-      cur = nl[nl.length - 1] ?? '';
-    }
-  }
-  flush();
+  if (tail) lines.push(tail);
   return lines;
 }

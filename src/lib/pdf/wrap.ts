@@ -72,9 +72,16 @@ export function fitWrapped(opts: {
 }
 
 /**
- * Titular ("SURNAMES, NAME") wrap. If it fits on one line it stays one line;
- * otherwise it breaks at the first comma — surnames above, name below — and each
- * part is word-wrapped in turn, so a very long surname still can't overflow.
+ * Titular ("SURNAMES, NAME") wrap, in as few lines as possible while keeping the
+ * NAME (everything after the comma) on a single line:
+ *   - fits on one line  → one line ("TOUS PUIG, PERE").
+ *   - surnames fill a line, name doesn't fit after them → name drops whole to the
+ *     next line ("SURNAMES," / "PERE PAU" — never "…PERE" / "PAU").
+ *   - surnames must break AND the name fits after the trailing surname words →
+ *     surnames split, the tail shares its line with the name ("PUIG DE LA" /
+ *     "GRAN, ANNA").
+ * Surname words too wide are character-broken; a name wider than the box is the
+ * only case that wraps the name itself.
  */
 export function wrapTitular(
   measure: (s: string) => number,
@@ -87,10 +94,55 @@ export function wrapTitular(
   if (measure(text) <= maxWidth) return [text];
   const i = text.indexOf(',');
   if (i < 0) return wrapLines(measure, text, maxWidth);
-  const surnames = text.slice(0, i + 1).trim(); // keep the comma with the surnames
+  const surnames = text.slice(0, i + 1).trim(); // keeps the comma
   const name = text.slice(i + 1).trim();
-  return [
-    ...wrapLines(measure, surnames, maxWidth),
-    ...(name ? wrapLines(measure, name, maxWidth) : []),
-  ];
+
+  const fits = (s: string) => measure(s) <= maxWidth;
+  const lines: string[] = [];
+  let cur = '';
+  const flush = () => {
+    if (cur) {
+      lines.push(cur);
+      cur = '';
+    }
+  };
+  const place = (tok: string): boolean => {
+    const cand = cur ? cur + ' ' + tok : tok;
+    if (!fits(cand)) return false;
+    cur = cand;
+    return true;
+  };
+
+  // surname words — breakable
+  for (const w of surnames.split(/\s+/).filter(Boolean)) {
+    if (place(w)) continue;
+    flush();
+    if (fits(w)) {
+      cur = w;
+    } else {
+      for (const ch of w) {
+        if (cur && !fits(cur + ch)) {
+          lines.push(cur);
+          cur = ch;
+        } else {
+          cur += ch;
+        }
+      }
+    }
+  }
+
+  // name — one atomic unit: attach to the current line, else drop it whole to the
+  // next line; only wrap it if it is itself wider than the box.
+  if (name && !place(name)) {
+    flush();
+    if (fits(name)) {
+      cur = name;
+    } else {
+      const nl = wrapLines(measure, name, maxWidth);
+      lines.push(...nl.slice(0, -1));
+      cur = nl[nl.length - 1] ?? '';
+    }
+  }
+  flush();
+  return lines;
 }

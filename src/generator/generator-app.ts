@@ -134,6 +134,7 @@ export class GeneratorApp extends LitElement {
           /* ignore */
         }
         applyLang(this, this.uiLang);
+        this.syncColegiLabel(); // applyLang just wiped the picked colegio back to the placeholder
         this.setLangButtons();
         this.updatePages();
       }),
@@ -262,11 +263,21 @@ export class GeneratorApp extends LitElement {
       gr.style.display = any ? '' : 'none';
     });
   }
-  private async selectColegi(val: string) {
-    this.i('colegi').value = val;
+  /**
+   * Render the combo label from the current value: the chosen colegio (a proper
+   * noun, same in both languages) or the placeholder in the active language.
+   * Must re-run after applyLang(), which resets #colegiVal to the placeholder
+   * because the span carries data-i18n="colegiPh".
+   */
+  private syncColegiLabel() {
+    const val = this.i('colegi').value;
     const valEl = this.q('#colegiVal');
     valEl.textContent = val || (I18N[this.uiLang].colegiPh as string);
     valEl.classList.toggle('placeholder', !val);
+  }
+  private async selectColegi(val: string) {
+    this.i('colegi').value = val;
+    this.syncColegiLabel();
     this.openColegi(false);
     try {
       if (val) localStorage.setItem(COLEGI_KEY, val);

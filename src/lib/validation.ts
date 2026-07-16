@@ -32,13 +32,15 @@ export const titleCase = (s: string): string =>
     .replace(/(?<=^|[^\p{L}\p{N}])\p{L}/gu, (c) => c.toUpperCase())
     .trim();
 
+const NIE_PREFIX: Record<string, string> = { X: '0', Y: '1', Z: '2' };
+
 export function isNif(v: string): boolean {
   v = (v || '').toUpperCase();
   const L = 'TRWAGMYFPDXBNJZSQVHLCKE';
   let m: RegExpMatchArray | null;
   if ((m = v.match(/^(\d{8})([A-Z])$/))) return L[+m[1] % 23] === m[2];
   if ((m = v.match(/^([XYZ])(\d{7})([A-Z])$/)))
-    return L[+(({ X: '0', Y: '1', Z: '2' } as Record<string, string>)[m[1]] + m[2]) % 23] === m[3];
+    return L[+(NIE_PREFIX[m[1]] + m[2]) % 23] === m[3];
   return false;
 }
 
@@ -67,7 +69,7 @@ export const VAL: Record<string, ValRule> = {
  * serves all of Spain, so ONLY an explicit Catalan browser locale gets Catalan —
  * everything else (Spanish, English, unset…) defaults to Spanish.
  */
-export function detectLang(stored: string | null, navLang: string): Lang {
+export function detectLang(stored: string | null, navLang?: string | null): Lang {
   if (stored === 'ca' || stored === 'es') return stored;
-  return /^ca\b/i.test(navLang) ? 'ca' : 'es';
+  return navLang && /^ca\b/i.test(navLang) ? 'ca' : 'es';
 }

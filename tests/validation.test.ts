@@ -18,6 +18,9 @@ describe('detectLang', () => {
     ['garbage', 'en-US', 'es'],
     // 'catalan-ish' locales that don't start with the ca token stay Spanish
     [null, 'car', 'es'],
+    // navigator.language absent (odd webviews / test envs) → default, no throw
+    [null, undefined, 'es'],
+    [null, null, 'es'],
   ])('stored=%p nav=%p -> %p', (stored, nav, expected) => {
     expect(detectLang(stored, nav)).toBe(expected);
   });

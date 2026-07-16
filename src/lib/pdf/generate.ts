@@ -46,54 +46,68 @@ export async function generatePdf(
 }
 
 function drawField(page: PDFPage, sheetH: number, font: PDFFont, f: Field, value: string): void {
-  const size = f.style.size;
+  if (f.cells > 1) drawMultiCellField(page, sheetH, font, f, value);
+  else drawSingleCellField(page, sheetH, font, f, value);
+}
 
-  // font metrics for vertical placement
+// Fixed character grid (up/month/year/page): one glyph per cell, never wrapped.
+function drawMultiCellField(
+  page: PDFPage,
+  sheetH: number,
+  font: PDFFont,
+  f: Field,
+  value: string,
+): void {
+  const size = f.style.size;
   const ascent = font.heightAtSize(size, { descender: false });
   const full = font.heightAtSize(size);
   const descent = full - ascent;
-
   const boxBottom = sheetH - (f.box.y + f.box.h); // pdf-lib origin is bottom-left
   const boxTop = sheetH - f.box.y;
 
-  // Multi-cell fields (up/month/year/page) are fixed character grids: one glyph
-  // per cell, never wrapped.
-  if (f.cells > 1) {
-    const n = f.cells;
-    const cellW = f.box.w / n; // equal subdivision, no gap
-    const chars = [...String(value)];
-    let baseline: number;
-    switch (f.style.valign) {
-      case 'top':
-        baseline = boxTop - ascent;
-        break;
-      case 'bottom':
-        baseline = boxBottom + descent;
-        break;
-      case 'baseline':
-        baseline = boxBottom;
-        break;
-      default: // middle
-        baseline = boxBottom + (f.box.h - full) / 2 + descent;
-    }
-    for (let i = 0; i < n; i++) {
-      const str = chars[i] ?? '';
-      if (str === '') continue;
-      const cellX = f.box.x + i * cellW;
-      const tw = font.widthOfTextAtSize(str, size);
-      let x = cellX;
-      if (f.style.halign === 'center') x = cellX + (cellW - tw) / 2;
-      else if (f.style.halign === 'right') x = cellX + cellW - tw;
-      page.drawText(str, { x, y: baseline, size, font, color: rgb(0, 0, 0) });
-    }
-    return;
+  let baseline: number;
+  switch (f.style.valign) {
+    case 'top':
+      baseline = boxTop - ascent;
+      break;
+    case 'bottom':
+      baseline = boxBottom + descent;
+      break;
+    case 'baseline':
+      baseline = boxBottom;
+      break;
+    default: // middle
+      baseline = boxBottom + (f.box.h - full) / 2 + descent;
   }
 
-  // Single text field: wrap to the box width so long values break onto new lines,
-  // and shrink the font if the wrapped block is taller than the box, so text never
-  // spills into the field below. Values that already fit keep their configured size.
+  const n = f.cells;
+  const cellW = f.box.w / n; // equal subdivision, no gap
+  const chars = [...String(value)];
+  for (let i = 0; i < n; i++) {
+    const str = chars[i] ?? '';
+    if (str === '') continue;
+    const cellX = f.box.x + i * cellW;
+    const tw = font.widthOfTextAtSize(str, size);
+    let x = cellX;
+    if (f.style.halign === 'center') x = cellX + (cellW - tw) / 2;
+    else if (f.style.halign === 'right') x = cellX + cellW - tw;
+    page.drawText(str, { x, y: baseline, size, font, color: rgb(0, 0, 0) });
+  }
+}
+
+// Single text field: wrap to the box width so long values break onto new lines,
+// and shrink the font if the wrapped block is taller than the box, so text never
+// spills into the field below. Values that already fit keep their configured size.
+function drawSingleCellField(
+  page: PDFPage,
+  sheetH: number,
+  font: PDFFont,
+  f: Field,
+  value: string,
+): void {
   const str = String(value);
   if (str === '') return;
+
   const wrapAt = (sz: number): string[] => {
     const measure = (s: string) => font.widthOfTextAtSize(s, sz);
     return f.key === 'titular'
@@ -101,7 +115,7 @@ function drawField(page: PDFPage, sheetH: number, font: PDFFont, f: Field, value
       : wrapLines(measure, str, f.box.w);
   };
   const { size: fitSize, lines } = fitWrapped({
-    startSize: size,
+    startSize: f.style.size,
     minSize: MIN_FONT_SIZE,
     step: 0.5,
     boxH: f.box.h,
@@ -110,25 +124,28 @@ function drawField(page: PDFPage, sheetH: number, font: PDFFont, f: Field, value
   });
   if (lines.length === 0) return;
 
-  const fitAscent = font.heightAtSize(fitSize, { descender: false });
-  const fitFull = font.heightAtSize(fitSize);
-  const fitDescent = fitFull - fitAscent;
-  const lineH = fitFull;
+  const ascent = font.heightAtSize(fitSize, { descender: false });
+  const full = font.heightAtSize(fitSize);
+  const descent = full - ascent;
+  const lineH = full;
   const blockH = lines.length * lineH;
+  const boxBottom = sheetH - (f.box.y + f.box.h);
+  const boxTop = sheetH - f.box.y;
+
   let firstBaseline: number;
   switch (f.style.valign) {
-    case 'bottom':
-      firstBaseline = boxBottom + fitDescent + (lines.length - 1) * lineH;
+    case 'top':
+      firstBaseline = boxTop - ascent;
       break;
-    case 'middle':
-      firstBaseline = boxTop - (f.box.h - blockH) / 2 - fitAscent;
+    case 'bottom':
+      firstBaseline = boxBottom + descent + (lines.length - 1) * lineH;
       break;
     case 'baseline':
       // last line's baseline sits on the box bottom, earlier lines stack above it
       firstBaseline = boxBottom + (lines.length - 1) * lineH;
       break;
-    default: // top: fill downward from the top of the box
-      firstBaseline = boxTop - fitAscent;
+    default: // middle
+      firstBaseline = boxTop - (f.box.h - blockH) / 2 - ascent;
   }
 
   lines.forEach((line, i) => {

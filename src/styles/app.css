@@ -871,16 +871,16 @@ select[aria-invalid='true']:focus {
   border: 1px solid var(--line);
   border-radius: 12px;
   box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.4);
-  max-width: 430px;
+  max-width: 380px;
   width: 100%;
-  padding: 20px 22px 18px;
+  padding: 34px 30px 30px;
 }
 .modal-title {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 700;
   font-size: 16px;
   color: var(--note-ink);
-  margin-bottom: 8px;
+  margin-bottom: 16px;
 }
 .modal-msg {
   margin: 0 0 18px;
@@ -948,7 +948,12 @@ select[aria-invalid='true']:focus {
   color: var(--muted);
   min-height: 18px;
 }
-.gen-result .modal-actions,
+/* gen-result has no message paragraph above the buttons, so it needs the gap the
+   .modal-msg margin gives gen-error — otherwise the success modal is just a title
+   stacked straight onto the buttons. */
+.gen-result .modal-actions {
+  margin-top: 30px;
+}
 .gen-error .modal-actions {
   margin-top: 4px;
 }

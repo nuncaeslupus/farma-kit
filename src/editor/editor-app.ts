@@ -17,6 +17,8 @@ import { generatePdf } from '../lib/pdf/generate';
 
 const round = (n: number) => Math.round(n * 100) / 100;
 const CSS_PPP = 96 / 72;
+// Heading and tab title, one string so they cannot drift.
+const TITLE = 'Farma Kit - Template editor';
 
 @customElement('editor-app')
 export class EditorApp extends LitElement {
@@ -34,6 +36,12 @@ export class EditorApp extends LitElement {
   @state() private addKey = FIELD_PRESETS[0].key;
   @state() private snap = true;
   @state() private status = 'Upload the official sheet PDF to begin.';
+  // Undo stack of serialised field lists. Fields are plain data, so a JSON round
+  // trip is a sound clone and a cheap way to compare states. Depth-capped: this is
+  // a tracing tool, not a word processor — 50 steps covers a slip, and the whole
+  // stack is throwaway once you export.
+  @state() private history: string[] = [];
+  @state() private future: string[] = []; // undone states, newest last
 
   private engine!: CanvasEngine;
   // Reactive: the "Include official sheet" control enables/disables on it, and it is
@@ -45,16 +53,78 @@ export class EditorApp extends LitElement {
     this.engine = new CanvasEngine(host, {
       onSelect: (f) => (this.selected = f),
       onChange: () => this.requestUpdate(),
+      onBeforeChange: () => this.snapshot(),
       snapEnabled: () => this.snap,
     });
     this.engine.setFields(this.fields);
     this.fit();
   }
 
+  connectedCallback() {
+    super.connectedCallback();
+    document.addEventListener('keydown', this.onUndoKey);
+    // The editor owns the tab title only while it is mounted, and nothing here
+    // needs to undo it: the generator sets its own title from the i18n dict every
+    // time it mounts (applyLang), so routing back restores it. Deliberately not in
+    // app-root — that ships, and index.html's title is the indexed/og:title one.
+    document.title = TITLE;
+  }
+
   disconnectedCallback() {
     super.disconnectedCallback();
+    document.removeEventListener('keydown', this.onUndoKey);
     this.engine?.destroy();
   }
+
+  // ---- undo / redo ----
+  /** Record the current fields as an undo step. Call *before* mutating them. */
+  private snapshot() {
+    const snap = JSON.stringify(this.fields);
+    // Gestures that end where they began (a click, a drag snapped back) leave no
+    // visible change — an undo step for one would be a keypress that does nothing.
+    if (this.history[this.history.length - 1] === snap) return;
+    this.history = [...this.history.slice(-49), snap];
+    this.future = []; // editing after an undo forks the timeline; the redos are gone
+  }
+
+  /**
+   * Swap the field list for a recorded one, moving the state it replaces onto the
+   * opposite stack — that symmetry is what lets undo and redo walk the same steps.
+   */
+  private travel(from: 'history' | 'future') {
+    const src = from === 'history' ? this.history : this.future;
+    if (!src.length) return;
+    const snap = src[src.length - 1];
+    const rest = src.slice(0, -1);
+    const current = JSON.stringify(this.fields);
+    if (from === 'history') {
+      this.history = rest;
+      this.future = [...this.future, current];
+    } else {
+      this.future = rest;
+      this.history = [...this.history, current];
+    }
+    // Restoring replaces every Field object, so the old `selected` reference now
+    // points into a discarded array — reselect by key or the panel would edit a
+    // field the canvas no longer draws.
+    const key = this.selected?.key;
+    this.fields = JSON.parse(snap) as Field[];
+    this.engine.setFields(this.fields);
+    this.engine.setSelected(this.fields.find((f) => f.key === key) ?? null);
+  }
+
+  private onUndoKey = (e: KeyboardEvent) => {
+    if (!(e.ctrlKey || e.metaKey)) return;
+    const k = e.key.toLowerCase();
+    const redo = (k === 'z' && e.shiftKey) || k === 'y';
+    if (k !== 'z' && !redo) return;
+    // Let inputs keep their own undo — Ctrl+Z in a text box should fix the typo
+    // you just made, not rewind the sheet behind it.
+    const active = (e.composedPath()[0] as HTMLElement) ?? document.activeElement;
+    if (active && /INPUT|SELECT|TEXTAREA/.test(active.tagName)) return;
+    e.preventDefault();
+    this.travel(redo ? 'future' : 'history');
+  };
 
   // ---- zoom ----
   private syncZoom() {
@@ -64,10 +134,19 @@ export class EditorApp extends LitElement {
     this.engine.setScale(Math.max(0.15, Math.min(6, this.engine.scaleValue * f)));
     this.syncZoom();
   }
-  private fit() {
+  /**
+   * 'page' fits the whole sheet; 'width' fills the stage across and lets it run
+   * off the bottom — the header you are tracing sits in the top fifth of the
+   * sheet, so filling the width is what actually magnifies the work.
+   */
+  private fit(mode: 'page' | 'width' = 'page') {
     const stage = this.renderRoot.querySelector('#stage') as HTMLElement;
     if (!stage) return;
-    this.engine.setScale(this.engine.fitScale(stage.clientWidth - 48, stage.clientHeight - 48));
+    // Fitting to width brings on the vertical scrollbar, which then narrows the
+    // stage — reserve it up front so the sheet doesn't end up a hair too wide.
+    const bar = mode === 'width' ? 16 : 0;
+    const availH = mode === 'width' ? Infinity : stage.clientHeight - 48;
+    this.engine.setScale(this.engine.fitScale(stage.clientWidth - 48 - bar, availH));
     this.syncZoom();
   }
 
@@ -93,6 +172,7 @@ export class EditorApp extends LitElement {
       const p = FIELD_PRESETS.find((x) => x.key === this.addKey)!;
       f = mkField(p.key, p.label, p.cells, p.font, p.sample);
     }
+    this.snapshot();
     this.fields = [...this.fields, f];
     this.engine.setFields(this.fields);
     this.engine.setSelected(f);
@@ -100,6 +180,7 @@ export class EditorApp extends LitElement {
     this.addKey = avail[0]?.key ?? '__custom';
   }
   private removeField(f: Field) {
+    this.snapshot();
     this.fields = this.fields.filter((x) => x !== f);
     this.engine.setFields(this.fields);
     if (this.selected === f) this.engine.setSelected(null);
@@ -107,6 +188,7 @@ export class EditorApp extends LitElement {
 
   /** Mutate the selected field, then refresh boxes + panel. */
   private edit(fn: () => void) {
+    this.snapshot();
     fn();
     this.engine.drawBoxes();
     this.requestUpdate();
@@ -160,6 +242,11 @@ export class EditorApp extends LitElement {
       this.fields = (Array.isArray(tpl?.fields) ? tpl.fields : [])
         .filter((f) => !!f && typeof f === 'object')
         .map(normalizeField);
+      // Undo tracks fields only, but an import also swaps name/cn/segell. Stepping
+      // across one would graft the old sheet's boxes onto the new sheet's identity,
+      // so the imported file is the new floor.
+      this.history = [];
+      this.future = [];
       // A bad sheet is already reported; don't hand it to the canvas as well.
       // `> 0` alone is not enough: JSON.parse('1e309') yields Infinity, which
       // passes that check and then sizes the canvas to Infinity.
@@ -209,18 +296,24 @@ export class EditorApp extends LitElement {
       flex-direction: column;
       height: 100vh;
       overflow: hidden;
+      --rail-left: 300px;
+      --rail-right: 328px;
+      --bar-pad: 14px;
     }
     .middle {
       flex: 1;
       display: grid;
-      grid-template-columns: 264px 1fr 288px;
+      grid-template-columns: var(--rail-left) 1fr var(--rail-right);
       overflow: hidden;
     }
     #stage {
       overflow: auto;
       background: #6d665a;
       display: grid;
-      place-items: center;
+      /* "safe" centring: once the sheet outgrows the stage (zoomed in, or fit to
+         width) plain centring overflows in both directions and the top edge
+         becomes unreachable by scrolling. "safe" falls back to start-aligned. */
+      place-items: safe center;
     }
     .tbar-left,
     .tbar-right {
@@ -237,6 +330,32 @@ export class EditorApp extends LitElement {
       font-size: 15px;
       margin: 0;
       white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      /* Left rail minus the bar's own padding: pins the title over the panel so
+         the arrows beside it start exactly at the canvas edge. Shares the rail
+         variable with the grid — the two must not drift apart. */
+      width: calc(var(--rail-left) - var(--bar-pad));
+    }
+    .hist {
+      display: flex;
+      gap: 4px;
+    }
+    .hist fk-button::part(button) {
+      font-size: 15px;
+      padding: 6px 10px;
+    }
+    /* The checkbox is an option *of* Generate, not a sibling action — box them
+       together so the pairing survives without a caption saying so. */
+    .gen {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 3px;
+      padding-left: 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface-2);
     }
     .zoom {
       display: flex;
@@ -410,30 +529,53 @@ export class EditorApp extends LitElement {
   render() {
     return html`
       <fk-bar edge="top">
-        <div class="tbar-left"><h1>Farma-Kit · Templates</h1></div>
+        <div class="tbar-left">
+          <h1>${TITLE}</h1>
+          <div class="hist">
+            <fk-button
+              variant="ghost"
+              ?disabled=${!this.history.length}
+              title="Undo (Ctrl+Z)"
+              @click=${() => this.travel('history')}
+              >↶</fk-button
+            >
+            <fk-button
+              variant="ghost"
+              ?disabled=${!this.future.length}
+              title="Redo (Ctrl+Shift+Z)"
+              @click=${() => this.travel('future')}
+              >↷</fk-button
+            >
+          </div>
+        </div>
         <div class="zoom">
           <fk-button variant="ghost" @click=${() => this.zoom(1 / 1.2)}>−</fk-button>
           <span class="pct">${this.zoomPct}%</span>
           <fk-button variant="ghost" @click=${() => this.zoom(1.2)}>+</fk-button>
-          <fk-button variant="ghost" @click=${() => this.fit()}>Fit</fk-button>
+          <fk-button variant="ghost" title="Fit the whole sheet" @click=${() => this.fit()}
+            >Fit page</fk-button
+          >
+          <fk-button variant="ghost" title="Fill the stage across" @click=${() => this.fit('width')}
+            >Fit width</fk-button
+          >
         </div>
         <div class="tbar-right">
-          <label
-            class="incl ${this.pdfBytes ? '' : 'off'}"
-            title=${this.pdfBytes
-              ? 'Draw the data over the official sheet (alignment check). Untick for the data only — what actually prints onto the physical sheet.'
-              : 'Upload the official sheet PDF first.'}
-            ><input
-              type="checkbox"
-              .checked=${this.includeSheet && !!this.pdfBytes}
-              ?disabled=${!this.pdfBytes}
-              @change=${(e: Event) => (this.includeSheet = (e.target as HTMLInputElement).checked)}
-            />
-            Include official sheet</label
-          >
-          <fk-button @click=${() => this.onGenerate()}>Generate test PDF</fk-button>
-          <input type="file" accept="application/json,.json" id="jsonInput" style="display:none" @change=${this.onImport} />
-          <fk-button variant="ghost" @click=${() => (this.renderRoot.querySelector('#jsonInput') as HTMLElement).click()}>Import JSON</fk-button>
+          <div class="gen">
+            <label
+              class="incl ${this.pdfBytes ? '' : 'off'}"
+              title=${this.pdfBytes
+                ? 'Draw the data over the official sheet (alignment check). Untick for the data only — what actually prints onto the physical sheet.'
+                : 'Upload the official sheet PDF first.'}
+              ><input
+                type="checkbox"
+                .checked=${this.includeSheet && !!this.pdfBytes}
+                ?disabled=${!this.pdfBytes}
+                @change=${(e: Event) => (this.includeSheet = (e.target as HTMLInputElement).checked)}
+              />
+              Include official sheet</label
+            >
+            <fk-button @click=${() => this.onGenerate()}>Generate test PDF</fk-button>
+          </div>
           <fk-button variant="ghost" @click=${() => this.onExport()}>Export JSON</fk-button>
         </div>
       </fk-bar>
@@ -448,6 +590,10 @@ export class EditorApp extends LitElement {
               <span class="fake">Upload PDF…</span>
             </label>
             <div class="filename" title=${this.fileName}>${this.fileName || 'No file selected'}</div>
+            <label class="filebtn">
+              <input type="file" accept="application/json,.json" @change=${this.onImport} />
+              <span class="fake">Import JSON…</span>
+            </label>
             <label class="fld">Template name</label>
             <input
               type="text"
@@ -455,11 +601,7 @@ export class EditorApp extends LitElement {
               .value=${this.name}
               @input=${(e: Event) => (this.name = (e.target as HTMLInputElement).value)}
             />
-            <div class="muted">
-              Exports as
-              <b>templates/${slug(this.name) || 'template'}.json</b>. One sheet can serve several
-              colegios — map them to it in <b>templates/index.json</b>.
-            </div>
+            <div class="muted">→ <b>templates/${slug(this.name) || 'template'}.json</b></div>
             <label class="fld">National Code (CN)</label>
             <input
               type="text"

@@ -8,7 +8,21 @@ pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
 export interface EngineHost {
   onSelect(field: Field | null): void;
   onChange(): void; // a field's box was mutated (drag/resize/nudge)
+  // Fired once per gesture, before the first mutation — the host's undo snapshot
+  // point. A drag fires onChange on every mousemove, so snapshotting there would
+  // bury the pre-drag state under a hundred identical steps.
+  onBeforeChange(): void;
   snapEnabled(): boolean;
+}
+
+/**
+ * Axis a Shift-constrained drag should freeze, or null when unconstrained.
+ * Compares the total offset from the drag origin, so it holds whether Shift went
+ * down before the drag or midway through it, and re-decides as the drag turns.
+ */
+export function lockAxis(dx: number, dy: number, shift: boolean): 'x' | 'y' | null {
+  if (!shift) return null;
+  return Math.abs(dx) > Math.abs(dy) ? 'y' : 'x';
 }
 
 const BOX_STYLE = `
@@ -222,13 +236,19 @@ export class CanvasEngine {
     if ((e.target as HTMLElement).classList.contains('fhnd')) return;
     e.preventDefault();
     this.setSelected(f);
+    this.cb.onBeforeChange();
     const sx = e.clientX;
     const sy = e.clientY;
     const ox = f.box.x;
     const oy = f.box.y;
     const move = (ev: MouseEvent) => {
-      f.box.x = Math.max(0, this.snap(ox + (ev.clientX - sx) / this.scale, this.edges('x', f)));
-      f.box.y = Math.max(0, this.snap(oy + (ev.clientY - sy) / this.scale, this.edges('y', f)));
+      const dx = (ev.clientX - sx) / this.scale;
+      const dy = (ev.clientY - sy) / this.scale;
+      const lock = lockAxis(dx, dy, ev.shiftKey);
+      // Hold the frozen axis at its origin rather than snapping it: snap() would
+      // pull a locked coordinate onto a neighbour's edge and break the constraint.
+      f.box.x = lock === 'x' ? ox : Math.max(0, this.snap(ox + dx, this.edges('x', f)));
+      f.box.y = lock === 'y' ? oy : Math.max(0, this.snap(oy + dy, this.edges('y', f)));
       this.positionBox(f);
       this.cb.onChange();
     };
@@ -244,6 +264,7 @@ export class CanvasEngine {
     e.preventDefault();
     e.stopPropagation();
     this.setSelected(f);
+    this.cb.onBeforeChange();
     const sx = e.clientX;
     const sy = e.clientY;
     const ow = f.box.w;
@@ -277,6 +298,7 @@ export class CanvasEngine {
     const step = d[e.key];
     if (!step) return;
     e.preventDefault();
+    this.cb.onBeforeChange();
     const px = e.shiftKey ? 10 : 1;
     this.selected.box.x = Math.max(0, this.selected.box.x + step[0] * px);
     this.selected.box.y = Math.max(0, this.selected.box.y + step[1] * px);

@@ -35,7 +35,7 @@ export class FkButton extends LitElement {
   `;
 
   render() {
-    return html`<button ?disabled=${this.disabled}><slot></slot></button>`;
+    return html`<button part="button" ?disabled=${this.disabled}><slot></slot></button>`;
   }
 }
 

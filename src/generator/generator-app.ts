@@ -378,19 +378,20 @@ export class GeneratorApp extends LitElement {
     }
   }
   /**
-   * Briefly relabel the share button to confirm the copy. It must drop
-   * data-i18n while flashing: applyLang() overwrites [data-i18n] textContent on
+   * Briefly relabel the share button's text to confirm the copy — the icon next
+   * to it is untouched. The label (not the button) carries data-i18n and must
+   * drop it while flashing: applyLang() overwrites [data-i18n] textContent on
    * every language switch (see the trap noted in status/handoff.md), which would
    * otherwise wipe this message mid-flash instead of the button's normal label.
    */
   private flashShareFeedback() {
-    const btn = this.q('#shareBtn');
+    const label = this.q('#shareLabel');
     clearTimeout(this.shareTimer);
-    btn.removeAttribute('data-i18n');
-    btn.textContent = I18N[this.uiLang].shareCopied as string;
+    label.removeAttribute('data-i18n');
+    label.textContent = I18N[this.uiLang].shareCopied as string;
     this.shareTimer = setTimeout(() => {
-      btn.setAttribute('data-i18n', 'share');
-      btn.textContent = I18N[this.uiLang].share as string;
+      label.setAttribute('data-i18n', 'share');
+      label.textContent = I18N[this.uiLang].share as string;
     }, 2000);
   }
 
@@ -1071,11 +1072,31 @@ export class GeneratorApp extends LitElement {
         </div>
 
         <div class="page-foot">
-          <button type="button" class="linklike" id="shareBtn" data-i18n="share" @click=${() => this.share()}>Compartir</button>
+          <button type="button" class="linklike" id="shareBtn" @click=${() => this.share()}>
+            <svg class="foot-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="18" cy="5" r="3"></circle>
+              <circle cx="6" cy="12" r="3"></circle>
+              <circle cx="18" cy="19" r="3"></circle>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+            </svg>
+            <span id="shareLabel" data-i18n="share">Compartir</span>
+          </button>
           <span class="foot-dot" aria-hidden="true">·</span>
-          <button type="button" class="linklike" id="contactBtn" data-i18n="contact" @click=${() => this.contactar()}>Contactar</button>
+          <button type="button" class="linklike" id="contactBtn" @click=${() => this.contactar()}>
+            <svg class="foot-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+            </svg>
+            <span data-i18n="contact">Contactar</span>
+          </button>
           <span class="foot-dot" aria-hidden="true">·</span>
-          <a class="linklike" href="https://github.com/nuncaeslupus/farma-kit" target="_blank" rel="noopener" data-i18n="githubLink">Codi a GitHub</a>
+          <a class="linklike" href="https://github.com/nuncaeslupus/farma-kit" target="_blank" rel="noopener">
+            <svg class="foot-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.84 1.236 1.84 1.236 1.07 1.835 2.807 1.305 3.492.997.107-.775.42-1.305.763-1.605-2.665-.3-5.466-1.335-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23a11.5 11.5 0 0 1 3-.405c1.02.005 2.047.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"></path>
+            </svg>
+            <span data-i18n="githubLink">Codi a GitHub</span>
+          </a>
         </div>
 
         <div class="modal-overlay" id="genModal" hidden>

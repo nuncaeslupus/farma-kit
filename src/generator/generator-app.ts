@@ -232,6 +232,7 @@ export class GeneratorApp extends LitElement {
       this.pdfUrl = null;
     }
     clearTimeout(this.shareTimer);
+    this.barRO?.disconnect();
     super.disconnectedCallback();
   }
 
@@ -686,6 +687,32 @@ export class GeneratorApp extends LitElement {
     } catch {
       /* ignore */
     }
+    this.wirePrivacyBarSpacing();
+  }
+  /**
+   * A fixed-position bar doesn't push layout — it just paints over whatever
+   * sits underneath it — so something in the normal flow has to reserve its
+   * height, or a tall bar (a wrapped 3-clause privacy message on a narrow
+   * phone, or a long warning) covers this footer's Share / Contactar / GitHub
+   * links. That can't be `body`'s own padding: `html, body { min-height: 100% }`
+   * pins body's box to exactly the viewport, so once content overflows past
+   * it — the normal case once the form is tall enough to scroll — body's own
+   * padding-bottom stops affecting layout at all (confirmed: setting it to
+   * 500px changed nothing). #barSpacer is a plain block inside .wrap instead,
+   * so its height genuinely extends the scrollable document. Track the bar's
+   * real height rather than guessing at one, so it stays right across screen
+   * width, language, and the privacy-message/warning swap in showWarn().
+   */
+  private barRO?: ResizeObserver;
+  private wirePrivacyBarSpacing() {
+    const bar = this.q('#privacyBar');
+    const spacer = this.q('#barSpacer');
+    const sync = () => {
+      spacer.style.height = bar.hidden ? '0px' : `${bar.getBoundingClientRect().height}px`;
+    };
+    this.barRO = new ResizeObserver(sync);
+    this.barRO.observe(bar);
+    sync();
   }
   private showWarn(on: boolean) {
     this.q('#warnConfirm').hidden = !on;
@@ -1098,6 +1125,7 @@ export class GeneratorApp extends LitElement {
             <span data-i18n="githubLink">Codi a GitHub</span>
           </a>
         </div>
+        <div class="bar-spacer" id="barSpacer" aria-hidden="true"></div>
 
         <div class="modal-overlay" id="genModal" hidden>
           <div class="modal" role="alertdialog" aria-modal="true">

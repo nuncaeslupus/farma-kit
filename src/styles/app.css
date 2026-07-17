@@ -865,6 +865,14 @@ select[aria-invalid='true']:focus {
   .divider {
     height: 1px;
   }
+  /* The 48px side padding was sized for desktop; on a phone it eats enough
+     width that the three-clause privacy message wraps to 3-4 lines. Only the
+     right side needs to stay clear of .bar-x — shrink the left one so the
+     text gets more room and wraps less. The spacer's height still adapts to
+     whatever height this ends up at (see wirePrivacyBarSpacing). */
+  .privacy-bar {
+    padding: 10px 44px 10px 16px;
+  }
 }
 
 /* confirm modal */
@@ -1095,8 +1103,13 @@ select[aria-invalid='true']:focus {
   flex: none;
 }
 
-body {
-  padding-bottom: 60px; /* clear the fixed .privacy-bar */
+/* Reserves room in the normal document flow for the fixed .privacy-bar, so it
+   doesn't paint over the footer above it — see wirePrivacyBarSpacing() for why
+   this can't just be padding-bottom on <body>. The height below is a
+   single-line pre-hydration guess; JS sets the real (possibly multi-line)
+   value as soon as it can measure the bar. */
+.bar-spacer {
+  height: 52px;
 }
 
 /* theme toggle: fixed-size switch (icon only) — a text label would change width

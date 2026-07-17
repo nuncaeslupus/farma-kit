@@ -215,26 +215,31 @@ gate before deploying, so a red suite cannot reach the live site.
 
 ## Status
 
-- The page is **indexed** by Google (verified 2026-07-17). It will not *rank* for
-  competitive terms from a github.io path with no backlinks; a colegio linking to
-  it would outweigh every tag here. Sharing the link is the realistic distribution
-  channel.
+- The page is **indexed** by Google (verified 2026-07-17), but only the Spanish
+  URL — the client-side language toggle never changed the URL or the crawlable
+  shell, so Catalan had no page of its own to be found under. Fixed 2026-07-17:
+  `ca/index.html` is now a second HTML entry (Catalan title/description/OG,
+  canonical `.../ca/`), reciprocal `hreflang` alternates (`es`/`ca`/`x-default`)
+  sit on both shells, `vite.config.ts` builds both via `build.rollupOptions.input`,
+  `sitemap.xml` lists both URLs, and `generator-app.ts` boots the app in Catalan
+  when the path is `/ca/` (an explicit signal that outranks a stored language
+  preference from an earlier visit to the root). Re-verify indexing of `/ca/` in
+  Search Console once Google has re-crawled.
 - `catalunya.json` has been re-traced from the original artwork and printed onto a
   real sheet — alignment is good, with the 1.72 pt caveat above.
 - Catalunya is still the only template. Every other col·legi is listed but not
   selectable.
+- **Share button** and **GitHub link** now live in `.page-foot`, next to
+  *Contactar*. Share uses the Web Share API (native share sheet on mobile) with a
+  copy-link clipboard fallback where it's unsupported — the copy confirmation
+  flashes by clearing the button's `data-i18n` attribute first and restoring it
+  afterwards, since `applyLang` overwrites `[data-i18n]` textContent on every
+  language switch (see `syncColegiLabel` for the same trap).
+- Fixed 2026-07-17: on narrow phones, the language segment + theme switch used to
+  share the header row with the title, squeezing it to almost one word per line
+  and pushing the page into horizontal scroll. Both controls now sit in a
+  `.util-bar` above the header instead.
 
 ## Next up
 
-- **Share button** — the app now produces a proper preview card when shared, and
-  sharing is how this actually reaches pharmacists. Use the Web Share API
-  (`navigator.share`, which gives the native share sheet on mobile) with a
-  copy-link fallback where it is unsupported. It belongs in `.page-foot`, next to
-  *Contactar*.
-- **GitHub link** — to this repo, same footer. There is none today.
-
-Both are UI strings, so they need `ca`/`es` entries in `src/lib/i18n.ts` (the
-key-parity test enforces both). Watch the trap that has bitten twice: an element
-carrying `data-i18n` has its `textContent` overwritten by `applyLang` on every
-language switch — anything dynamic inside it must be re-applied afterwards (see
-`syncColegiLabel`).
+Nothing queued right now.

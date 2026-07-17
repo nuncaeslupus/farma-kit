@@ -56,6 +56,7 @@ export class GeneratorApp extends LitElement {
   private monthNative?: boolean; // cached: does this browser implement type="month"?
   private pdfUrl: string | null = null; // last generated blob URL, revoked on the next run
   private cpCitiesP: Promise<Record<string, string[]>> | null = null; // memoized postal fetch
+  private shareTimer?: ReturnType<typeof setTimeout>; // clears the "copied" flash on the share button
   private q = (s: string) => this.querySelector(s) as HTMLElement;
   private i = (id: string) => this.querySelector('#' + id) as HTMLInputElement;
 
@@ -65,7 +66,12 @@ export class GeneratorApp extends LitElement {
 
   async firstUpdated() {
     try {
-      this.uiLang = detectLang(localStorage.getItem(LANG_KEY), navigator.language);
+      // /ca/ is a distinct crawlable URL (see ca/index.html) so Google can index
+      // the Catalan version on its own — arriving there is an explicit signal,
+      // so it wins over a stored preference from a previous visit to the root.
+      this.uiLang = /\/ca\/?$/.test(location.pathname)
+        ? 'ca'
+        : detectLang(localStorage.getItem(LANG_KEY), navigator.language);
     } catch {
       /* ignore */
     }
@@ -225,6 +231,7 @@ export class GeneratorApp extends LitElement {
       URL.revokeObjectURL(this.pdfUrl);
       this.pdfUrl = null;
     }
+    clearTimeout(this.shareTimer);
     super.disconnectedCallback();
   }
 
@@ -346,6 +353,45 @@ export class GeneratorApp extends LitElement {
     openMail(
       `mailto:${REQUEST_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
     );
+  }
+
+  /**
+   * Web Share API on mobile (native share sheet); copy-to-clipboard where it's
+   * unsupported (desktop browsers). `navigator.share` rejects on user cancel —
+   * that is not a failure, so it is swallowed rather than surfaced as one.
+   */
+  private async share() {
+    const data = { title: document.title, url: location.href };
+    if (navigator.share) {
+      try {
+        await navigator.share(data);
+      } catch {
+        /* cancelled, or the OS refused it — nothing to recover from */
+      }
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(location.href);
+      this.flashShareFeedback();
+    } catch {
+      /* no share sheet, no clipboard access — nothing more this button can do */
+    }
+  }
+  /**
+   * Briefly relabel the share button to confirm the copy. It must drop
+   * data-i18n while flashing: applyLang() overwrites [data-i18n] textContent on
+   * every language switch (see the trap noted in status/handoff.md), which would
+   * otherwise wipe this message mid-flash instead of the button's normal label.
+   */
+  private flashShareFeedback() {
+    const btn = this.q('#shareBtn');
+    clearTimeout(this.shareTimer);
+    btn.removeAttribute('data-i18n');
+    btn.textContent = I18N[this.uiLang].shareCopied as string;
+    this.shareTimer = setTimeout(() => {
+      btn.setAttribute('data-i18n', 'share');
+      btn.textContent = I18N[this.uiLang].share as string;
+    }, 2000);
   }
 
   // ---------- template-driven gate ----------
@@ -888,6 +934,18 @@ export class GeneratorApp extends LitElement {
     const provinces = COLEGIOS.flatMap((g) => g.colegios).sort((a, b) => a.localeCompare(b));
     return html`
       <main class="wrap">
+        <div class="util-bar">
+          <div class="seg" role="group" aria-label="Idioma">
+            <button type="button" data-lang="ca" aria-pressed="false">Català</button>
+            <button type="button" data-lang="es" aria-pressed="true">Español</button>
+          </div>
+          <button type="button" class="theme-switch" id="themeBtn" role="switch" aria-checked="false" aria-label="Tema clar / fosc">
+            <span class="ts-knob">
+              <svg class="glyph glyph-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
+              <svg class="glyph glyph-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg>
+            </span>
+          </button>
+        </div>
         <header>
           <div class="brand">
             <svg class="logo" viewBox="0 0 44 56" role="img" aria-label="Full de cupons">
@@ -908,18 +966,6 @@ export class GeneratorApp extends LitElement {
               <rect class="coupon" x="29.4" y="44" width="8.6" height="6.5" rx="1.2"></rect>
             </svg>
             <h1 data-i18n="appTitle">Emplenador de <span class="lo">fulls de cupons precinte</span></h1>
-          </div>
-          <div class="controls">
-            <div class="seg" role="group" aria-label="Idioma">
-              <button type="button" data-lang="ca" aria-pressed="false">Català</button>
-              <button type="button" data-lang="es" aria-pressed="true">Español</button>
-            </div>
-            <button type="button" class="theme-switch" id="themeBtn" role="switch" aria-checked="false" aria-label="Tema clar / fosc">
-              <span class="ts-knob">
-                <svg class="glyph glyph-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
-                <svg class="glyph glyph-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg>
-              </span>
-            </button>
           </div>
         </header>
 
@@ -1025,7 +1071,11 @@ export class GeneratorApp extends LitElement {
         </div>
 
         <div class="page-foot">
+          <button type="button" class="linklike" id="shareBtn" data-i18n="share" @click=${() => this.share()}>Compartir</button>
+          <span class="foot-dot" aria-hidden="true">·</span>
           <button type="button" class="linklike" id="contactBtn" data-i18n="contact" @click=${() => this.contactar()}>Contactar</button>
+          <span class="foot-dot" aria-hidden="true">·</span>
+          <a class="linklike" href="https://github.com/nuncaeslupus/farma-kit" target="_blank" rel="noopener" data-i18n="githubLink">Codi a GitHub</a>
         </div>
 
         <div class="modal-overlay" id="genModal" hidden>

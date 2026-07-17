@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- One page, one entry. changefreq/priority are omitted on purpose: Google
-     ignores them. Submit this in Search Console — robots.txt cannot advertise it
-     here, since robots.txt is only read at the origin root and this site lives
-     under /farma-kit/. -->
+<!-- Two entries: the Spanish default and its Catalan sibling at /ca/ (see
+     ca/index.html and the hreflang alternates on both shells). changefreq/
+     priority are omitted on purpose: Google ignores them. Submit this in
+     Search Console — robots.txt cannot advertise it here, since robots.txt is
+     only read at the origin root and this site lives under /farma-kit/. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://nuncaeslupus.github.io/farma-kit/</loc>
+  </url>
+  <url>
+    <loc>https://nuncaeslupus.github.io/farma-kit/ca/</loc>
   </url>
 </urlset>

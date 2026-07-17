@@ -3,3 +3,6 @@ dist
 .vite
 *.local
 .DS_Store
+
+# Official coupon sheets — the col·legi's documents, never redistributed
+sheets

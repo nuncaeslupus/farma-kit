@@ -90,11 +90,25 @@ a:hover {
   padding: 28px 24px 48px;
 }
 
+/* ---------- utility bar (language + theme) ---------- */
+/* Sits above the header so the title always has the full row width — on a
+   narrow phone, sharing that row with the language segment and theme switch
+   left the title only a sliver, wrapping almost one word per line. No border
+   or background of its own: it reads as part of the header block above it. */
+.util-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-top: 4px;
+  margin-bottom: 10px;
+}
+
 /* ---------- header ---------- */
 header {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
   gap: 24px;
   padding-bottom: 16px;
   border-bottom: 1px solid var(--line);
@@ -103,6 +117,7 @@ header {
   display: flex;
   gap: 14px;
   align-items: center;
+  min-width: 0;
 }
 .logo {
   flex: none;
@@ -140,13 +155,6 @@ h1 {
 }
 h1 .lo {
   color: var(--accent);
-}
-
-.controls {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex: none;
 }
 
 /* segmented language */
@@ -1151,4 +1159,8 @@ body {
 }
 .linklike:hover {
   color: var(--accent-ink);
+}
+.foot-dot {
+  color: var(--faint);
+  opacity: 0.6;
 }

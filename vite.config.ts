@@ -6,6 +6,19 @@ import { defineConfig } from 'vite';
 // slash. import.meta.env.BASE_URL === '/farma-kit/' at runtime.
 export default defineConfig({
   base: '/farma-kit/',
+  build: {
+    rollupOptions: {
+      // Two HTML shells (index.html, ca/index.html) so Google can index the
+      // Catalan version at its own URL instead of the single Spanish shell
+      // the client-side language toggle can't change for a crawler. Vite keeps
+      // each input's directory in the output, so this lands at dist/ca/index.html
+      // → served at /farma-kit/ca/.
+      input: {
+        main: 'index.html',
+        ca: 'ca/index.html',
+      },
+    },
+  },
   test: {
     // jsdom for the applyLang DOM test; the pure-logic tests don't need it but
     // one environment for the whole suite is simpler than per-file overrides.

@@ -22,10 +22,11 @@ export class FkPanel extends LitElement {
     }
     ::slotted(h2) {
       font-family: var(--font-head);
-      font-size: 10px;
+      font-size: 12.5px;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--faint);
+      letter-spacing: 0.07em;
+      color: var(--ink-2);
       margin: 14px 0 7px;
     }
   `;

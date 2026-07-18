@@ -4,6 +4,7 @@ import { COLEGIOS } from '../lib/colegios';
 import { I18N, applyLang, type Lang } from '../lib/i18n';
 import { slug, type Template } from '../lib/template';
 import { CP2PROV, titleCase, VAL, detectLang } from '../lib/validation';
+import { applyStoredTheme, toggleTheme } from '../lib/theme';
 import { generatePdf } from '../lib/pdf/generate';
 
 /* Base64 only to keep the address out of the bundle and the public repo as a
@@ -16,7 +17,6 @@ const REQUEST_EMAIL = atob('ZmFybWFraXRzdXBwb3J0QGdtYWlsLmNvbQ==');
    requests on, and leave harvested spam behind. */
 const MAIL_TAG = '[farma-kit]';
 const LANG_KEY = 'cupons_lang';
-const THEME_KEY = 'cupons_theme';
 const RKEY = 'cupons_remember';
 const COLEGI_KEY = 'cupons_colegi'; // remembered independently of Recorda'm
 const PBKEY = 'cupons_privacybar_hidden';
@@ -75,12 +75,7 @@ export class GeneratorApp extends LitElement {
     } catch {
       /* ignore */
     }
-    try {
-      if (localStorage.getItem(THEME_KEY) === 'dark')
-        document.documentElement.setAttribute('data-theme', 'dark');
-    } catch {
-      /* ignore */
-    }
+    applyStoredTheme();
 
     try {
       const res = await fetch(`${import.meta.env.BASE_URL}templates/index.json`);
@@ -136,29 +131,43 @@ export class GeneratorApp extends LitElement {
   private wireLang() {
     this.querySelectorAll<HTMLButtonElement>('.seg button').forEach((b) =>
       b.addEventListener('click', () => {
-        this.uiLang = b.dataset.lang as Lang;
+        const target = b.dataset.lang as Lang;
+        if (target === this.uiLang) return;
+        this.uiLang = target;
         try {
-          localStorage.setItem(LANG_KEY, this.uiLang);
+          localStorage.setItem(LANG_KEY, target);
         } catch {
           /* ignore */
         }
-        applyLang(this, this.uiLang);
+        // ca and es are distinct crawlable shells (/, /ca/). Swap text in place
+        // for a seamless toggle, but pushState the URL to its sibling so it stays
+        // shareable and honest — a hard refresh still serves the right shell, and
+        // crawlers hit each URL directly regardless.
+        history.pushState(null, '', target === 'ca' ? `${import.meta.env.BASE_URL}ca/` : import.meta.env.BASE_URL);
+        applyLang(this, target);
         this.syncColegiLabel(); // applyLang just wiped the picked colegio back to the placeholder
         this.syncMonthHint(); // the month example is language-dependent
         this.setLangButtons();
         this.updatePages();
       }),
     );
+    // Keep back/forward honest: the toggle uses pushState, so navigating history
+    // must re-derive the language from the URL rather than leave stale UI.
+    window.addEventListener('popstate', this.onPopLang);
   }
+  private onPopLang = () => {
+    const lang: Lang = /\/ca\/?$/.test(location.pathname) ? 'ca' : 'es';
+    if (lang === this.uiLang) return;
+    this.uiLang = lang;
+    applyLang(this, lang);
+    this.syncColegiLabel();
+    this.syncMonthHint();
+    this.setLangButtons();
+    this.updatePages();
+  };
   private wireTheme() {
     this.q('#themeBtn').addEventListener('click', () => {
-      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', next);
-      try {
-        localStorage.setItem(THEME_KEY, next);
-      } catch {
-        /* ignore */
-      }
+      toggleTheme();
       this.setLangButtons();
     });
   }
@@ -223,6 +232,7 @@ export class GeneratorApp extends LitElement {
   disconnectedCallback() {
     document.removeEventListener('click', this.onDocClick);
     document.removeEventListener('keydown', this.onDocKey);
+    window.removeEventListener('popstate', this.onPopLang);
     // Release the last PDF: generate() only revokes the previous one on the next
     // run, so an unmount in between would strand it. Reachable only in dev (the
     // #editor route; prod drops the editor and never leaves the generator), but it
@@ -379,21 +389,17 @@ export class GeneratorApp extends LitElement {
     }
   }
   /**
-   * Briefly relabel the share button's text to confirm the copy — the icon next
-   * to it is untouched. The label (not the button) carries data-i18n and must
-   * drop it while flashing: applyLang() overwrites [data-i18n] textContent on
-   * every language switch (see the trap noted in status/handoff.md), which would
-   * otherwise wipe this message mid-flash instead of the button's normal label.
+   * Confirm the copy with a small overlay toast above the button, so the button
+   * label stays put — relabelling it changed its width and shifted the whole
+   * centered footer line. The toast carries no data-i18n, so applyLang() leaves
+   * it alone; its text is set here in the current language on each flash.
    */
   private flashShareFeedback() {
-    const label = this.q('#shareLabel');
+    const toast = this.q('#shareToast');
     clearTimeout(this.shareTimer);
-    label.removeAttribute('data-i18n');
-    label.textContent = I18N[this.uiLang].shareCopied as string;
-    this.shareTimer = setTimeout(() => {
-      label.setAttribute('data-i18n', 'share');
-      label.textContent = I18N[this.uiLang].share as string;
-    }, 2000);
+    toast.textContent = I18N[this.uiLang].shareCopied as string;
+    toast.classList.add('show');
+    this.shareTimer = setTimeout(() => toast.classList.remove('show'), 2000);
   }
 
   // ---------- template-driven gate ----------
@@ -963,6 +969,14 @@ export class GeneratorApp extends LitElement {
     return html`
       <main class="wrap">
         <div class="util-bar">
+          <div class="app-brand">
+            <img class="app-badge" src="${import.meta.env.BASE_URL}brand/farmakit-badge.svg" alt="" width="48" height="48" />
+            <div class="app-id">
+              <span class="app-name">Farma<span class="kit">Kit</span></span>
+              <span class="app-tag" data-i18n="tagline">Eines per a la farmàcia</span>
+            </div>
+          </div>
+          <div class="util-controls">
           <div class="seg" role="group" aria-label="Idioma">
             <button type="button" data-lang="ca" aria-pressed="false">Català</button>
             <button type="button" data-lang="es" aria-pressed="true">Español</button>
@@ -973,26 +987,11 @@ export class GeneratorApp extends LitElement {
               <svg class="glyph glyph-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg>
             </span>
           </button>
+          </div>
         </div>
         <header>
           <div class="brand">
-            <svg class="logo" viewBox="0 0 44 56" role="img" aria-label="Full de cupons">
-              <rect class="sheet" x="2" y="2" width="40" height="52" rx="4"></rect>
-              <rect class="band" x="6" y="6" width="32" height="7" rx="1.6"></rect>
-              <rect class="bandln" x="8.5" y="8.7" width="16" height="1.8" rx=".9"></rect>
-              <rect class="coupon" x="6" y="17" width="8.6" height="6.5" rx="1.2"></rect>
-              <rect class="coupon" x="17.7" y="17" width="8.6" height="6.5" rx="1.2"></rect>
-              <rect class="coupon" x="29.4" y="17" width="8.6" height="6.5" rx="1.2"></rect>
-              <rect class="coupon" x="6" y="26" width="8.6" height="6.5" rx="1.2"></rect>
-              <rect class="coupon" x="17.7" y="26" width="8.6" height="6.5" rx="1.2"></rect>
-              <rect class="coupon" x="29.4" y="26" width="8.6" height="6.5" rx="1.2"></rect>
-              <rect class="coupon" x="6" y="35" width="8.6" height="6.5" rx="1.2"></rect>
-              <rect class="coupon" x="17.7" y="35" width="8.6" height="6.5" rx="1.2"></rect>
-              <rect class="coupon" x="29.4" y="35" width="8.6" height="6.5" rx="1.2"></rect>
-              <rect class="coupon" x="6" y="44" width="8.6" height="6.5" rx="1.2"></rect>
-              <rect class="coupon" x="17.7" y="44" width="8.6" height="6.5" rx="1.2"></rect>
-              <rect class="coupon" x="29.4" y="44" width="8.6" height="6.5" rx="1.2"></rect>
-            </svg>
+            <img class="logo" src="${import.meta.env.BASE_URL}brand/rellenador.svg" alt="" width="38" height="38" />
             <h1 data-i18n="appTitle">Emplenador de <span class="lo">fulls de cupons precinte</span></h1>
           </div>
         </header>
@@ -1107,7 +1106,8 @@ export class GeneratorApp extends LitElement {
               <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
               <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
             </svg>
-            <span id="shareLabel" data-i18n="share">Compartir</span>
+            <span data-i18n="share">Compartir</span>
+            <span class="share-toast" id="shareToast" aria-hidden="true"></span>
           </button>
           <span class="foot-dot" aria-hidden="true">·</span>
           <button type="button" class="linklike" id="contactBtn" @click=${() => this.contactar()}>

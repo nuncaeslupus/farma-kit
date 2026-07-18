@@ -14,10 +14,12 @@ import {
 } from '../lib/template';
 import { CanvasEngine } from './canvas-engine';
 import { generatePdf } from '../lib/pdf/generate';
+import { applyStoredTheme, toggleTheme, isDark } from '../lib/theme';
 
 const round = (n: number) => Math.round(n * 100) / 100;
 const CSS_PPP = 96 / 72;
-// Heading and tab title, one string so they cannot drift.
+// Tab title (brand + tool). The heading shows only the tool name — the FarmaKit
+// wordmark sits in the brand row above it.
 const TITLE = 'Farma Kit - Template editor';
 
 @customElement('editor-app')
@@ -47,6 +49,7 @@ export class EditorApp extends LitElement {
   // Reactive: the "Include official sheet" control enables/disables on it, and it is
   // assigned after an await in onUpload — a plain field would leave the UI stale.
   @state() private pdfBytes: ArrayBuffer | null = null;
+  @state() private dark = false;
 
   firstUpdated() {
     const host = this.renderRoot.querySelector('#canvas-host') as HTMLElement;
@@ -60,8 +63,17 @@ export class EditorApp extends LitElement {
     this.fit();
   }
 
+  private onToggleTheme = () => {
+    toggleTheme();
+    this.dark = isDark();
+  };
+
   connectedCallback() {
     super.connectedCallback();
+    // A direct load of #editor has no generator to apply the stored theme, so do
+    // it here; carried-over dark from an in-app route change is already applied.
+    applyStoredTheme();
+    this.dark = isDark();
     document.addEventListener('keydown', this.onUndoKey);
     // The editor owns the tab title only while it is mounted, and nothing here
     // needs to undo it: the generator sets its own title from the i18n dict every
@@ -306,7 +318,16 @@ export class EditorApp extends LitElement {
       grid-template-columns: var(--rail-left) 1fr var(--rail-right);
       overflow: hidden;
     }
+    /* The toolbar lives here, not full-width above: it spans only the canvas so
+       the two rails rise all the way to the brand row. */
+    .center {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      overflow: hidden;
+    }
     #stage {
+      flex: 1;
       overflow: auto;
       background: #6d665a;
       display: grid;
@@ -325,17 +346,54 @@ export class EditorApp extends LitElement {
     .tbar-right {
       justify-content: flex-end;
     }
+    .brandbar {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 10px;
+      padding: 7px var(--bar-pad);
+      border-bottom: 1px solid var(--line);
+    }
+    .app-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-self: start;
+    }
+    .app-badge {
+      border-radius: 7px;
+      flex: none;
+      display: block;
+    }
+    .app-name {
+      font-family: var(--font-head);
+      font-weight: 600;
+      font-size: 17px;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+    }
+    .app-name .kit {
+      color: var(--accent);
+    }
+    .theme-btn {
+      font-size: 15px;
+      line-height: 1;
+      width: 30px;
+      height: 30px;
+      border-radius: 7px;
+      border: 1px solid var(--line);
+      background: var(--surface-2);
+      color: var(--ink);
+      cursor: pointer;
+      justify-self: end;
+    }
     h1 {
       font-family: var(--font-head);
-      font-size: 15px;
+      font-weight: 600;
+      font-size: 16px;
       margin: 0;
       white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      /* Left rail minus the bar's own padding: pins the title over the panel so
-         the arrows beside it start exactly at the canvas edge. Shares the rail
-         variable with the grid — the two must not drift apart. */
-      width: calc(var(--rail-left) - var(--bar-pad));
+      justify-self: center;
     }
     .hist {
       display: flex;
@@ -352,7 +410,7 @@ export class EditorApp extends LitElement {
       align-items: center;
       gap: 8px;
       padding: 3px;
-      padding-left: 10px;
+      padding-right: 10px;
       border: 1px solid var(--line);
       border-radius: var(--radius);
       background: var(--surface-2);
@@ -366,6 +424,12 @@ export class EditorApp extends LitElement {
       font-family: var(--font-mono);
       min-width: 46px;
       text-align: center;
+    }
+    .zoom fk-button::part(button) {
+      padding: 6px 9px;
+    }
+    .zoom fk-button svg {
+      display: block;
     }
     .divider {
       margin: 20px 0 0;
@@ -508,7 +572,6 @@ export class EditorApp extends LitElement {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      margin-right: 10px;
       font-size: 12px;
       color: var(--ink);
       white-space: nowrap;
@@ -528,57 +591,22 @@ export class EditorApp extends LitElement {
 
   render() {
     return html`
-      <fk-bar edge="top">
-        <div class="tbar-left">
-          <h1>${TITLE}</h1>
-          <div class="hist">
-            <fk-button
-              variant="ghost"
-              ?disabled=${!this.history.length}
-              title="Undo (Ctrl+Z)"
-              @click=${() => this.travel('history')}
-              >↶</fk-button
-            >
-            <fk-button
-              variant="ghost"
-              ?disabled=${!this.future.length}
-              title="Redo (Ctrl+Shift+Z)"
-              @click=${() => this.travel('future')}
-              >↷</fk-button
-            >
-          </div>
+      <div class="brandbar">
+        <div class="app-brand">
+          <img class="app-badge" src="${import.meta.env.BASE_URL}brand/farmakit-badge.svg" alt="" width="48" height="48" />
+          <span class="app-name">Farma<span class="kit">Kit</span></span>
         </div>
-        <div class="zoom">
-          <fk-button variant="ghost" @click=${() => this.zoom(1 / 1.2)}>−</fk-button>
-          <span class="pct">${this.zoomPct}%</span>
-          <fk-button variant="ghost" @click=${() => this.zoom(1.2)}>+</fk-button>
-          <fk-button variant="ghost" title="Fit the whole sheet" @click=${() => this.fit()}
-            >Fit page</fk-button
-          >
-          <fk-button variant="ghost" title="Fill the stage across" @click=${() => this.fit('width')}
-            >Fit width</fk-button
-          >
-        </div>
-        <div class="tbar-right">
-          <div class="gen">
-            <label
-              class="incl ${this.pdfBytes ? '' : 'off'}"
-              title=${this.pdfBytes
-                ? 'Draw the data over the official sheet (alignment check). Untick for the data only — what actually prints onto the physical sheet.'
-                : 'Upload the official sheet PDF first.'}
-              ><input
-                type="checkbox"
-                .checked=${this.includeSheet && !!this.pdfBytes}
-                ?disabled=${!this.pdfBytes}
-                @change=${(e: Event) => (this.includeSheet = (e.target as HTMLInputElement).checked)}
-              />
-              Include official sheet</label
-            >
-            <fk-button @click=${() => this.onGenerate()}>Generate test PDF</fk-button>
-          </div>
-          <fk-button variant="ghost" @click=${() => this.onExport()}>Export JSON</fk-button>
-        </div>
-      </fk-bar>
+        <h1>Template editor</h1>
+        <button
+          type="button"
+          class="theme-btn"
+          title="Light / dark"
+          aria-label="Light / dark"
+          @click=${this.onToggleTheme}
+        >
+          ${this.dark ? '☀' : '☾'}
+        </button>
+      </div>
 
       <div class="middle">
         <fk-panel side="left">
@@ -636,7 +664,65 @@ export class EditorApp extends LitElement {
           </div>
         </fk-panel>
 
-        <div id="stage"><div id="canvas-host"></div></div>
+        <div class="center">
+          <fk-bar edge="top">
+            <div class="tbar-left">
+              <div class="hist">
+                <fk-button
+                  variant="ghost"
+                  ?disabled=${!this.history.length}
+                  title="Undo (Ctrl+Z)"
+                  @click=${() => this.travel('history')}
+                  >↶</fk-button
+                >
+                <fk-button
+                  variant="ghost"
+                  ?disabled=${!this.future.length}
+                  title="Redo (Ctrl+Shift+Z)"
+                  @click=${() => this.travel('future')}
+                  >↷</fk-button
+                >
+              </div>
+            </div>
+            <div class="zoom">
+              <fk-button variant="ghost" @click=${() => this.zoom(1 / 1.2)}>−</fk-button>
+              <span class="pct">${this.zoomPct}%</span>
+              <fk-button variant="ghost" @click=${() => this.zoom(1.2)}>+</fk-button>
+              <fk-button variant="ghost" title="Fit the whole sheet" @click=${() => this.fit()}>
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"></rect><path d="M12 11V7.8"></path><path d="M10.4 9.2 12 7.6 13.6 9.2"></path><path d="M12 13v3.2"></path><path d="M10.4 14.8 12 16.4 13.6 14.8"></path><path d="M11 12H7.8"></path><path d="M9.2 10.4 7.6 12 9.2 13.6"></path><path d="M13 12h3.2"></path><path d="M14.8 10.4 16.4 12 14.8 13.6"></path></svg>
+              </fk-button>
+              <fk-button variant="ghost" title="Fill the stage across" @click=${() => this.fit('width')}>
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"></rect><path d="M7.3 12h9.4"></path><path d="M9.1 10.2 7.3 12 9.1 13.8"></path><path d="M14.9 10.2 16.7 12 14.9 13.8"></path></svg>
+              </fk-button>
+            </div>
+            <div class="tbar-right">
+              <div class="gen">
+                <fk-button
+                  variant="ghost"
+                  ?disabled=${!this.fields.length}
+                  title=${this.fields.length ? 'Draw a test PDF' : 'Add a field first'}
+                  @click=${() => this.onGenerate()}
+                  >Generate PDF</fk-button
+                >
+                <label
+                  class="incl ${this.pdfBytes ? '' : 'off'}"
+                  title=${this.pdfBytes
+                    ? 'Draw the data over the official sheet (alignment check). Untick for the data only — what actually prints onto the physical sheet.'
+                    : 'Upload the official sheet PDF first.'}
+                  ><input
+                    type="checkbox"
+                    .checked=${this.includeSheet && !!this.pdfBytes}
+                    ?disabled=${!this.pdfBytes}
+                    @change=${(e: Event) => (this.includeSheet = (e.target as HTMLInputElement).checked)}
+                  />
+                  Include sheet</label
+                >
+              </div>
+              <fk-button @click=${() => this.onExport()}>Export JSON</fk-button>
+            </div>
+          </fk-bar>
+          <div id="stage"><div id="canvas-host"></div></div>
+        </div>
 
         <fk-panel side="right">
           <h2>Selected field</h2>

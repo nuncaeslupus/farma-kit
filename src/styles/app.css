@@ -87,7 +87,7 @@ a:hover {
   width: 100%;
   max-width: 940px;
   margin: 0 auto;
-  padding: 28px 24px 48px;
+  padding: 8px 24px 20px;
 }
 
 /* ---------- utility bar (language + theme) ---------- */
@@ -98,11 +98,53 @@ a:hover {
 .util-bar {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   flex-wrap: wrap;
   gap: 10px;
   padding-top: 4px;
-  margin-bottom: 10px;
+  margin-bottom: 34px;
+}
+.util-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+/* app-level identity (top row): badge + wordmark + tagline. Distinct from the
+   per-tool brand in <header> below, which names the current tool. */
+.app-brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+.app-badge {
+  flex: none;
+  display: block;
+  border-radius: 9px;
+}
+.app-id {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+  min-width: 0;
+}
+.app-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.app-name .kit {
+  color: var(--accent);
+}
+.app-tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--faint);
 }
 
 /* ---------- header ---------- */
@@ -121,29 +163,9 @@ header {
 }
 .logo {
   flex: none;
-  width: 42px;
-  height: auto;
+  width: 38px;
+  height: 38px;
   display: block;
-}
-.logo .sheet {
-  fill: var(--field-bg);
-  stroke: var(--accent);
-  stroke-width: 1.6;
-}
-.logo .band {
-  fill: var(--accent);
-}
-.logo .bandln {
-  fill: var(--surface);
-  opacity: 0.9;
-}
-.logo .coupon {
-  fill: var(--faint);
-  opacity: 0.5;
-}
-[data-theme='dark'] .logo .coupon {
-  fill: var(--faint);
-  opacity: 0.42;
 }
 h1 {
   font-family: 'Space Grotesk', sans-serif;
@@ -236,7 +258,7 @@ h1 .lo {
 
 /* ---------- lead ---------- */
 .lead {
-  margin: 12px 0 10px;
+  margin: 8px 0 8px;
   color: var(--muted);
   font-size: 13px;
   line-height: 1.55;
@@ -1188,4 +1210,32 @@ select[aria-invalid='true']:focus {
 .foot-dot {
   color: var(--faint);
   opacity: 0.6;
+}
+/* copy-confirmation toast: overlays above the share button so its label never
+   changes width and the centered footer line stays put */
+#shareBtn {
+  position: relative;
+}
+.linklike > .share-toast {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 6px);
+  transform: translate(-50%, 4px);
+  white-space: nowrap;
+  background: var(--btn-bg);
+  color: var(--btn-ink);
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  box-shadow: var(--shadow);
+  pointer-events: none;
+  text-decoration: none;
+  opacity: 0;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+}
+.share-toast.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
 }

@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { CP2PROV, titleCase, isNif, VAL, detectLang } from '../src/lib/validation';
+import { CP2PROV, titleCase, isNif, VAL, detectLang, isCatalanPath } from '../src/lib/validation';
 
 describe('detectLang', () => {
   // The app serves all of Spain: a saved preference wins, otherwise only an
@@ -23,6 +23,20 @@ describe('detectLang', () => {
     [null, null, 'es'],
   ])('stored=%p nav=%p -> %p', (stored, nav, expected) => {
     expect(detectLang(stored, nav)).toBe(expected);
+  });
+});
+
+describe('isCatalanPath', () => {
+  test.each([
+    ['/farma-kit/ca/', true],
+    ['/farma-kit/ca', true],
+    ['/farma-kit/ca/index.html', true],
+    ['/farma-kit/', false],
+    ['/farma-kit/index.html', false],
+    // must not false-positive on words that merely start with "ca"
+    ['/farma-kit/casa/', false],
+  ])('%p -> %p', (path, expected) => {
+    expect(isCatalanPath(path)).toBe(expected);
   });
 });
 

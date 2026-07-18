@@ -3,7 +3,7 @@ import { customElement } from 'lit/decorators.js';
 import { COLEGIOS } from '../lib/colegios';
 import { I18N, applyLang, type Lang } from '../lib/i18n';
 import { slug, type Template } from '../lib/template';
-import { CP2PROV, titleCase, VAL, detectLang } from '../lib/validation';
+import { CP2PROV, titleCase, VAL, detectLang, isCatalanPath } from '../lib/validation';
 import { applyStoredTheme, toggleTheme } from '../lib/theme';
 import { generatePdf } from '../lib/pdf/generate';
 
@@ -69,7 +69,7 @@ export class GeneratorApp extends LitElement {
       // /ca/ is a distinct crawlable URL (see ca/index.html) so Google can index
       // the Catalan version on its own — arriving there is an explicit signal,
       // so it wins over a stored preference from a previous visit to the root.
-      this.uiLang = /\/ca\/?$/.test(location.pathname)
+      this.uiLang = isCatalanPath(location.pathname)
         ? 'ca'
         : detectLang(localStorage.getItem(LANG_KEY), navigator.language);
     } catch {
@@ -156,7 +156,7 @@ export class GeneratorApp extends LitElement {
     window.addEventListener('popstate', this.onPopLang);
   }
   private onPopLang = () => {
-    const lang: Lang = /\/ca\/?$/.test(location.pathname) ? 'ca' : 'es';
+    const lang: Lang = isCatalanPath(location.pathname) ? 'ca' : 'es';
     if (lang === this.uiLang) return;
     this.uiLang = lang;
     applyLang(this, lang);

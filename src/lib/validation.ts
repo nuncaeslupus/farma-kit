@@ -77,3 +77,11 @@ export function detectLang(stored: string | null, navLang?: string | null): Lang
   if (stored === 'ca' || stored === 'es') return stored;
   return navLang && /^ca\b/i.test(navLang) ? 'ca' : 'es';
 }
+
+/**
+ * True when a URL path is the Catalan entry point. Matches /ca, /ca/ and
+ * /ca/index.html (a direct hit GitHub Pages serves), but not /casa.
+ */
+export function isCatalanPath(pathname: string): boolean {
+  return /\/ca(\/|$)/.test(pathname);
+}

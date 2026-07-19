@@ -168,7 +168,6 @@ header {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 24px;
   padding-bottom: 12px;
   border-bottom: 1px solid var(--line);
 }
@@ -195,6 +194,13 @@ h1 {
 }
 h1 .lo {
   color: var(--accent);
+}
+/* On a narrow phone the 54px logo leaves the centered title too little width,
+   wrapping it and shoving it off-centre — stack logo over title instead. */
+@media (max-width: 480px) {
+  .brand {
+    flex-direction: column;
+  }
 }
 
 /* segmented language */

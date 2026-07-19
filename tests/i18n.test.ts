@@ -30,6 +30,7 @@ describe('applyLang', () => {
     applyLang(document.body, 'es');
     expect(document.querySelector('h1')!.textContent).toBe(I18N.es.instr);
     expect(document.querySelector('input')!.getAttribute('placeholder')).toBe(I18N.es.colegiPh);
+    expect(document.querySelector('input')!.getAttribute('aria-label')).toBe(I18N.es.colegiPh);
     expect(document.documentElement.lang).toBe('es');
 
     applyLang(document.body, 'ca');

@@ -232,9 +232,11 @@ export class GeneratorApp extends LitElement {
   };
   private onDocKey = (e: KeyboardEvent) => {
     if (e.key !== 'Escape') return;
+    // While the modal is up, Escape belongs to it alone: close when idle, do
+    // nothing mid-generation — never fall through to the combobox behind it.
     const modal = this.q('#genModal');
-    if (!modal.hidden && this.q('#genProgress').hidden) {
-      this.closeGenModal();
+    if (!modal.hidden) {
+      if (this.q('#genProgress').hidden) this.closeGenModal();
       return;
     }
     this.openColegi(false);
@@ -1020,7 +1022,12 @@ export class GeneratorApp extends LitElement {
     const focusables = Array.from(
       dialog.querySelectorAll<HTMLElement>('a[href], button:not([disabled])'),
     ).filter((el) => el.offsetParent !== null);
-    if (!focusables.length) return;
+    if (!focusables.length) {
+      // Mid-generation the dialog has no interactive content at all — swallow
+      // Tab entirely or focus escapes to the covered page behind the overlay.
+      e.preventDefault();
+      return;
+    }
     const first = focusables[0];
     const last = focusables[focusables.length - 1];
     if (e.shiftKey && (document.activeElement === first || document.activeElement === dialog)) {
@@ -1224,7 +1231,8 @@ export class GeneratorApp extends LitElement {
           <span class="dot" aria-hidden="true">·</span>
           <span data-i18n="noCookies">El lloc no fa servir cookies</span>
         </div>
-        <div class="warn-confirm" id="warnConfirm" role="alertdialog" aria-describedby="warnMsg" hidden>
+        <div class="warn-confirm" id="warnConfirm" role="alertdialog" aria-labelledby="warnTitle" aria-describedby="warnMsg" hidden>
+          <h2 class="visually-hidden" id="warnTitle" data-i18n="alertLabel">Alerta!</h2>
           <p class="warn-confirm-msg" id="warnMsg"></p>
           <div class="warn-confirm-actions">
             <button type="button" class="btn-ghost" id="warnCancel" data-i18n="cancel">Cancel·lar</button>

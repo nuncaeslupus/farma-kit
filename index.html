@@ -46,11 +46,14 @@
     />
     <meta name="twitter:image" content="https://nuncaeslupus.github.io/farma-kit/og-card.png" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Serif:wght@400;500;600&display=swap"
-      rel="stylesheet"
+    <!-- Meta-CSP as defense in depth: GitHub Pages serves static files and can't
+         set response headers, so this is the only way to ship a CSP at all. Now
+         that fonts are self-hosted (see src/styles/fonts.css), everything the app
+         needs is same-origin. style-src keeps 'unsafe-inline' because Lit writes
+         inline styles. -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"
     />
   </head>
   <body>

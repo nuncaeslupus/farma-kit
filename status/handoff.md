@@ -178,10 +178,12 @@ importable without side effects, which is why:
 `tests/template.test.ts` validates the shipped `catalunya.json`, so a bad template
 edit fails CI instead of reaching a printer.
 
-**There is no automated PR reviewer any more** — Gemini Code Assist's consumer
-version was sunset on 2026-07-17. The suite and CI are the only gate left, and a
-suite catches regressions, not half-finished fixes: re-read the whole path before
-calling something done.
+**Gemini Code Assist's PR reviews are best-effort, not guaranteed** — its
+consumer version had an announced sunset of 2026-07-17, but reviews were still
+arriving on PRs #18/#19 as of 2026-07-19, after that date. Don't rely on it
+showing up. The suite and CI remain the real gate, and a suite catches
+regressions, not half-finished fixes: re-read the whole path before calling
+something done.
 
 ## Deploy
 
@@ -231,10 +233,14 @@ gate before deploying, so a red suite cannot reach the live site.
   selectable.
 - **Share button** and **GitHub link** now live in `.page-foot`, next to
   *Contactar*. Share uses the Web Share API (native share sheet on mobile) with a
-  copy-link clipboard fallback where it's unsupported — the copy confirmation
-  flashes by clearing the button's `data-i18n` attribute first and restoring it
-  afterwards, since `applyLang` overwrites `[data-i18n]` textContent on every
-  language switch (see `syncColegiLabel` for the same trap).
+  copy-link clipboard fallback where it's unsupported — the copy confirmation is
+  an overlay toast (`#shareToast`) that deliberately carries no `data-i18n`, so
+  `applyLang` can't touch it on a language switch mid-flash.
+- Fonts are now self-hosted: latin woff2 subsets live in `public/fonts/` and
+  `src/styles/fonts.css` declares the `@font-face` rules, imported first in
+  `main.ts`. Both HTML shells now also carry a same-origin meta CSP. The
+  Google Fonts CDN links are gone — they contradicted the privacy bar's
+  promise that data is processed in your browser and sent nowhere.
 - Fixed 2026-07-17: on narrow phones, the language segment + theme switch used to
   share the header row with the title, squeezing it to almost one word per line
   and pushing the page into horizontal scroll. Both controls now sit in a

@@ -34,7 +34,6 @@ export const I18N: { ca: Dict; es: Dict } = {
     // a card number and offers credit-card autofill. Verified by bisection.
     num: 'Quantitat de fulls',
     pages: 'Pàgines a imprimir',
-    dismiss: 'No mostrar més',
     segell: 'Generar també les dades del segell',
     cognoms: 'Cognoms del titular',
     nom: 'Nom del titular',
@@ -62,7 +61,6 @@ export const I18N: { ca: Dict; es: Dict } = {
     errCp: 'Codi postal no vàlid (5 xifres).',
     errRequired: 'Cal omplir aquest camp per generar el segell.',
     errColegi: 'Selecciona un col·legi amb plantilla disponible.',
-    showAgain: "Mostra l'avís legal",
     continuar: 'Continuar',
     cancel: 'Cancel·lar',
     warnAhead: (mes: string) =>
@@ -71,6 +69,7 @@ export const I18N: { ca: Dict; es: Dict } = {
       "Compte! S'estan generant les primeres pàgines per al mes <strong>" +
       mes +
       '</strong>, que està acabant. És correcte?',
+    // Accessible name of the pre-generate warning dialog (visually hidden).
     alertLabel: 'Alerta!',
     alertText: 'Aquesta pàgina no pertany a cap Col·legi de Farmacèutics',
     theme_dark: 'Fosc',
@@ -114,7 +113,6 @@ export const I18N: { ca: Dict; es: Dict } = {
     full: 'Hoja inicial',
     num: 'Cantidad de hojas',
     pages: 'Páginas a imprimir',
-    dismiss: 'No mostrar más',
     segell: 'Generar también los datos del sello',
     cognoms: 'Apellidos del titular',
     nom: 'Nombre del titular',
@@ -139,7 +137,6 @@ export const I18N: { ca: Dict; es: Dict } = {
     errCp: 'Código postal no válido (5 cifras).',
     errRequired: 'Rellena este campo para generar el sello.',
     errColegi: 'Selecciona un colegio con plantilla disponible.',
-    showAgain: 'Mostrar el aviso legal',
     continuar: 'Continuar',
     cancel: 'Cancelar',
     warnAhead: (mes: string) =>

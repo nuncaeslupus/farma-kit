@@ -23,14 +23,36 @@ export const CP2PROV: Record<string, string> = {
   '49': 'Zamora', '50': 'Zaragoza', '51': 'Ceuta', '52': 'Melilla',
 };
 
+// Toponym/name particles kept lowercase when they sit BETWEEN words, across the
+// four languages this app serves (Spanish, Catalan, Galician, Basque): the city
+// is "Sant Boi de Llobregat", not "…De Llobregat". A particle as the FIRST word
+// still capitalizes, since there it heads the name ("La Rioja", "A Coruña").
+const PARTICLES = new Set([
+  'de', 'del', 'dels', 'des', 'da', 'do', 'das', 'dos',
+  'la', 'les', 'las', 'los', 'lo', 'el', 'els',
+  'e', 'y', 'i', 'a', 'o', 'as', 'os',
+  'eta',
+]);
+
 // Unicode-aware: \b\w is ASCII-only, so accented Spanish/Catalan names (Núñez,
 // Óscar, Àngels) capitalized wrong ("NúñEz"). Match the first letter at a string
 // start or after any non-letter/non-number instead.
+const capWord = (w: string): string =>
+  w.replace(/(?<=^|[^\p{L}\p{N}])\p{L}/gu, (c) => c.toUpperCase());
+
 export const titleCase = (s: string): string =>
   s
     .toLowerCase()
-    .replace(/(?<=^|[^\p{L}\p{N}])\p{L}/gu, (c) => c.toUpperCase())
-    .trim();
+    .trim()
+    .split(/\s+/)
+    .map((w, i) => {
+      if (i === 0) return capWord(w); // first word heads the name — always caps
+      if (PARTICLES.has(w)) return w; // "de", "la", "i"… stay lowercase mid-name
+      // Catalan/Galician elided article: "d'aro" → "d'Aro" (lowercase d, cap noun)
+      if (/^[dl]'\p{L}/u.test(w)) return w[0] + capWord(w).slice(1);
+      return capWord(w);
+    })
+    .join(' ');
 
 const NIE_PREFIX: Record<string, string> = { X: '0', Y: '1', Z: '2' };
 

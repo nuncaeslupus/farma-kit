@@ -135,7 +135,9 @@ a:hover {
 .app-badge {
   flex: none;
   display: block;
-  border-radius: 9px;
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
 }
 .app-id {
   display: flex;
@@ -146,7 +148,7 @@ a:hover {
 .app-name {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 600;
-  font-size: 18px;
+  font-size: 22px;
   letter-spacing: -0.01em;
   color: var(--ink);
 }
@@ -155,8 +157,8 @@ a:hover {
 }
 .app-tag {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 9.5px;
-  letter-spacing: 0.12em;
+  font-size: 11px;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--faint);
 }
@@ -166,7 +168,7 @@ header {
   display: flex;
   align-items: flex-start;
   gap: 24px;
-  padding-bottom: 16px;
+  padding-bottom: 12px;
   border-bottom: 1px solid var(--line);
 }
 .brand {
@@ -184,7 +186,7 @@ header {
 h1 {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 600;
-  font-size: 21px;
+  font-size: 19px;
   line-height: 1.18;
   letter-spacing: -0.01em;
   margin: 0;
@@ -677,6 +679,9 @@ select[aria-invalid='true']:focus {
   color: var(--faint);
   text-align: center;
 }
+.combo-empty[hidden] {
+  display: none;
+}
 .combo-err {
   display: flex;
   flex-direction: column;
@@ -745,6 +750,12 @@ select[aria-invalid='true']:focus {
 }
 .pages.empty {
   color: var(--faint);
+  font-weight: 500;
+}
+/* range past the page comb's capacity — submit refuses it, so flag it live */
+.pages.over {
+  color: var(--err);
+  font-size: 13px;
   font-weight: 500;
 }
 
@@ -1074,7 +1085,7 @@ select[aria-invalid='true']:focus {
   color: var(--ink);
 }
 
-/* fixed bottom bar: privacy notice, doubling as the pre-generate warning (non-modal) */
+/* fixed bottom bar: privacy notice (the pre-generate warning is a modal, #warnModal) */
 .privacy-bar {
   position: fixed;
   left: 0;
@@ -1124,30 +1135,6 @@ select[aria-invalid='true']:focus {
   color: var(--ink);
   background: var(--surface-2);
 }
-.privacy-msg[hidden] {
-  display: none;
-}
-.warn-confirm {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-  justify-content: center;
-  max-width: 820px;
-}
-.warn-confirm[hidden] {
-  display: none;
-}
-.warn-confirm-msg {
-  margin: 0;
-  font-size: 13px;
-}
-.warn-confirm-actions {
-  display: flex;
-  gap: 10px;
-  flex: none;
-}
-
 /* Reserves room in the normal document flow for the fixed .privacy-bar, so it
    doesn't paint over the footer above it — see wirePrivacyBarSpacing() for why
    this can't just be padding-bottom on <body>. The height below is a

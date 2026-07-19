@@ -424,7 +424,9 @@ export class EditorApp extends LitElement {
       grid-template-columns: 1fr auto 1fr;
       align-items: center;
       gap: 10px;
-      padding: 7px var(--bar-pad);
+      /* tight vertical padding: the 60px badge (coherent with the generator)
+         already sets the bar height, so extra padding only wastes canvas space. */
+      padding: 4px var(--bar-pad);
       border-bottom: 1px solid var(--line);
     }
     .app-brand {
@@ -434,7 +436,7 @@ export class EditorApp extends LitElement {
       justify-self: start;
     }
     .app-badge {
-      border-radius: 7px;
+      border-radius: 12px;
       flex: none;
       display: block;
     }
@@ -666,7 +668,7 @@ export class EditorApp extends LitElement {
     return html`
       <div class="brandbar">
         <div class="app-brand">
-          <img class="app-badge" src="${import.meta.env.BASE_URL}brand/farmakit-badge.svg" alt="" width="48" height="48" />
+          <img class="app-badge" src="${import.meta.env.BASE_URL}brand/farmakit-badge.svg" alt="" width="60" height="60" />
           <span class="app-name">Farma<span class="kit">Kit</span></span>
         </div>
         <h1>Template editor</h1>

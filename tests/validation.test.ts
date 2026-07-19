@@ -76,7 +76,6 @@ describe('CP2PROV', () => {
 
 describe('titleCase', () => {
   test.each([
-    ['maria del carmen', 'Maria Del Carmen'],
     ['CARRER MAJOR', 'Carrer Major'],
     ['  josep  ', 'Josep'],
     // Accented first letters — the ASCII \b\w version mangled these to "NúñEz".
@@ -85,6 +84,16 @@ describe('titleCase', () => {
     ['ÓSCAR', 'Óscar'],
     ['maria àngels', 'Maria Àngels'],
     ["l'hospitalet", "L'Hospitalet"],
+    // Particles ("de", "del", "la", "i"…) stay lowercase mid-name across the four
+    // languages served — but a leading article still capitalizes.
+    ['maria del carmen', 'Maria del Carmen'],
+    ['sant boi de llobregat', 'Sant Boi de Llobregat'],
+    ['mollet del vallès', 'Mollet del Vallès'],
+    ['carrer de la pau', 'Carrer de la Pau'],
+    ['vilanova i la geltrú', 'Vilanova i la Geltrú'],
+    ["sant joan d'alacant", "Sant Joan d'Alacant"], // elided article: d' lower, noun caps
+    ['a coruña', 'A Coruña'], // leading Galician article — stays capitalized
+    ['o barco de valdeorras', 'O Barco de Valdeorras'],
     ['', ''],
   ])('titleCase(%p) -> %p', (input, expected) => {
     expect(titleCase(input)).toBe(expected);

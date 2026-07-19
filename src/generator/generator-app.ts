@@ -1177,7 +1177,7 @@ export class GeneratorApp extends LitElement {
         </div>
         <header>
           <div class="brand">
-            <img class="logo" src="${import.meta.env.BASE_URL}brand/rellenador.svg" alt="" width="38" height="38" />
+            <img class="logo" src="${import.meta.env.BASE_URL}brand/rellenador.svg" alt="" width="54" height="54" />
             <h1 data-i18n="appTitle">Emplenador de <span class="lo">fulls de cupons precinte</span></h1>
           </div>
         </header>

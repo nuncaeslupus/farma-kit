@@ -116,7 +116,7 @@ a:hover {
   flex-wrap: wrap;
   gap: 10px;
   padding-top: 4px;
-  margin-bottom: 34px;
+  margin-bottom: 16px;
 }
 .util-controls {
   display: flex;
@@ -166,21 +166,22 @@ a:hover {
 /* ---------- header ---------- */
 header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
+  justify-content: center;
   gap: 24px;
   padding-bottom: 12px;
   border-bottom: 1px solid var(--line);
 }
 .brand {
   display: flex;
-  gap: 14px;
+  gap: 16px;
   align-items: center;
   min-width: 0;
 }
 .logo {
   flex: none;
-  width: 38px;
-  height: 38px;
+  width: 54px;
+  height: 54px;
   display: block;
 }
 h1 {
@@ -190,6 +191,7 @@ h1 {
   line-height: 1.18;
   letter-spacing: -0.01em;
   margin: 0;
+  text-align: center;
 }
 h1 .lo {
   color: var(--accent);

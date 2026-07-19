@@ -57,6 +57,7 @@ export class GeneratorApp extends LitElement {
   private pdfUrl: string | null = null; // last generated blob URL, revoked on the next run
   private cpCitiesP: Promise<Record<string, string[]>> | null = null; // memoized postal fetch
   private shareTimer?: ReturnType<typeof setTimeout>; // clears the "copied" flash on the share button
+  private genOpener: HTMLElement | null = null; // focus to restore once the generation modal closes
   private q = (s: string) => this.querySelector(s) as HTMLElement;
   private i = (id: string) => this.querySelector('#' + id) as HTMLInputElement;
 
@@ -176,16 +177,19 @@ export class GeneratorApp extends LitElement {
   private buildColegis() {
     let h = '';
     for (const g of COLEGIOS) {
-      h += `<div class="combo-group">${g.region}</div>`;
+      h += `<div class="combo-group" role="presentation">${g.region}</div>`;
       for (const name of g.colegios) {
         const sup = this.supported.has(slug(name));
         h +=
-          `<div class="combo-opt${sup ? '' : ' unsupported'}" role="option" data-val="${name}">` +
+          `<div class="combo-opt${sup ? '' : ' unsupported'}" role="option" id="copt-${slug(name)}" aria-selected="false" data-val="${name}">` +
           `<span class="combo-opt-name">${name}</span>` +
           (sup
             ? ''
             : `<span class="combo-req-status" data-i18n="reqStatus">Encara no disponible</span>` +
-              `<button type="button" class="combo-req" data-colegi="${name}" data-i18n="reqBtn">Demanar</button>`) +
+              // AT/keyboard users cannot reach this nested control (role=option
+              // containing a button is invalid ARIA) — they go through
+              // #colegiNoteReq instead once the unsupported colegio is selected.
+              `<button type="button" class="combo-req" data-colegi="${name}" data-i18n="reqBtn" aria-hidden="true" tabindex="-1">Demanar</button>`) +
           `</div>`;
       }
     }
@@ -227,7 +231,13 @@ export class GeneratorApp extends LitElement {
     if (this.isConnected && !this.q('#colegiCombo').contains(e.target as Node)) this.openColegi(false);
   };
   private onDocKey = (e: KeyboardEvent) => {
-    if (e.key === 'Escape') this.openColegi(false);
+    if (e.key !== 'Escape') return;
+    const modal = this.q('#genModal');
+    if (!modal.hidden && this.q('#genProgress').hidden) {
+      this.closeGenModal();
+      return;
+    }
+    this.openColegi(false);
   };
   disconnectedCallback() {
     document.removeEventListener('click', this.onDocClick);
@@ -253,27 +263,39 @@ export class GeneratorApp extends LitElement {
   }
   private setActive(i: number) {
     const opts = this.visibleOpts();
+    const search = this.i('colegiSearch');
     if (!opts.length) {
       this.activeIdx = -1;
+      search.removeAttribute('aria-activedescendant');
       return;
     }
     if (i < 0) i = opts.length - 1;
     if (i >= opts.length) i = 0;
-    opts.forEach((o) => o.classList.remove('active'));
+    opts.forEach((o) => {
+      o.classList.remove('active');
+      o.setAttribute('aria-selected', 'false');
+    });
     this.activeIdx = i;
     opts[i].classList.add('active');
+    opts[i].setAttribute('aria-selected', 'true');
     opts[i].scrollIntoView({ block: 'nearest' });
+    search.setAttribute('aria-activedescendant', opts[i].id);
   }
   private openColegi(o: boolean) {
     const panel = this.q('#colegiPanel');
+    const hadFocus = !o && panel.contains(document.activeElement);
     panel.hidden = !o;
+    const search = this.i('colegiSearch');
     this.q('#colegiBtn').setAttribute('aria-expanded', String(o));
+    search.setAttribute('aria-expanded', String(o));
     if (o) {
-      const search = this.i('colegiSearch');
       search.value = '';
       this.filterColegis('');
       this.activeIdx = -1;
+      search.removeAttribute('aria-activedescendant');
       setTimeout(() => search.focus(), 0);
+    } else if (hadFocus) {
+      this.q('#colegiBtn').focus();
     }
   }
   private filterColegis(query: string) {
@@ -283,6 +305,7 @@ export class GeneratorApp extends LitElement {
       o.style.display = norm(o.dataset.val || '').includes(nq) ? '' : 'none';
     });
     this.activeIdx = -1;
+    this.i('colegiSearch').removeAttribute('aria-activedescendant');
     this.querySelectorAll<HTMLElement>('.combo-group').forEach((gr) => {
       let any = false;
       let n = gr.nextElementSibling as HTMLElement | null;
@@ -322,6 +345,7 @@ export class GeneratorApp extends LitElement {
     if (supported) {
       this.q('#err-colegi').style.display = 'none';
       this.q('#colegiBtn').removeAttribute('aria-invalid');
+      this.q('#colegiBtn').removeAttribute('aria-describedby');
       await this.loadTemplate(val);
     } else {
       this.tpl = null;
@@ -399,7 +423,11 @@ export class GeneratorApp extends LitElement {
     clearTimeout(this.shareTimer);
     toast.textContent = I18N[this.uiLang].shareCopied as string;
     toast.classList.add('show');
-    this.shareTimer = setTimeout(() => toast.classList.remove('show'), 2000);
+    this.q('#shareStatus').textContent = I18N[this.uiLang].shareCopied as string;
+    this.shareTimer = setTimeout(() => {
+      toast.classList.remove('show');
+      this.q('#shareStatus').textContent = '';
+    }, 2000);
   }
 
   // ---------- template-driven gate ----------
@@ -631,6 +659,7 @@ export class GeneratorApp extends LitElement {
     const errEl = this.q('#err-' + key);
     if (vd.segell && !this.i('segell').checked) {
       el.removeAttribute('aria-invalid');
+      el.removeAttribute('aria-describedby');
       errEl.style.display = 'none';
       return true;
     }
@@ -650,18 +679,22 @@ export class GeneratorApp extends LitElement {
     }
     if (!ok && (forceShow || el.dataset.touched)) {
       el.setAttribute('aria-invalid', 'true');
+      el.setAttribute('aria-describedby', 'err-' + key);
       errEl.textContent = I18N[this.uiLang][msg!] as string;
       errEl.style.display = 'block';
       return false;
     }
     el.removeAttribute('aria-invalid');
+    el.removeAttribute('aria-describedby');
     errEl.style.display = 'none';
     return ok;
   }
   private validateColegi(forceShow: boolean): boolean {
     const ok = this.isSupported(this.i('colegi').value);
     if (!ok && forceShow) {
-      this.q('#colegiBtn').setAttribute('aria-invalid', 'true');
+      const btn = this.q('#colegiBtn');
+      btn.setAttribute('aria-invalid', 'true');
+      btn.setAttribute('aria-describedby', 'err-colegi');
       const err = this.q('#err-colegi');
       err.textContent = I18N[this.uiLang].errColegi as string;
       err.style.display = 'block';
@@ -675,7 +708,10 @@ export class GeneratorApp extends LitElement {
       this.showWarn(false);
       void this.generate();
     });
-    this.q('#warnCancel').addEventListener('click', () => this.showWarn(false));
+    this.q('#warnCancel').addEventListener('click', () => {
+      this.showWarn(false);
+      this.querySelector<HTMLElement>('button[type="submit"]')?.focus();
+    });
     this.q('#barX').addEventListener('click', () => {
       this.barDismissed = true;
       this.q('#privacyBar').hidden = true;
@@ -838,6 +874,7 @@ export class GeneratorApp extends LitElement {
       if (w) {
         this.q('#warnMsg').innerHTML = w;
         this.showWarn(true);
+        this.q('#warnOk').focus();
         return;
       }
       void this.generate();
@@ -853,7 +890,9 @@ export class GeneratorApp extends LitElement {
     result.hidden = true;
     error.hidden = true;
     this.q('#genProgress').hidden = false;
+    this.genOpener = document.activeElement as HTMLElement | null;
     modal.hidden = false;
+    (modal.querySelector('.modal') as HTMLElement).focus();
     this.setGenTitle('genTitle');
     bar.style.width = '30%';
 
@@ -941,7 +980,7 @@ export class GeneratorApp extends LitElement {
         /* refused — fall through to the modal link */
       }
       if (tab) {
-        this.q('#genModal').hidden = true;
+        this.closeGenModal();
         this.q('#genProgress').hidden = true;
         this.setGenTitle('genTitle'); // reset for the next run
         return;
@@ -949,11 +988,13 @@ export class GeneratorApp extends LitElement {
       this.q('#genProgress').hidden = true;
       this.setGenTitle('genDone');
       result.hidden = false;
+      (this.q('#genDownload') as HTMLElement).focus();
     } catch {
       this.q('#genProgress').hidden = true;
       this.setGenTitle('genErrTitle');
       this.q('#genErrMsg').textContent = I18N[this.uiLang].genErrGeneric as string;
       error.hidden = false;
+      (this.q('#genErrClose') as HTMLElement).focus();
     }
   }
 
@@ -963,6 +1004,33 @@ export class GeneratorApp extends LitElement {
     t.dataset.i18n = key;
     t.textContent = I18N[this.uiLang][key] as string;
   }
+
+  /** Close the modal and give focus back to where generation started. */
+  private closeGenModal() {
+    this.q('#genModal').hidden = true;
+    this.genOpener?.focus();
+    this.genOpener = null;
+  }
+
+  /** Minimal Tab trap: the page behind the overlay is visually covered but still
+      in the tab order (light DOM), so wrap focus at the dialog's edges. */
+  private onModalKey = (e: KeyboardEvent) => {
+    if (e.key !== 'Tab') return;
+    const dialog = this.q('#genModal').querySelector('.modal') as HTMLElement;
+    const focusables = Array.from(
+      dialog.querySelectorAll<HTMLElement>('a[href], button:not([disabled])'),
+    ).filter((el) => el.offsetParent !== null);
+    if (!focusables.length) return;
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    if (e.shiftKey && (document.activeElement === first || document.activeElement === dialog)) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  };
 
   render() {
     const provinces = COLEGIOS.flatMap((g) => g.colegios).sort((a, b) => a.localeCompare(b));
@@ -1007,12 +1075,12 @@ export class GeneratorApp extends LitElement {
               <svg class="combo-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg>
             </button>
             <div class="combo-panel" id="colegiPanel" hidden>
-              <input type="text" class="combo-search" id="colegiSearch" data-i18n-ph="searchPh" placeholder="Cerca…" autocomplete="off" />
+              <input type="text" class="combo-search" id="colegiSearch" role="combobox" aria-expanded="false" aria-controls="colegiList" aria-autocomplete="list" aria-label="Cerca…" data-i18n-ph="searchPh" placeholder="Cerca…" autocomplete="off" />
               <div class="combo-list" id="colegiList" role="listbox" aria-labelledby="colegiLbl"></div>
             </div>
             <input type="hidden" id="colegi" name="colegi" value="" form="form" />
           </div>
-          <span class="field-err" id="err-colegi"></span>
+          <span class="field-err" id="err-colegi" role="alert"></span>
           <div class="field-note colegi-note" id="colegiNote" hidden>
             <span id="colegiNoteText" data-i18n="noTemplate">Encara no tenim la plantilla d'aquest col·legi. Demana-la i l'afegirem perquè la puguis fer servir.</span>
             <button type="button" class="combo-req" id="colegiNoteReq" data-i18n="reqBtn" @click=${() => this.demanar(this.i('colegi').value)}>Demanar</button>
@@ -1042,7 +1110,7 @@ export class GeneratorApp extends LitElement {
               <div class="field">
                 <label for="up" data-i18n="up">UP de la farmàcia</label>
                 <input id="up" name="up" type="text" inputmode="numeric" maxlength="5" class="numr" placeholder="10000" />
-                <span class="field-err" id="err-up"></span>
+                <span class="field-err" id="err-up" role="alert"></span>
               </div>
               <div class="field">
                 <!-- data-i18n sits on the inner span, not the label: applyLang
@@ -1052,11 +1120,11 @@ export class GeneratorApp extends LitElement {
                   ><span class="mes-fmt" id="mesFmt" hidden></span></label
                 >
                 <input id="mes" name="mes" type="month" />
-                <span class="field-err" id="err-mes"></span>
+                <span class="field-err" id="err-mes" role="alert"></span>
               </div>
               <div class="two-up">
-                <div class="field"><label for="full" data-i18n="full">Full inicial</label><input id="full" name="full" type="text" inputmode="numeric" maxlength="4" class="numr" placeholder="1" /><span class="field-err" id="err-full"></span></div>
-                <div class="field"><label for="num" data-i18n="num">Quantitat de fulls</label><input id="num" name="num" type="text" inputmode="numeric" maxlength="4" class="numr" placeholder="50" /><span class="field-err" id="err-num"></span></div>
+                <div class="field"><label for="full" data-i18n="full">Full inicial</label><input id="full" name="full" type="text" inputmode="numeric" maxlength="4" class="numr" placeholder="1" /><span class="field-err" id="err-full" role="alert"></span></div>
+                <div class="field"><label for="num" data-i18n="num">Quantitat de fulls</label><input id="num" name="num" type="text" inputmode="numeric" maxlength="4" class="numr" placeholder="50" /><span class="field-err" id="err-num" role="alert"></span></div>
               </div>
 
               <div class="pages-line" aria-live="polite">
@@ -1070,21 +1138,21 @@ export class GeneratorApp extends LitElement {
             <section class="col" id="segellSection">
               <label class="check segell-toggle"><input type="checkbox" id="segell" /><span data-i18n="segell">Generar també les dades del segell</span></label>
               <div class="opt-fields" id="optFields" data-off="true">
-                <div class="field"><label for="cognoms" data-i18n="cognoms">Cognoms del titular</label><input id="cognoms" name="cognoms" type="text" disabled /><span class="field-err" id="err-cognoms"></span></div>
-                <div class="field"><label for="nom" data-i18n="nom">Nom del titular</label><input id="nom" name="nom" type="text" disabled /><span class="field-err" id="err-nom"></span></div>
+                <div class="field"><label for="cognoms" data-i18n="cognoms">Cognoms del titular</label><input id="cognoms" name="cognoms" type="text" disabled /><span class="field-err" id="err-cognoms" role="alert"></span></div>
+                <div class="field"><label for="nom" data-i18n="nom">Nom del titular</label><input id="nom" name="nom" type="text" disabled /><span class="field-err" id="err-nom" role="alert"></span></div>
                 <div class="two-up">
-                  <div class="field"><label for="nif" data-i18n="nif">NIF</label><input id="nif" name="nif" type="text" maxlength="9" disabled /><span class="field-err" id="err-nif"></span></div>
-                  <div class="field"><label for="cp" data-i18n="cp">Codi postal</label><input id="cp" name="cp" type="text" inputmode="numeric" maxlength="5" class="numr" disabled /><span class="field-err" id="err-cp"></span></div>
+                  <div class="field"><label for="nif" data-i18n="nif">NIF</label><input id="nif" name="nif" type="text" maxlength="9" disabled /><span class="field-err" id="err-nif" role="alert"></span></div>
+                  <div class="field"><label for="cp" data-i18n="cp">Codi postal</label><input id="cp" name="cp" type="text" inputmode="numeric" maxlength="5" class="numr" disabled /><span class="field-err" id="err-cp" role="alert"></span></div>
                 </div>
-                <div class="field"><label for="adreca" data-i18n="adreca">Adreça</label><input id="adreca" name="adreca" type="text" disabled /><span class="field-err" id="err-adreca"></span></div>
+                <div class="field"><label for="adreca" data-i18n="adreca">Adreça</label><input id="adreca" name="adreca" type="text" disabled /><span class="field-err" id="err-adreca" role="alert"></span></div>
                 <div class="two-up">
-                  <div class="field"><label for="poblacio" data-i18n="poblacio">Població</label><input id="poblacio" name="poblacio" type="text" list="pobles" disabled /><datalist id="pobles"></datalist><span class="field-err" id="err-poblacio"></span></div>
+                  <div class="field"><label for="poblacio" data-i18n="poblacio">Població</label><input id="poblacio" name="poblacio" type="text" list="pobles" disabled /><datalist id="pobles"></datalist><span class="field-err" id="err-poblacio" role="alert"></span></div>
                   <div class="field"><label for="provincia" data-i18n="provincia">Província</label>
                     <select id="provincia" name="provincia" disabled>
                       <option value="" data-i18n="provinciaPh" selected>—</option>
                       ${provinces.map((p) => html`<option>${p}</option>`)}
                     </select>
-                    <span class="field-err" id="err-provincia"></span>
+                    <span class="field-err" id="err-provincia" role="alert"></span>
                   </div>
                 </div>
               </div>
@@ -1109,6 +1177,7 @@ export class GeneratorApp extends LitElement {
             <span data-i18n="share">Compartir</span>
             <span class="share-toast" id="shareToast" aria-hidden="true"></span>
           </button>
+          <span class="visually-hidden" role="status" id="shareStatus"></span>
           <span class="foot-dot" aria-hidden="true">·</span>
           <button type="button" class="linklike" id="contactBtn" @click=${() => this.contactar()}>
             <svg class="foot-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -1128,19 +1197,19 @@ export class GeneratorApp extends LitElement {
         <div class="bar-spacer" id="barSpacer" aria-hidden="true"></div>
 
         <div class="modal-overlay" id="genModal" hidden>
-          <div class="modal" role="alertdialog" aria-modal="true">
-            <div class="modal-title gen" data-i18n="genTitle">Generant el document…</div>
-            <div class="gen-progress" id="genProgress"><div class="progress-track"><div class="progress-fill" id="genBar"></div></div></div>
+          <div class="modal" role="alertdialog" aria-modal="true" aria-labelledby="genTitle" tabindex="-1" @keydown=${this.onModalKey}>
+            <div class="modal-title gen" id="genTitle" role="status" data-i18n="genTitle">Generant el document…</div>
+            <div class="gen-progress" id="genProgress" aria-busy="true"><div class="progress-track"><div class="progress-fill" id="genBar"></div></div></div>
             <div class="gen-result" id="genResult" hidden>
               <div class="modal-actions">
                 <a class="btn" id="genDownload" href="#" target="_blank" rel="noopener" data-i18n="genDownload">Obrir / Descarregar PDF</a>
-                <button type="button" class="btn-ghost" data-i18n="genClose" @click=${() => (this.q('#genModal').hidden = true)}>Tancar</button>
+                <button type="button" class="btn-ghost" data-i18n="genClose" @click=${() => this.closeGenModal()}>Tancar</button>
               </div>
             </div>
             <div class="gen-error" id="genError" hidden>
               <p class="modal-msg" id="genErrMsg"></p>
               <div class="modal-actions">
-                <button type="button" class="btn-ghost" data-i18n="genClose" @click=${() => (this.q('#genModal').hidden = true)}>Tancar</button>
+                <button type="button" class="btn-ghost" id="genErrClose" data-i18n="genClose" @click=${() => this.closeGenModal()}>Tancar</button>
               </div>
             </div>
           </div>
@@ -1155,7 +1224,7 @@ export class GeneratorApp extends LitElement {
           <span class="dot" aria-hidden="true">·</span>
           <span data-i18n="noCookies">El lloc no fa servir cookies</span>
         </div>
-        <div class="warn-confirm" id="warnConfirm" hidden>
+        <div class="warn-confirm" id="warnConfirm" role="alertdialog" aria-describedby="warnMsg" hidden>
           <p class="warn-confirm-msg" id="warnMsg"></p>
           <div class="warn-confirm-actions">
             <button type="button" class="btn-ghost" id="warnCancel" data-i18n="cancel">Cancel·lar</button>

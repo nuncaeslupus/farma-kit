@@ -181,6 +181,11 @@ export function applyLang(root: ParentNode, lang: Lang): void {
   });
   root.querySelectorAll<HTMLElement>('[data-i18n-ph]').forEach((el) => {
     const v = d[el.getAttribute('data-i18n-ph')!];
-    if (typeof v === 'string') el.setAttribute('placeholder', v);
+    if (typeof v === 'string') {
+      el.setAttribute('placeholder', v);
+      // Placeholder-only fields have no visible label; mirror it as the
+      // accessible name so it survives language switches.
+      el.setAttribute('aria-label', v);
+    }
   });
 }

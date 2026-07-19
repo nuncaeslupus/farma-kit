@@ -188,7 +188,11 @@
       </p>
       <!-- Crawlable cross-links between the language versions (the toggle above
            is a JS button, invisible to link-following crawlers). Each link
-           self-labels in its own language, so this line needs no data-i18n. -->
+           self-labels in its own language, so this line needs no data-i18n.
+           Absolute /farma-kit/ on purpose: the dev server serves under the same
+           base (vite.config.ts), so these work in both environments — while
+           relative hrefs would resolve to the wrong place from the
+           no-trailing-slash URL variants. -->
       <p class="about-langs">
         <a href="/farma-kit/" hreflang="es" lang="es">Versión en español</a>
         <span aria-hidden="true">·</span>

@@ -3,7 +3,7 @@ import { customElement } from 'lit/decorators.js';
 import { COLEGIOS } from '../lib/colegios';
 import { I18N, applyLang, type Lang } from '../lib/i18n';
 import { slug, type Template } from '../lib/template';
-import { CP2PROV, titleCase, VAL, detectLang, isCatalanPath, pageRangeExceeds } from '../lib/validation';
+import { CP2PROV, titleCase, VAL, isCatalanPath, pageRangeExceeds } from '../lib/validation';
 import { applyStoredTheme, toggleTheme } from '../lib/theme';
 import { generatePdf } from '../lib/pdf/generate';
 
@@ -16,7 +16,6 @@ const REQUEST_EMAIL = atob('ZmFybWFraXRzdXBwb3J0QGdtYWlsLmNvbQ==');
    not carry it was not sent from here — filter on it to forward the real
    requests on, and leave harvested spam behind. */
 const MAIL_TAG = '[farma-kit]';
-const LANG_KEY = 'cupons_lang';
 const RKEY = 'cupons_remember';
 const COLEGI_KEY = 'cupons_colegi'; // remembered independently of Recorda'm
 const PBKEY = 'cupons_privacybar_hidden';
@@ -71,16 +70,12 @@ export class GeneratorApp extends LitElement {
   }
 
   async firstUpdated() {
-    try {
-      // /ca/ is a distinct crawlable URL (see ca/index.html) so Google can index
-      // the Catalan version on its own — arriving there is an explicit signal,
-      // so it wins over a stored preference from a previous visit to the root.
-      this.uiLang = isCatalanPath(location.pathname)
-        ? 'ca'
-        : detectLang(localStorage.getItem(LANG_KEY), navigator.language);
-    } catch {
-      /* ignore */
-    }
+    // The URL is the single source of truth for language: / is Spanish, /ca/ is
+    // Catalan (two crawlable shells, see index.html and ca/index.html). There
+    // used to be a stored preference + navigator.language detection here, but a
+    // stored 'ca' silently overrode the root URL, so the crawlable link to the
+    // Spanish version rendered Catalan anyway — a link that "did not work".
+    this.uiLang = isCatalanPath(location.pathname) ? 'ca' : 'es';
     applyStoredTheme();
 
     this.indexOk = await this.loadIndex();
@@ -135,30 +130,34 @@ export class GeneratorApp extends LitElement {
 
   // ---------- language / theme ----------
   private setLangButtons() {
-    this.querySelectorAll<HTMLButtonElement>('.seg button').forEach((b) =>
-      b.setAttribute('aria-pressed', b.dataset.lang === this.uiLang ? 'true' : 'false'),
-    );
+    this.querySelectorAll<HTMLAnchorElement>('.seg a').forEach((a) => {
+      // aria-current="page", not aria-pressed: these are links to the two
+      // language URLs, and the active one IS the current page.
+      if (a.dataset.lang === this.uiLang) a.setAttribute('aria-current', 'page');
+      else a.removeAttribute('aria-current');
+    });
     this.querySelector('#themeBtn')?.setAttribute(
       'aria-checked',
       document.documentElement.getAttribute('data-theme') === 'dark' ? 'true' : 'false',
     );
   }
   private wireLang() {
-    this.querySelectorAll<HTMLButtonElement>('.seg button').forEach((b) =>
-      b.addEventListener('click', () => {
-        const target = b.dataset.lang as Lang;
+    // The switcher entries are real <a href> so crawlers can follow them and
+    // they work without JS; this handler is progressive enhancement that swaps
+    // the text in place instead, so a half-filled form survives the switch.
+    this.querySelectorAll<HTMLAnchorElement>('.seg a').forEach((a) =>
+      a.addEventListener('click', (e) => {
+        // Modified clicks (new tab/window) keep native link behavior.
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+        e.preventDefault();
+        const target = a.dataset.lang as Lang;
         if (target === this.uiLang) return;
         this.uiLang = target;
-        try {
-          localStorage.setItem(LANG_KEY, target);
-        } catch {
-          /* ignore */
-        }
         // ca and es are distinct crawlable shells (/, /ca/). Swap text in place
         // for a seamless toggle, but pushState the URL to its sibling so it stays
         // shareable and honest — a hard refresh still serves the right shell, and
         // crawlers hit each URL directly regardless.
-        history.pushState(null, '', target === 'ca' ? `${import.meta.env.BASE_URL}ca/` : import.meta.env.BASE_URL);
+        history.pushState(null, '', a.href);
         applyLang(document.body, target); // body: also reaches the shell's static about/FAQ
         this.syncColegiLabel(); // applyLang just wiped the picked colegio back to the placeholder
         this.syncMonthHint(); // the month example is language-dependent
@@ -1172,8 +1171,8 @@ export class GeneratorApp extends LitElement {
           </div>
           <div class="util-controls">
           <div class="seg" role="group" aria-label="Idioma">
-            <button type="button" data-lang="ca" aria-pressed="false">Català</button>
-            <button type="button" data-lang="es" aria-pressed="true">Español</button>
+            <a href="${import.meta.env.BASE_URL}ca/" data-lang="ca">Català</a>
+            <a href="${import.meta.env.BASE_URL}" data-lang="es">Español</a>
           </div>
           <button type="button" class="theme-switch" id="themeBtn" role="switch" aria-checked="false" aria-label="Tema clar / fosc">
             <span class="ts-knob">

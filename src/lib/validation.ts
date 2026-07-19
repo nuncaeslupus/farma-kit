@@ -1,10 +1,8 @@
 /* Pure, DOM-free pharmacy-form logic. Lives apart from generator-app.ts (a Lit
    component that registers a custom element and touches the DOM on import) so this
    can be imported — by the component AND by tests — with no side effects. The
-   errors this file guards against (NIF checksum, CP→province, the Spanish/Catalan
-   default) are exactly the class that has slipped through before. */
-
-import type { Lang } from './i18n';
+   errors this file guards against (NIF checksum, CP→province, the Catalan-path
+   match) are exactly the class that has slipped through before. */
 
 /* CP first-two-digits → province. Drives instant client-side province autofill. */
 export const CP2PROV: Record<string, string> = {
@@ -102,18 +100,11 @@ export function pageRangeExceeds(start: number, count: number, cells: number): b
 }
 
 /**
- * UI language on load. A saved 'ca'/'es' preference wins; otherwise the app
- * serves all of Spain, so ONLY an explicit Catalan browser locale gets Catalan —
- * everything else (Spanish, English, unset…) defaults to Spanish.
- */
-export function detectLang(stored: string | null, navLang?: string | null): Lang {
-  if (stored === 'ca' || stored === 'es') return stored;
-  return navLang && /^ca\b/i.test(navLang) ? 'ca' : 'es';
-}
-
-/**
  * True when a URL path is the Catalan entry point. Matches /ca, /ca/ and
  * /ca/index.html (a direct hit GitHub Pages serves), but not /casa.
+ * This is the ONLY language signal: / is Spanish, /ca/ is Catalan. A stored
+ * preference (and navigator.language detection) used to override the root URL,
+ * which made the crawlable link to the Spanish version render Catalan anyway.
  */
 export function isCatalanPath(pathname: string): boolean {
   return /\/ca(\/|$)/.test(pathname);

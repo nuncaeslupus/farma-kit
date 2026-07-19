@@ -241,8 +241,8 @@ gate before deploying, so a red suite cannot reach the live site.
   canonical `.../ca/`), reciprocal `hreflang` alternates (`es`/`ca`/`x-default`)
   sit on both shells, `vite.config.ts` builds both via `build.rollupOptions.input`,
   `sitemap.xml` lists both URLs, and `generator-app.ts` boots the app in Catalan
-  when the path is `/ca/` (an explicit signal that outranks a stored language
-  preference from an earlier visit to the root). Re-verify indexing of `/ca/` in
+  when the path is `/ca/` (since 2026-07-19 the path is the *only* signal — see
+  the language-model bullet below). Re-verify indexing of `/ca/` in
   Search Console once Google has re-crawled.
 - `catalunya.json` has been re-traced from the original artwork and printed onto a
   real sheet — alignment is good, with the 1.72 pt caveat above.
@@ -266,13 +266,22 @@ gate before deploying, so a red suite cannot reach the live site.
   in both shells, `WebApplication` + `FAQPage` JSON-LD, keyword-first titles
   («receta electrónica» is the discovery term — the tool itself is unknown, so
   people can only find it through what it's *for*), hreflang alternates in the
-  sitemap, crawlable cross-links between the language versions (the toggle is a
-  button, invisible to link crawlers), font preloads for the two above-the-fold
-  faces, and a `theme-color` meta kept in sync by `theme.ts`. Copy grounded in
+  sitemap, font preloads for the two above-the-fold faces, and a `theme-color`
+  meta kept in sync by `theme.ts`. Copy grounded in
   the terms the audience actually uses: «hojas de cupones precinto»/«fulls de
   cupons precinte», «facturación de recetas», MUFACE/ISFAS/MUGEJU. Adding a
   language (Euskera/Galician) = new shell dir + hreflang on all shells + sitemap
   entry + dict in `i18n.ts` — same recipe as `ca/`.
+- Language model since 2026-07-19: **the URL is the only language signal** —
+  `/` is Spanish, `/ca/` is Catalan. The switcher entries are real `<a href>`
+  links to the two shells (crawlable, work without JS, and they double as the
+  cross-language links); the click handler is progressive enhancement that swaps
+  text in place via pushState so a half-filled form survives the switch. The
+  old stored preference (`cupons_lang`) and `navigator.language` detection are
+  **gone on purpose**: a stored 'ca' silently overrode the root URL, so a link
+  to the Spanish version rendered Catalan anyway — do not reintroduce them.
+  Cost, accepted: a first-time visitor with a Catalan browser landing on `/`
+  sees Spanish until they click Català.
 
 ## Next up
 

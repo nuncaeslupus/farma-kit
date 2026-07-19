@@ -1,31 +1,9 @@
 import { describe, test, expect } from 'vitest';
-import { CP2PROV, titleCase, isNif, VAL, detectLang, isCatalanPath, pageRangeExceeds } from '../src/lib/validation';
+import { CP2PROV, titleCase, isNif, VAL, isCatalanPath, pageRangeExceeds } from '../src/lib/validation';
 
-describe('detectLang', () => {
-  // The app serves all of Spain: a saved preference wins, otherwise only an
-  // explicit Catalan locale gets Catalan and everything else defaults to Spanish.
-  // This exact default flipped the wrong way in a past release — guard it.
-  test.each([
-    ['ca', 'es-ES', 'ca'],
-    ['es', 'ca-ES', 'es'],
-    [null, 'ca', 'ca'],
-    [null, 'ca-ES', 'ca'],
-    [null, 'CA-es', 'ca'],
-    [null, 'es-ES', 'es'],
-    [null, 'en-US', 'es'],
-    [null, 'fr', 'es'],
-    [null, '', 'es'],
-    ['garbage', 'en-US', 'es'],
-    // 'catalan-ish' locales that don't start with the ca token stay Spanish
-    [null, 'car', 'es'],
-    // navigator.language absent (odd webviews / test envs) → default, no throw
-    [null, undefined, 'es'],
-    [null, null, 'es'],
-  ])('stored=%p nav=%p -> %p', (stored, nav, expected) => {
-    expect(detectLang(stored, nav)).toBe(expected);
-  });
-});
-
+// The path is the ONLY language signal (/ = es, /ca/ = ca) — there is no stored
+// preference or navigator.language detection anymore: both used to override the
+// root URL, so a link to the Spanish version could render Catalan anyway.
 describe('isCatalanPath', () => {
   test.each([
     ['/farma-kit/ca/', true],

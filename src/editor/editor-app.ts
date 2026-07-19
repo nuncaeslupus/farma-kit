@@ -46,9 +46,10 @@ export class EditorApp extends LitElement {
   @state() private future: string[] = []; // undone states, newest last
 
   private engine!: CanvasEngine;
-  // Gesture's pre-mutation snapshot, held until onChange confirms something actually
-  // moved — see firstUpdated's onChange/onBeforeChange wiring.
+  // Gesture's pre-mutation snapshot, held until the gesture proves it changed
+  // something — see firstUpdated's onChange/onBeforeChange wiring and onGestureEnd.
   private pending: string | null = null;
+  private mouseGesture = false; // a mouse button is down: defer the commit to mouseup
   // Reactive: the "Include official sheet" control enables/disables on it, and it is
   // assigned after an await in onUpload — a plain field would leave the UI stale.
   @state() private pdfBytes: ArrayBuffer | null = null;
@@ -64,7 +65,11 @@ export class EditorApp extends LitElement {
         // Commit the gesture's pre-state only once something actually mutated:
         // onBeforeChange fires on every mousedown, including selection clicks,
         // and an undo step for a no-op gesture is a Ctrl+Z that does nothing.
-        if (this.pending !== null) {
+        // Mouse gestures defer further, to mouseup (onGestureEnd): committing on
+        // the first mousemove would still record a dead step for a drag that
+        // returns to its origin. Keyboard nudges have no mouseup, so they commit
+        // here, immediately.
+        if (this.pending !== null && !this.mouseGesture) {
           this.push(this.pending);
           this.pending = null;
         }
@@ -91,6 +96,8 @@ export class EditorApp extends LitElement {
     applyStoredTheme();
     this.dark = isDark();
     document.addEventListener('keydown', this.onUndoKey);
+    window.addEventListener('mousedown', this.onGestureStart);
+    window.addEventListener('mouseup', this.onGestureEnd);
     // The editor owns the tab title only while it is mounted, and nothing here
     // needs to undo it: the generator sets its own title from the i18n dict every
     // time it mounts (applyLang), so routing back restores it. Deliberately not in
@@ -101,10 +108,24 @@ export class EditorApp extends LitElement {
   disconnectedCallback() {
     super.disconnectedCallback();
     document.removeEventListener('keydown', this.onUndoKey);
+    window.removeEventListener('mousedown', this.onGestureStart);
+    window.removeEventListener('mouseup', this.onGestureEnd);
     this.engine?.destroy();
     if (this.genUrl) URL.revokeObjectURL(this.genUrl);
     this.genUrl = null;
   }
+
+  private onGestureStart = () => {
+    this.mouseGesture = true;
+  };
+  /** End of a mouse gesture: commit its pre-state only if something really moved,
+      so a drag released back at its origin leaves no dead undo step. */
+  private onGestureEnd = () => {
+    this.mouseGesture = false;
+    if (this.pending === null) return;
+    if (this.pending !== JSON.stringify(this.fields)) this.push(this.pending);
+    this.pending = null;
+  };
 
   // ---- undo / redo ----
   private push(snap: string) {

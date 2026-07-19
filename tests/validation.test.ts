@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { CP2PROV, titleCase, isNif, VAL, detectLang, isCatalanPath } from '../src/lib/validation';
+import { CP2PROV, titleCase, isNif, VAL, detectLang, isCatalanPath, pageRangeExceeds } from '../src/lib/validation';
 
 describe('detectLang', () => {
   // The app serves all of Spain: a saved preference wins, otherwise only an
@@ -135,5 +135,26 @@ describe('VAL field rules', () => {
     for (const k of ['cognoms', 'nom', 'nif', 'cp', 'adreca', 'poblacio', 'provincia'])
       expect(VAL[k].segell).toBe(true);
     for (const k of ['up', 'full', 'num']) expect(VAL[k].segell).toBeUndefined();
+  });
+});
+
+describe('pageRangeExceeds', () => {
+  test('fits within the comb', () => {
+    expect(pageRangeExceeds(1, 9999, 4)).toBe(false);
+    expect(pageRangeExceeds(9999, 1, 4)).toBe(false);
+    expect(pageRangeExceeds(1, 1, 4)).toBe(false);
+  });
+
+  test('overflows the comb', () => {
+    expect(pageRangeExceeds(2, 9999, 4)).toBe(true);
+    expect(pageRangeExceeds(9999, 2, 4)).toBe(true);
+    // start alone can't reach here via the input filter (maxlength 4), but the
+    // function itself must still report it — it has no opinion on the caller.
+    expect(pageRangeExceeds(10000, 1, 4)).toBe(true);
+  });
+
+  test('respects other cell counts', () => {
+    expect(pageRangeExceeds(1, 99, 2)).toBe(false);
+    expect(pageRangeExceeds(1, 100, 2)).toBe(true);
   });
 });

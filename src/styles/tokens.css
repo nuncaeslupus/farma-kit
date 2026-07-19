@@ -6,7 +6,8 @@
   --surface-2: #f0ebe0;
   --ink: #201d18;
   --muted: #6d665a;
-  --faint: #938b7c;
+  /* AA-checked (>=4.5:1) against --paper, --surface, --surface-2, --field-bg */
+  --faint: #6f675a;
   --line: #ddd5c6;
   --line-2: #e7e0d2;
   --accent: #0f5d5c;

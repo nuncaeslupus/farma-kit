@@ -83,6 +83,12 @@ function drawMultiCellField(
   const n = f.cells;
   const cellW = f.box.w / n; // equal subdivision, no gap
   const chars = [...String(value)];
+  // Refuse rather than truncate: dropping trailing glyphs would print a wrong
+  // (and possibly duplicated) value onto an official sheet with no warning.
+  // The generator validates the page range before calling; this guards every
+  // other caller and template combination.
+  if (chars.length > n)
+    throw new Error(`Value "${value}" does not fit the ${n} cells of field "${f.key}".`);
   for (let i = 0; i < n; i++) {
     const str = chars[i] ?? '';
     if (str === '') continue;

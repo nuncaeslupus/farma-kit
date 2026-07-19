@@ -1,11 +1,15 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
 
 /** Shared button. variant: primary (accent) | ghost (neutral). */
 @customElement('fk-button')
 export class FkButton extends LitElement {
   @property({ reflect: true }) variant: 'primary' | 'ghost' = 'primary';
   @property({ type: Boolean, reflect: true }) disabled = false;
+  // Accessible name for icon-only content — slotted text names the button by
+  // itself, but glyphs/SVGs (↶, ↷, bare icons) are otherwise nameless to AT.
+  @property() label = '';
 
   static styles = css`
     :host {
@@ -35,7 +39,7 @@ export class FkButton extends LitElement {
   `;
 
   render() {
-    return html`<button part="button" ?disabled=${this.disabled}><slot></slot></button>`;
+    return html`<button part="button" aria-label=${ifDefined(this.label || undefined)} ?disabled=${this.disabled}><slot></slot></button>`;
   }
 }
 

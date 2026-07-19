@@ -3,7 +3,7 @@ import { customElement } from 'lit/decorators.js';
 import { COLEGIOS } from '../lib/colegios';
 import { I18N, applyLang, type Lang } from '../lib/i18n';
 import { slug, type Template } from '../lib/template';
-import { CP2PROV, titleCase, VAL, detectLang, isCatalanPath } from '../lib/validation';
+import { CP2PROV, titleCase, VAL, detectLang, isCatalanPath, pageRangeExceeds } from '../lib/validation';
 import { applyStoredTheme, toggleTheme } from '../lib/theme';
 import { generatePdf } from '../lib/pdf/generate';
 
@@ -47,6 +47,11 @@ const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,
 @customElement('generator-app')
 export class GeneratorApp extends LitElement {
   private uiLang: Lang = 'es';
+  private indexOk = false;
+  // Monotonic id per loadTemplate call. The selection-value check below can't tell
+  // two in-flight fetches for the SAME colegio apart (slow failure + quick retry),
+  // so each call also invalidates every earlier one.
+  private tplFetchId = 0;
   private supported = new Set<string>();
   private templateMap: Record<string, string> = {}; // colegio slug → template file slug
   private tpl: Template | null = null; // template of the currently-chosen colegio
@@ -78,15 +83,7 @@ export class GeneratorApp extends LitElement {
     }
     applyStoredTheme();
 
-    try {
-      const res = await fetch(`${import.meta.env.BASE_URL}templates/index.json`);
-      if (res.ok) {
-        this.templateMap = await res.json();
-        Object.keys(this.templateMap).forEach((s) => this.supported.add(s));
-      }
-    } catch {
-      /* none supported */
-    }
+    this.indexOk = await this.loadIndex();
 
     this.buildColegis();
     this.wireTheme();
@@ -113,6 +110,20 @@ export class GeneratorApp extends LitElement {
     }
     if (saved) await this.selectColegi(saved);
     this.restoreRemember();
+  }
+
+  /** Fetch the colegio→template index. Kept separate so a failed load can be retried
+      from the picker instead of silently rendering every colegio as unsupported. */
+  private async loadIndex(): Promise<boolean> {
+    try {
+      const res = await fetch(`${import.meta.env.BASE_URL}templates/index.json`);
+      if (!res.ok) return false;
+      this.templateMap = await res.json();
+      Object.keys(this.templateMap).forEach((s) => this.supported.add(s));
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   private isSupported(v: string) {
@@ -174,26 +185,35 @@ export class GeneratorApp extends LitElement {
   }
 
   // ---------- col·legi combobox ----------
-  private buildColegis() {
+  private renderColegiList() {
     let h = '';
-    for (const g of COLEGIOS) {
-      h += `<div class="combo-group" role="presentation">${g.region}</div>`;
-      for (const name of g.colegios) {
-        const sup = this.supported.has(slug(name));
-        h +=
-          `<div class="combo-opt${sup ? '' : ' unsupported'}" role="option" id="copt-${slug(name)}" aria-selected="false" data-val="${name}">` +
-          `<span class="combo-opt-name">${name}</span>` +
-          (sup
-            ? ''
-            : `<span class="combo-req-status" data-i18n="reqStatus">Encara no disponible</span>` +
-              // AT/keyboard users cannot reach this nested control (role=option
-              // containing a button is invalid ARIA) — they go through
-              // #colegiNoteReq instead once the unsupported colegio is selected.
-              `<button type="button" class="combo-req" data-colegi="${name}" data-i18n="reqBtn" aria-hidden="true" tabindex="-1">Demanar</button>`) +
-          `</div>`;
+    if (!this.indexOk) {
+      h =
+        `<div class="combo-err"><span data-i18n="loadErr">${I18N[this.uiLang].loadErr}</span>` +
+        `<button type="button" class="combo-req combo-retry" data-i18n="retry">${I18N[this.uiLang].retry}</button></div>`;
+    } else {
+      for (const g of COLEGIOS) {
+        h += `<div class="combo-group" role="presentation">${g.region}</div>`;
+        for (const name of g.colegios) {
+          const sup = this.supported.has(slug(name));
+          h +=
+            `<div class="combo-opt${sup ? '' : ' unsupported'}" role="option" id="copt-${slug(name)}" aria-selected="false" data-val="${name}">` +
+            `<span class="combo-opt-name">${name}</span>` +
+            (sup
+              ? ''
+              : `<span class="combo-req-status" data-i18n="reqStatus">Encara no disponible</span>` +
+                // AT/keyboard users cannot reach this nested control (role=option
+                // containing a button is invalid ARIA) — they go through
+                // #colegiNoteReq instead once the unsupported colegio is selected.
+                `<button type="button" class="combo-req" data-colegi="${name}" data-i18n="reqBtn" aria-hidden="true" tabindex="-1">Demanar</button>`) +
+            `</div>`;
+        }
       }
     }
     (this.q('#colegiList') as HTMLElement).innerHTML = h;
+  }
+  private buildColegis() {
+    this.renderColegiList();
 
     const btn = this.q('#colegiBtn');
     const list = this.q('#colegiList');
@@ -215,6 +235,12 @@ export class GeneratorApp extends LitElement {
     });
     list.addEventListener('click', (e) => {
       const t = e.target as HTMLElement;
+      const retry = t.closest('.combo-retry') as HTMLElement | null;
+      if (retry) {
+        e.stopPropagation();
+        void this.retryIndex();
+        return;
+      }
       const req = t.closest('.combo-req') as HTMLElement | null;
       if (req) {
         e.stopPropagation();
@@ -226,6 +252,12 @@ export class GeneratorApp extends LitElement {
     });
     document.addEventListener('click', this.onDocClick);
     document.addEventListener('keydown', this.onDocKey);
+  }
+  /** Re-attempt a failed index load in place, from the retry row in the picker. */
+  private async retryIndex() {
+    this.indexOk = await this.loadIndex();
+    this.renderColegiList();
+    applyLang(this.q('#colegiList'), this.uiLang);
   }
   private onDocClick = (e: MouseEvent) => {
     if (this.isConnected && !this.q('#colegiCombo').contains(e.target as Node)) this.openColegi(false);
@@ -334,6 +366,7 @@ export class GeneratorApp extends LitElement {
     this.i('colegi').value = val;
     this.syncColegiLabel();
     this.openColegi(false);
+    this.q('#tplLoadErr').hidden = true;
     try {
       if (val) localStorage.setItem(COLEGI_KEY, val);
     } catch {
@@ -434,16 +467,34 @@ export class GeneratorApp extends LitElement {
 
   // ---------- template-driven gate ----------
   private async loadTemplate(colegio: string) {
+    const fetchId = ++this.tplFetchId;
     const file = this.templateMap[slug(colegio)];
+    this.q('#tplLoadErr').hidden = true;
+    let tpl: Template;
     try {
-      this.tpl = (await (
-        await fetch(`${import.meta.env.BASE_URL}templates/${file}.json`)
-      ).json()) as Template;
+      const res = await fetch(`${import.meta.env.BASE_URL}templates/${file}.json`);
+      if (!res.ok) throw new Error(String(res.status));
+      tpl = (await res.json()) as Template;
     } catch {
+      // A superseded call must not report; a same-colegio retry may have succeeded.
+      if (this.tplFetchId !== fetchId) return;
+      // A stale failure must not clobber a newer selection's template.
+      if (this.i('colegi').value !== colegio) return;
       this.tpl = null;
       this.setGate(false);
+      // Failing to load is not "unsupported": swap the misleading gate hint for
+      // an error note with a retry, or the app blames the colegio for a network blip.
+      this.q('#gateHint').hidden = true;
+      this.q('#tplLoadErr').hidden = false;
       return;
     }
+    // Rapid switching can resolve fetches out of order; only the newest call for
+    // the still-current selection may install its template, CN line and segell
+    // gate. (The value check still matters on its own: selecting an unsupported
+    // colegio never calls loadTemplate, so it bumps no id.)
+    if (this.tplFetchId !== fetchId) return;
+    if (this.i('colegi').value !== colegio) return;
+    this.tpl = tpl;
     // National code (varies per colegio)
     const cnLine = this.q('#cnLine');
     if (this.tpl.cn) {
@@ -845,7 +896,10 @@ export class GeneratorApp extends LitElement {
     }
     this.i('remember').checked = true;
     this.i('up').value = String(d.up || '');
-    this.i('segell').checked = !!d.segell;
+    // Never re-check segell for a template that hides the section: loadTemplate
+    // just unchecked it, and a hidden checked box turns every hidden stamp field
+    // into a silently-failing required one on submit.
+    this.i('segell').checked = !!d.segell && this.tpl?.segell !== false;
     this.i('segell').dispatchEvent(new Event('change'));
     this.i('cognoms').value = String(d.cognoms || '');
     this.i('nom').value = String(d.nom || '');
@@ -868,6 +922,23 @@ export class GeneratorApp extends LitElement {
       Object.keys(VAL).forEach((key) => {
         if (!this.validateField(key, true) && !firstBad) firstBad = this.i(key);
       });
+      // The page comb has a fixed cell count; a run past its capacity would print
+      // silently truncated (duplicated) sheet numbers — refuse it here.
+      const pageField = this.tpl?.fields.find((f) => f.key === 'page');
+      if (!firstBad && pageField) {
+        const start = parseInt(this.i('full').value, 10) || 1;
+        const count = Math.max(1, parseInt(this.i('num').value, 10) || 1);
+        if (pageRangeExceeds(start, count, pageField.cells)) {
+          const max = String(10 ** pageField.cells - 1);
+          const err = this.q('#err-num');
+          err.textContent = (I18N[this.uiLang].errRange as (max: string) => string)(max);
+          err.style.display = 'block';
+          const num = this.i('num');
+          num.dataset.touched = '1';
+          num.setAttribute('aria-invalid', 'true');
+          firstBad = num;
+        }
+      }
       if (firstBad) {
         firstBad.focus();
         return;
@@ -935,8 +1006,13 @@ export class GeneratorApp extends LitElement {
           case 'province':
             if (segell) base.province = v('provincia').toUpperCase();
             break;
-          default:
-            base[f.key] = v(f.key);
+          default: {
+            // The template model is open (custom keys), but this form only has the
+            // preset inputs — querySelector must not throw on a digit-leading key
+            // nor .value on a null. An unknown field prints blank, not a crash.
+            const el = this.querySelector<HTMLInputElement>('#' + CSS.escape(f.key));
+            base[f.key] = el ? el.value.trim() : '';
+          }
         }
       }
 
@@ -1091,6 +1167,13 @@ export class GeneratorApp extends LitElement {
           <div class="field-note colegi-note" id="colegiNote" hidden>
             <span id="colegiNoteText" data-i18n="noTemplate">Encara no tenim la plantilla d'aquest col·legi. Demana-la i l'afegirem perquè la puguis fer servir.</span>
             <button type="button" class="combo-req" id="colegiNoteReq" data-i18n="reqBtn" @click=${() => this.demanar(this.i('colegi').value)}>Demanar</button>
+          </div>
+          <div class="field-note colegi-note" id="tplLoadErr" hidden>
+            <span data-i18n="tplErr">No s'ha pogut carregar la plantilla. Comprova la connexió i torna-ho a provar.</span>
+            <button type="button" class="combo-req" data-i18n="retry" @click=${() => {
+              const c = this.i('colegi').value;
+              if (c) void this.loadTemplate(c);
+            }}>Torna-ho a provar</button>
           </div>
           <p class="gate-hint" id="gateHint" data-i18n="gateHint">Selecciona un col·legi amb plantilla disponible per continuar.</p>
         </section>

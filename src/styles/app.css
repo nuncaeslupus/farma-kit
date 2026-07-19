@@ -677,6 +677,15 @@ select[aria-invalid='true']:focus {
   color: var(--faint);
   text-align: center;
 }
+.combo-err {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px 14px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
 
 /* col·legi "no template yet" note (official-only) */
 .colegi-note {

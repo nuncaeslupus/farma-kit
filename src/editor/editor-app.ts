@@ -46,17 +46,38 @@ export class EditorApp extends LitElement {
   @state() private future: string[] = []; // undone states, newest last
 
   private engine!: CanvasEngine;
+  // Gesture's pre-mutation snapshot, held until the gesture proves it changed
+  // something — see firstUpdated's onChange/onBeforeChange wiring and onGestureEnd.
+  private pending: string | null = null;
+  private mouseGesture = false; // a mouse button is down: defer the commit to mouseup
   // Reactive: the "Include official sheet" control enables/disables on it, and it is
   // assigned after an await in onUpload — a plain field would leave the UI stale.
   @state() private pdfBytes: ArrayBuffer | null = null;
   @state() private dark = false;
+  @state() private genBusy = false;
+  private genUrl: string | null = null;
 
   firstUpdated() {
     const host = this.renderRoot.querySelector('#canvas-host') as HTMLElement;
     this.engine = new CanvasEngine(host, {
       onSelect: (f) => (this.selected = f),
-      onChange: () => this.requestUpdate(),
-      onBeforeChange: () => this.snapshot(),
+      onChange: () => {
+        // Commit the gesture's pre-state only once something actually mutated:
+        // onBeforeChange fires on every mousedown, including selection clicks,
+        // and an undo step for a no-op gesture is a Ctrl+Z that does nothing.
+        // Mouse gestures defer further, to mouseup (onGestureEnd): committing on
+        // the first mousemove would still record a dead step for a drag that
+        // returns to its origin. Keyboard nudges have no mouseup, so they commit
+        // here, immediately.
+        if (this.pending !== null && !this.mouseGesture) {
+          this.push(this.pending);
+          this.pending = null;
+        }
+        this.requestUpdate();
+      },
+      onBeforeChange: () => {
+        this.pending = JSON.stringify(this.fields);
+      },
       snapEnabled: () => this.snap,
     });
     this.engine.setFields(this.fields);
@@ -75,6 +96,8 @@ export class EditorApp extends LitElement {
     applyStoredTheme();
     this.dark = isDark();
     document.addEventListener('keydown', this.onUndoKey);
+    window.addEventListener('mousedown', this.onGestureStart);
+    window.addEventListener('mouseup', this.onGestureEnd);
     // The editor owns the tab title only while it is mounted, and nothing here
     // needs to undo it: the generator sets its own title from the i18n dict every
     // time it mounts (applyLang), so routing back restores it. Deliberately not in
@@ -85,18 +108,37 @@ export class EditorApp extends LitElement {
   disconnectedCallback() {
     super.disconnectedCallback();
     document.removeEventListener('keydown', this.onUndoKey);
+    window.removeEventListener('mousedown', this.onGestureStart);
+    window.removeEventListener('mouseup', this.onGestureEnd);
     this.engine?.destroy();
+    if (this.genUrl) URL.revokeObjectURL(this.genUrl);
+    this.genUrl = null;
   }
 
+  private onGestureStart = () => {
+    this.mouseGesture = true;
+  };
+  /** End of a mouse gesture: commit its pre-state only if something really moved,
+      so a drag released back at its origin leaves no dead undo step. */
+  private onGestureEnd = () => {
+    this.mouseGesture = false;
+    if (this.pending === null) return;
+    if (this.pending !== JSON.stringify(this.fields)) this.push(this.pending);
+    this.pending = null;
+  };
+
   // ---- undo / redo ----
-  /** Record the current fields as an undo step. Call *before* mutating them. */
-  private snapshot() {
-    const snap = JSON.stringify(this.fields);
+  private push(snap: string) {
     // Gestures that end where they began (a click, a drag snapped back) leave no
     // visible change — an undo step for one would be a keypress that does nothing.
     if (this.history[this.history.length - 1] === snap) return;
     this.history = [...this.history.slice(-49), snap];
     this.future = []; // editing after an undo forks the timeline; the redos are gone
+  }
+
+  /** Record the current fields as an undo step. Call *before* mutating them. */
+  private snapshot() {
+    this.push(JSON.stringify(this.fields));
   }
 
   /**
@@ -164,13 +206,23 @@ export class EditorApp extends LitElement {
 
   // ---- source pdf ----
   private async onUpload(e: Event) {
-    const file = (e.target as HTMLInputElement).files?.[0];
+    const input = e.target as HTMLInputElement;
+    const file = input.files?.[0];
     if (!file) return;
-    this.fileName = file.name;
-    this.pdfBytes = await file.arrayBuffer();
-    await this.engine.loadPdf(this.pdfBytes.slice(0));
-    this.fit();
-    this.status = '';
+    try {
+      const bytes = await file.arrayBuffer();
+      // Only after a successful parse: pdfBytes gates "Include sheet", and a file
+      // that failed to load must not present itself as a usable sheet.
+      await this.engine.loadPdf(bytes.slice(0));
+      this.pdfBytes = bytes;
+      this.fileName = file.name;
+      this.fit();
+      this.status = '';
+    } catch {
+      this.status = `Could not read "${file.name}" as a PDF.`;
+    }
+    // Reset so picking the same file again re-fires change after a failure.
+    input.value = '';
   }
 
   // ---- fields ----
@@ -225,14 +277,35 @@ export class EditorApp extends LitElement {
     };
   }
   private async onGenerate() {
-    if (!this.fields.length) return;
+    if (!this.fields.length || this.genBusy) return;
+    this.genBusy = true;
     this.status = 'Generating…';
-    const data = Object.fromEntries(this.fields.map((f) => [f.key, f.sample ?? '']));
-    // With the sheet: checks alignment. Without: exactly what prints onto the paper.
-    const base = this.includeSheet && this.pdfBytes ? this.pdfBytes.slice(0) : null;
-    const bytes = await generatePdf(this.template(), [data], base);
-    window.open(URL.createObjectURL(new Blob([bytes as BlobPart], { type: 'application/pdf' })), '_blank');
-    this.status = base ? 'Test PDF (over the sheet) opened in a new tab.' : 'Test PDF (data only) opened in a new tab.';
+    try {
+      const data = Object.fromEntries(this.fields.map((f) => [f.key, f.sample ?? '']));
+      // With the sheet: checks alignment. Without: exactly what prints onto the paper.
+      const base = this.includeSheet && this.pdfBytes ? this.pdfBytes.slice(0) : null;
+      const bytes = await generatePdf(this.template(), [data], base);
+      // Each run allocates a blob the browser holds until revoked — release the
+      // previous one; any tab that opened it has long since loaded its copy.
+      if (this.genUrl) URL.revokeObjectURL(this.genUrl);
+      this.genUrl = URL.createObjectURL(new Blob([bytes as BlobPart], { type: 'application/pdf' }));
+      let tab: Window | null = null;
+      try {
+        tab = window.open(this.genUrl, '_blank');
+        if (tab) tab.opener = null;
+      } catch {
+        /* refused — report below instead of failing the run */
+      }
+      this.status = tab
+        ? base
+          ? 'Test PDF (over the sheet) opened in a new tab.'
+          : 'Test PDF (data only) opened in a new tab.'
+        : 'Pop-up blocked — allow pop-ups for this site and try again.';
+    } catch (err) {
+      this.status = `Could not generate: ${err instanceof Error ? err.message : String(err)}`;
+    } finally {
+      this.genBusy = false;
+    }
   }
   private async onImport(e: Event) {
     const input = e.target as HTMLInputElement;
@@ -672,6 +745,7 @@ export class EditorApp extends LitElement {
                   variant="ghost"
                   ?disabled=${!this.history.length}
                   title="Undo (Ctrl+Z)"
+                  label="Undo (Ctrl+Z)"
                   @click=${() => this.travel('history')}
                   >↶</fk-button
                 >
@@ -679,19 +753,20 @@ export class EditorApp extends LitElement {
                   variant="ghost"
                   ?disabled=${!this.future.length}
                   title="Redo (Ctrl+Shift+Z)"
+                  label="Redo (Ctrl+Shift+Z)"
                   @click=${() => this.travel('future')}
                   >↷</fk-button
                 >
               </div>
             </div>
             <div class="zoom">
-              <fk-button variant="ghost" @click=${() => this.zoom(1 / 1.2)}>−</fk-button>
+              <fk-button variant="ghost" label="Zoom out" @click=${() => this.zoom(1 / 1.2)}>−</fk-button>
               <span class="pct">${this.zoomPct}%</span>
-              <fk-button variant="ghost" @click=${() => this.zoom(1.2)}>+</fk-button>
-              <fk-button variant="ghost" title="Fit the whole sheet" @click=${() => this.fit()}>
+              <fk-button variant="ghost" label="Zoom in" @click=${() => this.zoom(1.2)}>+</fk-button>
+              <fk-button variant="ghost" title="Fit the whole sheet" label="Fit the whole sheet" @click=${() => this.fit()}>
                 <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"></rect><path d="M12 11V7.8"></path><path d="M10.4 9.2 12 7.6 13.6 9.2"></path><path d="M12 13v3.2"></path><path d="M10.4 14.8 12 16.4 13.6 14.8"></path><path d="M11 12H7.8"></path><path d="M9.2 10.4 7.6 12 9.2 13.6"></path><path d="M13 12h3.2"></path><path d="M14.8 10.4 16.4 12 14.8 13.6"></path></svg>
               </fk-button>
-              <fk-button variant="ghost" title="Fill the stage across" @click=${() => this.fit('width')}>
+              <fk-button variant="ghost" title="Fill the stage across" label="Fill the stage across" @click=${() => this.fit('width')}>
                 <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"></rect><path d="M7.3 12h9.4"></path><path d="M9.1 10.2 7.3 12 9.1 13.8"></path><path d="M14.9 10.2 16.7 12 14.9 13.8"></path></svg>
               </fk-button>
             </div>
@@ -699,7 +774,7 @@ export class EditorApp extends LitElement {
               <div class="gen">
                 <fk-button
                   variant="ghost"
-                  ?disabled=${!this.fields.length}
+                  ?disabled=${!this.fields.length || this.genBusy}
                   title=${this.fields.length ? 'Draw a test PDF' : 'Add a field first'}
                   @click=${() => this.onGenerate()}
                   >Generate PDF</fk-button

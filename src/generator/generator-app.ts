@@ -48,6 +48,10 @@ const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,
 export class GeneratorApp extends LitElement {
   private uiLang: Lang = 'es';
   private indexOk = false;
+  // Monotonic id per loadTemplate call. The selection-value check below can't tell
+  // two in-flight fetches for the SAME colegio apart (slow failure + quick retry),
+  // so each call also invalidates every earlier one.
+  private tplFetchId = 0;
   private supported = new Set<string>();
   private templateMap: Record<string, string> = {}; // colegio slug → template file slug
   private tpl: Template | null = null; // template of the currently-chosen colegio
@@ -433,6 +437,7 @@ export class GeneratorApp extends LitElement {
 
   // ---------- template-driven gate ----------
   private async loadTemplate(colegio: string) {
+    const fetchId = ++this.tplFetchId;
     const file = this.templateMap[slug(colegio)];
     this.q('#tplLoadErr').hidden = true;
     let tpl: Template;
@@ -441,6 +446,8 @@ export class GeneratorApp extends LitElement {
       if (!res.ok) throw new Error(String(res.status));
       tpl = (await res.json()) as Template;
     } catch {
+      // A superseded call must not report; a same-colegio retry may have succeeded.
+      if (this.tplFetchId !== fetchId) return;
       // A stale failure must not clobber a newer selection's template.
       if (this.i('colegi').value !== colegio) return;
       this.tpl = null;
@@ -451,8 +458,11 @@ export class GeneratorApp extends LitElement {
       this.q('#tplLoadErr').hidden = false;
       return;
     }
-    // Rapid switching can resolve fetches out of order; only the fetch for the
-    // still-current selection may install its template, CN line and segell gate.
+    // Rapid switching can resolve fetches out of order; only the newest call for
+    // the still-current selection may install its template, CN line and segell
+    // gate. (The value check still matters on its own: selecting an unsupported
+    // colegio never calls loadTemplate, so it bumps no id.)
+    if (this.tplFetchId !== fetchId) return;
     if (this.i('colegi').value !== colegio) return;
     this.tpl = tpl;
     // National code (varies per colegio)

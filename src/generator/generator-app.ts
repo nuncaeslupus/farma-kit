@@ -56,13 +56,13 @@ export class GeneratorApp extends LitElement {
   private templateMap: Record<string, string> = {}; // colegio slug → template file slug
   private tpl: Template | null = null; // template of the currently-chosen colegio
   private provManual = false;
-  private barDismissed = false;
   private activeIdx = -1;
   private monthNative?: boolean; // cached: does this browser implement type="month"?
   private pdfUrl: string | null = null; // last generated blob URL, revoked on the next run
   private cpCitiesP: Promise<Record<string, string[]>> | null = null; // memoized postal fetch
   private shareTimer?: ReturnType<typeof setTimeout>; // clears the "copied" flash on the share button
   private genOpener: HTMLElement | null = null; // focus to restore once the generation modal closes
+  private warnOpener: HTMLElement | null = null; // focus to restore if the pre-generate warning is cancelled
   private q = (s: string) => this.querySelector(s) as HTMLElement;
   private i = (id: string) => this.querySelector('#' + id) as HTMLInputElement;
 
@@ -230,7 +230,10 @@ export class GeneratorApp extends LitElement {
         this.setActive(this.activeIdx - 1);
       } else if (e.key === 'Enter') {
         e.preventDefault();
-        this.visibleOpts()[this.activeIdx]?.click();
+        // No arrow navigation yet (activeIdx === -1) but the query narrowed the
+        // list: Enter selects the first match, so type-and-Enter works.
+        const opts = this.visibleOpts();
+        (opts[this.activeIdx] ?? opts[0])?.click();
       }
     });
     list.addEventListener('click', (e) => {
@@ -264,8 +267,14 @@ export class GeneratorApp extends LitElement {
   };
   private onDocKey = (e: KeyboardEvent) => {
     if (e.key !== 'Escape') return;
-    // While the modal is up, Escape belongs to it alone: close when idle, do
-    // nothing mid-generation — never fall through to the combobox behind it.
+    // A modal up front owns Escape — never fall through to the combobox behind it.
+    // The pre-generate warning is a plain confirm, so Escape cancels it.
+    const warn = this.q('#warnModal');
+    if (!warn.hidden) {
+      this.cancelWarn();
+      return;
+    }
+    // Generation modal: close when idle, do nothing mid-generation.
     const modal = this.q('#genModal');
     if (!modal.hidden) {
       if (this.q('#genProgress').hidden) this.closeGenModal();
@@ -349,6 +358,9 @@ export class GeneratorApp extends LitElement {
       }
       gr.style.display = any ? '' : 'none';
     });
+    // A query that matches nothing must say so — an empty panel reads as broken.
+    // (Only when the list actually has options: the load-error state has none.)
+    this.q('#colegiNoResults').hidden = !this.indexOk || this.visibleOpts().length > 0;
   }
   /**
    * Render the combo label from the current value: the chosen colegio (a proper
@@ -558,16 +570,27 @@ export class GeneratorApp extends LitElement {
     const full = parseInt(this.i('full').value, 10);
     const num = parseInt(this.i('num').value, 10);
     const out = this.q('#pagesOut');
+    const pageField = this.tpl?.fields.find((f) => f.key === 'page');
     if (full >= 1 && num >= 1) {
+      // Don't preview a range the page comb can't hold: submit refuses it, so the
+      // live line must warn here too rather than show an impossible "…a la 10048".
+      if (pageField && pageRangeExceeds(full, num, pageField.cells)) {
+        const max = String(10 ** pageField.cells - 1);
+        out.textContent = (I18N[this.uiLang].errRange as (m: string) => string)(max);
+        out.classList.remove('empty');
+        out.classList.add('over');
+        return;
+      }
       out.innerHTML = (I18N[this.uiLang].pages_fmt as (a: string, b: string, n: string) => string)(
         String(full),
         String(full + num - 1),
         String(num),
       );
-      out.classList.remove('empty');
+      out.classList.remove('empty', 'over');
     } else {
       out.textContent = '—';
       out.classList.add('empty');
+      out.classList.remove('over');
     }
   }
   /**
@@ -675,13 +698,17 @@ export class GeneratorApp extends LitElement {
     return this.cpCitiesP;
   }
 
-  private async lookupCity() {
+  // fillField=false only refreshes the <datalist> suggestions and never touches the
+  // población value — used when restoring, where the saved city is trusted (it may
+  // be a hand-typed one this CP's list doesn't contain, which we must not wipe).
+  private async lookupCity(fillField = true) {
     const cp = (this.i('cp').value || '').replace(/\D/g, '');
     if (cp.length !== 5) return;
     const cities = (await this.loadCpCities())[cp];
     // Rewrite unconditionally: an unknown CP must clear the previous CP's
     // suggestions, not leave them on offer.
     this.q('#pobles').innerHTML = (cities ?? []).map((c) => `<option value="${c}"></option>`).join('');
+    if (!fillField) return;
     if (!cities || !cities.length) return; // unknown CP: we know nothing, leave the field alone
     const pob = this.i('poblacio');
     // A city left over from a previous CP is stale: it would print a wrong
@@ -759,14 +786,11 @@ export class GeneratorApp extends LitElement {
   private wireWarn() {
     this.q('#warnOk').addEventListener('click', () => {
       this.showWarn(false);
+      this.warnOpener = null; // generate() opens (and restores focus for) its own modal
       void this.generate();
     });
-    this.q('#warnCancel').addEventListener('click', () => {
-      this.showWarn(false);
-      this.querySelector<HTMLElement>('button[type="submit"]')?.focus();
-    });
+    this.q('#warnCancel').addEventListener('click', () => this.cancelWarn());
     this.q('#barX').addEventListener('click', () => {
-      this.barDismissed = true;
       this.q('#privacyBar').hidden = true;
       try {
         localStorage.setItem(PBKEY, '1');
@@ -776,7 +800,6 @@ export class GeneratorApp extends LitElement {
     });
     try {
       if (localStorage.getItem(PBKEY) === '1') {
-        this.barDismissed = true;
         this.q('#privacyBar').hidden = true;
       }
     } catch {
@@ -809,12 +832,16 @@ export class GeneratorApp extends LitElement {
     this.barRO.observe(bar);
     sync();
   }
+  /** Show/hide the pre-generate warning as a modal confirm (see #warnModal). */
   private showWarn(on: boolean) {
-    this.q('#warnConfirm').hidden = !on;
-    this.q('#privacyMsg').hidden = on; // bar shows either privacy OR the warning
-    // the warning must appear even if the bar was dismissed; on cancel/ok,
-    // return the bar to its dismissed state.
-    this.q('#privacyBar').hidden = on ? false : this.barDismissed;
+    if (on) this.warnOpener = document.activeElement as HTMLElement | null;
+    this.q('#warnModal').hidden = !on;
+  }
+  /** Dismiss the warning without generating, returning focus to what opened it. */
+  private cancelWarn() {
+    this.showWarn(false);
+    (this.warnOpener ?? this.querySelector<HTMLElement>('button[type="submit"]'))?.focus();
+    this.warnOpener = null;
   }
   private mesPhrase(y: number, m: number) {
     const name = new Date(y, m, 1).toLocaleDateString(this.uiLang === 'es' ? 'es-ES' : 'ca-ES', {
@@ -907,9 +934,14 @@ export class GeneratorApp extends LitElement {
     this.i('cp').value = String(d.cp || '');
     this.i('adreca').value = String(d.adreca || '');
     this.i('poblacio').value = String(d.poblacio || '');
+    // Populate the city suggestions for the restored CP (datalist only — never
+    // overwrite the saved población, which may not be in this CP's list).
+    void this.lookupCity(false);
+    // Restore the saved província, but DON'T mark it manual: a restored value is
+    // not a fresh override, so correcting the CP afterwards should still re-sync
+    // the province (a real manual change sets provManual via its change listener).
     if (d.provincia) {
       (this.i('provincia') as unknown as HTMLSelectElement).value = String(d.provincia);
-      this.provManual = true;
     }
   }
 
@@ -1091,10 +1123,11 @@ export class GeneratorApp extends LitElement {
   }
 
   /** Minimal Tab trap: the page behind the overlay is visually covered but still
-      in the tab order (light DOM), so wrap focus at the dialog's edges. */
+      in the tab order (light DOM), so wrap focus at the dialog's edges. Bound to
+      each `.modal`, so `currentTarget` is the dialog — shared by both overlays. */
   private onModalKey = (e: KeyboardEvent) => {
     if (e.key !== 'Tab') return;
-    const dialog = this.q('#genModal').querySelector('.modal') as HTMLElement;
+    const dialog = e.currentTarget as HTMLElement;
     const focusables = Array.from(
       dialog.querySelectorAll<HTMLElement>('a[href], button:not([disabled])'),
     ).filter((el) => el.offsetParent !== null);
@@ -1121,7 +1154,7 @@ export class GeneratorApp extends LitElement {
       <main class="wrap">
         <div class="util-bar">
           <div class="app-brand">
-            <img class="app-badge" src="${import.meta.env.BASE_URL}brand/farmakit-badge.svg" alt="" width="48" height="48" />
+            <img class="app-badge" src="${import.meta.env.BASE_URL}brand/farmakit-badge.svg" alt="" width="60" height="60" />
             <div class="app-id">
               <span class="app-name">Farma<span class="kit">Kit</span></span>
               <span class="app-tag" data-i18n="tagline">Eines per a la farmàcia</span>
@@ -1160,6 +1193,7 @@ export class GeneratorApp extends LitElement {
             <div class="combo-panel" id="colegiPanel" hidden>
               <input type="text" class="combo-search" id="colegiSearch" role="combobox" aria-expanded="false" aria-controls="colegiList" aria-autocomplete="list" aria-label="Cerca…" data-i18n-ph="searchPh" placeholder="Cerca…" autocomplete="off" />
               <div class="combo-list" id="colegiList" role="listbox" aria-labelledby="colegiLbl"></div>
+              <div class="combo-empty" id="colegiNoResults" data-i18n="noResults" hidden>Sense resultats</div>
             </div>
             <input type="hidden" id="colegi" name="colegi" value="" form="form" />
           </div>
@@ -1304,6 +1338,17 @@ export class GeneratorApp extends LitElement {
             </div>
           </div>
         </div>
+
+        <div class="modal-overlay" id="warnModal" hidden>
+          <div class="modal" role="alertdialog" aria-modal="true" aria-labelledby="warnTitle" aria-describedby="warnMsg" tabindex="-1" @keydown=${this.onModalKey}>
+            <h2 class="modal-title" id="warnTitle" data-i18n="alertLabel">Alerta!</h2>
+            <p class="modal-msg" id="warnMsg"></p>
+            <div class="modal-actions">
+              <button type="button" class="btn-ghost" id="warnCancel" data-i18n="cancel">Cancel·lar</button>
+              <button type="button" class="btn" id="warnOk" data-i18n="continuar">Continuar</button>
+            </div>
+          </div>
+        </div>
       </main>
 
       <div class="privacy-bar" id="privacyBar">
@@ -1313,14 +1358,6 @@ export class GeneratorApp extends LitElement {
           <span data-i18n="privacy">Les dades es processen al teu navegador i no s'envien enlloc</span>
           <span class="dot" aria-hidden="true">·</span>
           <span data-i18n="noCookies">El lloc no fa servir cookies</span>
-        </div>
-        <div class="warn-confirm" id="warnConfirm" role="alertdialog" aria-labelledby="warnTitle" aria-describedby="warnMsg" hidden>
-          <h2 class="visually-hidden" id="warnTitle" data-i18n="alertLabel">Alerta!</h2>
-          <p class="warn-confirm-msg" id="warnMsg"></p>
-          <div class="warn-confirm-actions">
-            <button type="button" class="btn-ghost" id="warnCancel" data-i18n="cancel">Cancel·lar</button>
-            <button type="button" class="btn" id="warnOk" data-i18n="continuar">Continuar</button>
-          </div>
         </div>
         <button type="button" class="bar-x" id="barX" aria-label="Tancar / Cerrar">×</button>
       </div>

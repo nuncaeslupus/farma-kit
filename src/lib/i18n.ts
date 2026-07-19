@@ -23,6 +23,7 @@ export const I18N: { ca: Dict; es: Dict } = {
     colegi: 'Col·legi de Farmacèutics',
     colegiPh: 'Selecciona el teu col·legi…',
     searchPh: 'Cerca…',
+    noResults: 'Cap col·legi coincideix amb la cerca.',
     reqBtn: 'Demanar',
     reqStatus: 'Encara no disponible',
     noTemplate:
@@ -68,10 +69,11 @@ export const I18N: { ca: Dict; es: Dict } = {
     retry: 'Torna-ho a provar',
     continuar: 'Continuar',
     cancel: 'Cancel·lar',
+    // No "Compte!" prefix — the dialog title (alertLabel) already carries it.
     warnAhead: (mes: string) =>
-      'Compte! Estàs generant pàgines avançades per al mes <strong>' + mes + '</strong>. És correcte?',
+      'Estàs generant pàgines avançades per al mes <strong>' + mes + '</strong>. És correcte?',
     warnCurrent: (mes: string) =>
-      "Compte! S'estan generant les primeres pàgines per al mes <strong>" +
+      "S'estan generant les primeres pàgines per al mes <strong>" +
       mes +
       '</strong>, que està acabant. És correcte?',
     // Accessible name of the pre-generate warning dialog (visually hidden).
@@ -109,6 +111,7 @@ export const I18N: { ca: Dict; es: Dict } = {
     colegi: 'Colegio de Farmacéuticos',
     colegiPh: 'Selecciona tu colegio…',
     searchPh: 'Buscar…',
+    noResults: 'Ningún colegio coincide con la búsqueda.',
     reqBtn: 'Pedir',
     reqStatus: 'Aún no disponible',
     noTemplate:
@@ -149,12 +152,13 @@ export const I18N: { ca: Dict; es: Dict } = {
     retry: 'Reintentar',
     continuar: 'Continuar',
     cancel: 'Cancelar',
+    // No "¡Atención!" prefix — the dialog title (alertLabel) already carries it.
     warnAhead: (mes: string) =>
-      '¡Atención! Estás generando páginas adelantadas para el mes <strong>' +
+      'Estás generando páginas adelantadas para el mes <strong>' +
       mes +
       '</strong>. ¿Es correcto?',
     warnCurrent: (mes: string) =>
-      '¡Atención! Se están generando las primeras páginas para el mes <strong>' +
+      'Se están generando las primeras páginas para el mes <strong>' +
       mes +
       '</strong>, que está terminando. ¿Es correcto?',
     alertLabel: '¡Atención!',

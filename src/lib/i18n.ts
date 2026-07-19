@@ -62,6 +62,11 @@ export const I18N: { ca: Dict; es: Dict } = {
     errCp: 'Codi postal no vàlid (5 xifres).',
     errRequired: 'Cal omplir aquest camp per generar el segell.',
     errColegi: 'Selecciona un col·legi amb plantilla disponible.',
+    errRange: (max: string) =>
+      'El full final supera ' + max + ': redueix el full inicial o la quantitat de fulls.',
+    loadErr: "No s'ha pogut carregar la llista de plantilles. Comprova la connexió i torna-ho a provar.",
+    tplErr: "No s'ha pogut carregar la plantilla. Comprova la connexió i torna-ho a provar.",
+    retry: 'Torna-ho a provar',
     showAgain: "Mostra l'avís legal",
     continuar: 'Continuar',
     cancel: 'Cancel·lar',
@@ -139,6 +144,11 @@ export const I18N: { ca: Dict; es: Dict } = {
     errCp: 'Código postal no válido (5 cifras).',
     errRequired: 'Rellena este campo para generar el sello.',
     errColegi: 'Selecciona un colegio con plantilla disponible.',
+    errRange: (max: string) =>
+      'La hoja final supera ' + max + ': reduce la hoja inicial o la cantidad de hojas.',
+    loadErr: 'No se pudo cargar la lista de plantillas. Comprueba la conexión y vuelve a intentarlo.',
+    tplErr: 'No se pudo cargar la plantilla. Comprueba la conexión y vuelve a intentarlo.',
+    retry: 'Reintentar',
     showAgain: 'Mostrar el aviso legal',
     continuar: 'Continuar',
     cancel: 'Cancelar',

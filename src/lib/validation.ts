@@ -69,6 +69,17 @@ export const VAL: Record<string, ValRule> = {
 };
 
 /**
+ * True when the run's last sheet number (start + count - 1) cannot fit the page
+ * comb's fixed cell count. padStart never shortens, and the PDF grid draws one
+ * glyph per cell, so an overflowing number would silently print truncated —
+ * wrong AND duplicated sequential numbers on official sheets. Callers refuse to
+ * generate instead.
+ */
+export function pageRangeExceeds(start: number, count: number, cells: number): boolean {
+  return start + count - 1 >= 10 ** cells;
+}
+
+/**
  * UI language on load. A saved 'ca'/'es' preference wins; otherwise the app
  * serves all of Spain, so ONLY an explicit Catalan browser locale gets Catalan —
  * everything else (Spanish, English, unset…) defaults to Spanish.

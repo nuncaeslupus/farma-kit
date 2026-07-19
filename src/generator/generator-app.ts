@@ -1156,7 +1156,7 @@ export class GeneratorApp extends LitElement {
       <main class="wrap">
         <div class="util-bar">
           <div class="app-brand">
-            <span class="app-badge" aria-hidden="true"></span>
+            <span class="app-badge" aria-hidden="true" style="--svg-snake:url('${import.meta.env.BASE_URL}brand/farmakit-snake.svg');--svg-bowl:url('${import.meta.env.BASE_URL}brand/farmakit-bowl.svg')"></span>
             <div class="app-id">
               <span class="app-name">Farma<span class="kit">Kit</span></span>
               <span class="app-tag" data-i18n="tagline">Eines per a la farmàcia</span>

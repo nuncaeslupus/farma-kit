@@ -150,15 +150,17 @@ a:hover {
   -webkit-mask: center / contain no-repeat;
   mask: center / contain no-repeat;
 }
+/* Mask URLs come from the host template (--svg-snake/--svg-bowl) so they carry
+   the app's BASE_URL rather than a hardcoded path. */
 .app-badge::before {
   background-color: var(--accent);
-  -webkit-mask-image: url('/farma-kit/brand/farmakit-snake.svg');
-  mask-image: url('/farma-kit/brand/farmakit-snake.svg');
+  -webkit-mask-image: var(--svg-snake);
+  mask-image: var(--svg-snake);
 }
 .app-badge::after {
   background-color: var(--ink);
-  -webkit-mask-image: url('/farma-kit/brand/farmakit-bowl.svg');
-  mask-image: url('/farma-kit/brand/farmakit-bowl.svg');
+  -webkit-mask-image: var(--svg-bowl);
+  mask-image: var(--svg-bowl);
 }
 .app-id {
   display: flex;

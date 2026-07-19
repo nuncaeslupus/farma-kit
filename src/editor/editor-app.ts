@@ -452,15 +452,17 @@ export class EditorApp extends LitElement {
       -webkit-mask: center / contain no-repeat;
       mask: center / contain no-repeat;
     }
+    /* Mask URLs come from the span's inline --svg-snake/--svg-bowl (built from
+       BASE_URL), so no hardcoded base path lives in these styles. */
     .app-badge::before {
       background-color: var(--accent);
-      -webkit-mask-image: url('/farma-kit/brand/farmakit-snake.svg');
-      mask-image: url('/farma-kit/brand/farmakit-snake.svg');
+      -webkit-mask-image: var(--svg-snake);
+      mask-image: var(--svg-snake);
     }
     .app-badge::after {
       background-color: var(--ink);
-      -webkit-mask-image: url('/farma-kit/brand/farmakit-bowl.svg');
-      mask-image: url('/farma-kit/brand/farmakit-bowl.svg');
+      -webkit-mask-image: var(--svg-bowl);
+      mask-image: var(--svg-bowl);
     }
     .app-name {
       font-family: var(--font-head);
@@ -690,7 +692,7 @@ export class EditorApp extends LitElement {
     return html`
       <div class="brandbar">
         <div class="app-brand">
-          <span class="app-badge" aria-hidden="true"></span>
+          <span class="app-badge" aria-hidden="true" style="--svg-snake:url('${import.meta.env.BASE_URL}brand/farmakit-snake.svg');--svg-bowl:url('${import.meta.env.BASE_URL}brand/farmakit-bowl.svg')"></span>
           <span class="app-name">Farma<span class="kit">Kit</span></span>
         </div>
         <h1>Template editor</h1>

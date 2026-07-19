@@ -217,11 +217,13 @@ h1 {
 h1 .lo {
   color: var(--accent);
 }
-/* On a narrow phone the 54px logo leaves the centered title too little width,
-   wrapping it and shoving it off-centre — stack logo over title instead. */
+/* On a narrow phone the 54px logo leaves the title too little width, wrapping it
+   — stack logo over title. align-items:flex-start keeps both at the left edge, so
+   the stack matches the left-aligned title instead of centring the logo over it. */
 @media (max-width: 480px) {
   .brand {
     flex-direction: column;
+    align-items: flex-start;
   }
 }
 

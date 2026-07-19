@@ -100,12 +100,14 @@ export function pageRangeExceeds(start: number, count: number, cells: number): b
 }
 
 /**
- * True when a URL path is the Catalan entry point. Matches /ca, /ca/ and
- * /ca/index.html (a direct hit GitHub Pages serves), but not /casa.
- * This is the ONLY language signal: / is Spanish, /ca/ is Catalan. A stored
- * preference (and navigator.language detection) used to override the root URL,
- * which made the crawlable link to the Spanish version render Catalan anyway.
+ * True when a URL path is the Catalan entry point: /ca, /ca/ or /ca/index.html
+ * at the END of the path (a direct hit GitHub Pages serves), but not /casa —
+ * and anchored, so a "ca" segment anywhere else in a hosting prefix can never
+ * match. This is the ONLY language signal: / is Spanish, /ca/ is Catalan. A
+ * stored preference (and navigator.language detection) used to override the
+ * root URL, which made the crawlable link to the Spanish version render
+ * Catalan anyway.
  */
 export function isCatalanPath(pathname: string): boolean {
-  return /\/ca(\/|$)/.test(pathname);
+  return /\/ca(\/|\/index\.html)?$/.test(pathname);
 }

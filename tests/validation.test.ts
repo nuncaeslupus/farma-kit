@@ -13,6 +13,8 @@ describe('isCatalanPath', () => {
     ['/farma-kit/index.html', false],
     // must not false-positive on words that merely start with "ca"
     ['/farma-kit/casa/', false],
+    // anchored: a "ca" segment in a hosting prefix must not match
+    ['/ca/farma-kit/', false],
   ])('%p -> %p', (path, expected) => {
     expect(isCatalanPath(path)).toBe(expected);
   });

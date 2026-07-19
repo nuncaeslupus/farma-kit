@@ -132,12 +132,35 @@ a:hover {
   gap: 9px;
   min-width: 0;
 }
+/* Brand mark: the Hygieia glyph, no green tile, painted in two theme-aware inks
+   via stacked masks — snake in --accent (green→teal), bowl in --ink (dark→light),
+   so both keep contrast on whichever background the theme sets. */
 .app-badge {
+  position: relative;
   flex: none;
   display: block;
   width: 60px;
   height: 60px;
-  border-radius: 12px;
+}
+.app-badge::before,
+.app-badge::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  -webkit-mask: center / contain no-repeat;
+  mask: center / contain no-repeat;
+}
+/* Mask URLs come from the host template (--svg-snake/--svg-bowl) so they carry
+   the app's BASE_URL rather than a hardcoded path. */
+.app-badge::before {
+  background-color: var(--accent);
+  -webkit-mask-image: var(--svg-snake);
+  mask-image: var(--svg-snake);
+}
+.app-badge::after {
+  background-color: var(--ink);
+  -webkit-mask-image: var(--svg-bowl);
+  mask-image: var(--svg-bowl);
 }
 .app-id {
   display: flex;

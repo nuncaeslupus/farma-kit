@@ -435,10 +435,34 @@ export class EditorApp extends LitElement {
       gap: 10px;
       justify-self: start;
     }
+    /* Same two-tone Hygieia mark as the generator (snake --accent, bowl --ink),
+       smaller here so the toolbar stays thin. */
     .app-badge {
-      border-radius: 12px;
+      position: relative;
       flex: none;
       display: block;
+      width: 44px;
+      height: 44px;
+    }
+    .app-badge::before,
+    .app-badge::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      -webkit-mask: center / contain no-repeat;
+      mask: center / contain no-repeat;
+    }
+    /* Mask URLs come from the span's inline --svg-snake/--svg-bowl (built from
+       BASE_URL), so no hardcoded base path lives in these styles. */
+    .app-badge::before {
+      background-color: var(--accent);
+      -webkit-mask-image: var(--svg-snake);
+      mask-image: var(--svg-snake);
+    }
+    .app-badge::after {
+      background-color: var(--ink);
+      -webkit-mask-image: var(--svg-bowl);
+      mask-image: var(--svg-bowl);
     }
     .app-name {
       font-family: var(--font-head);
@@ -668,7 +692,7 @@ export class EditorApp extends LitElement {
     return html`
       <div class="brandbar">
         <div class="app-brand">
-          <img class="app-badge" src="${import.meta.env.BASE_URL}brand/farmakit-badge.svg" alt="" width="60" height="60" />
+          <span class="app-badge" aria-hidden="true" style="--svg-snake:url('${import.meta.env.BASE_URL}brand/farmakit-snake.svg');--svg-bowl:url('${import.meta.env.BASE_URL}brand/farmakit-bowl.svg')"></span>
           <span class="app-name">Farma<span class="kit">Kit</span></span>
         </div>
         <h1>Template editor</h1>

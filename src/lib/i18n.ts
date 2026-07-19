@@ -3,7 +3,9 @@ type Dict = Record<string, string | ((...a: string[]) => string)>;
 
 export const I18N: { ca: Dict; es: Dict } = {
   ca: {
-    docTitle: 'Farma-Kit - Emplenador de fulls de cupons precinte',
+    // Keyword-first (people search «cupons precinte» / «recepta electrònica»,
+    // not the brand). Must stay in sync with ca/index.html's <title>.
+    docTitle: 'Emplenar fulls de cupons precinte per a la recepta electrònica — Farma-Kit',
     appTitle:
       'Emplenador de <span class="lo">fulls de cupons precinte</span><br>per a la recepta electrònica',
     intro:
@@ -89,9 +91,31 @@ export const I18N: { ca: Dict; es: Dict } = {
     genErrGeneric: 'Hi ha hagut un error generant el document. Torna-ho a provar d’aquí una estona.',
     pages_fmt: (a: string, b: string, n: string) =>
       'Del full ' + a + ' al ' + b + ' <span class="dim">· ' + n + ' fulls</span>',
+    // Static about/FAQ section — lives pre-rendered in the HTML shells (outside
+    // fk-root) so crawlers see it without JS; these keys keep it in sync with
+    // the runtime language toggle. Edit the shells and the FAQPage JSON-LD
+    // there when editing these.
+    seoTitle: 'Preguntes freqüents',
+    seoQ1: 'Què són els fulls de cupons precinte?',
+    seoA1:
+      "Són els fulls oficials que cada Col·legi de Farmacèutics distribueix a les farmàcies, normalment a través del majorista, i on s'enganxen els cupons precinte dels envasos dispensats amb recepta electrònica: són el justificant per a la facturació i el control de les dispensacions del sistema públic de salut i de les mutualitats (MUFACE, ISFAS, MUGEJU). En castellà es coneixen com a «hojas de cupones precinto».",
+    seoQ2: 'Què emplena exactament aquesta eina?',
+    seoA2:
+      "Només la capçalera de cada full: la UP de la farmàcia, el mes i l'any, la numeració correlativa dels fulls i, si ho necessites, les dades del segell del titular. El resultat és un PDF a punt per imprimir sobre els fulls oficials de cupons; el full en si mai no s'imprimeix, només les teves dades.",
+    seoQ3: 'És gratuït? Cal registrar-se?',
+    seoA3:
+      'Sí: és una eina gratuïta i de codi obert (llicència MIT, <a href="https://github.com/nuncaeslupus/farma-kit" target="_blank" rel="noopener">codi a GitHub</a>). No hi ha registre, no hi ha comptes i el lloc no fa servir cookies.',
+    seoQ4: 'Què passa amb les dades de la meva farmàcia?',
+    seoA4:
+      "No surten del teu ordinador: el PDF es genera localment, al teu propi navegador, i no s'envia res a cap servidor. L'opció «Recorda'm» desa les dades únicament al teu navegador per a la propera visita.",
+    seoQ5: 'Amb quins col·legis de farmacèutics funciona?',
+    seoA5:
+      "Avui hi ha disponibles els fulls dels col·legis de Barcelona, Girona, Lleida i Tarragona, que comparteixen un mateix model. Si el teu col·legi encara no hi apareix, demana'l des de la mateixa aplicació i n'afegirem la plantilla.",
   },
   es: {
-    docTitle: 'Farma-Kit - Rellenador de hojas de cupones precinto',
+    // Keyword-first (people search «cupones precinto» / «receta electrónica»,
+    // not the brand). Must stay in sync with index.html's <title>.
+    docTitle: 'Rellenar hojas de cupones precinto para la receta electrónica — Farma-Kit',
     appTitle:
       'Rellenador de <span class="lo">hojas de cupones precinto</span><br>para la receta electrónica',
     intro:
@@ -173,6 +197,23 @@ export const I18N: { ca: Dict; es: Dict } = {
     genErrGeneric: 'Ha ocurrido un error generando el documento. Inténtalo de nuevo dentro de un rato.',
     pages_fmt: (a: string, b: string, n: string) =>
       'De la hoja ' + a + ' a la ' + b + ' <span class="dim">· ' + n + ' hojas</span>',
+    // See the note on the Catalan seo* block.
+    seoTitle: 'Preguntas frecuentes',
+    seoQ1: '¿Qué son las hojas de cupones precinto?',
+    seoA1:
+      'Son las hojas oficiales que cada Colegio de Farmacéuticos distribuye a las farmacias, normalmente a través del mayorista, y donde se pegan los cupones precinto de los envases dispensados con receta electrónica: son el justificante para la facturación y el control de las dispensaciones del sistema público de salud y de las mutualidades (MUFACE, ISFAS, MUGEJU). En Cataluña se conocen como «fulls de cupons precinte».',
+    seoQ2: '¿Qué rellena exactamente esta herramienta?',
+    seoA2:
+      'Solo la cabecera de cada hoja: la UP de la farmacia, el mes y el año, la numeración correlativa de las hojas y, si lo necesitas, los datos del sello del titular. El resultado es un PDF listo para imprimir sobre las hojas oficiales de cupones; la hoja en sí nunca se imprime, solo tus datos.',
+    seoQ3: '¿Es gratis? ¿Hay que registrarse?',
+    seoA3:
+      'Sí: es una herramienta gratuita y de código abierto (licencia MIT, <a href="https://github.com/nuncaeslupus/farma-kit" target="_blank" rel="noopener">código en GitHub</a>). No hay registro, no hay cuentas y el sitio no usa cookies.',
+    seoQ4: '¿Qué pasa con los datos de mi farmacia?',
+    seoA4:
+      'No salen de tu ordenador: el PDF se genera localmente, en tu propio navegador, y no se envía nada a ningún servidor. La opción «Recuérdame» guarda los datos únicamente en tu navegador para la próxima visita.',
+    seoQ5: '¿Con qué colegios de farmacéuticos funciona?',
+    seoA5:
+      'Hoy están disponibles las hojas de los colegios de Barcelona, Girona, Lleida y Tarragona, que comparten un mismo modelo. Si tu colegio todavía no aparece, pídelo desde la propia aplicación y añadiremos su plantilla.',
   },
 };
 

@@ -98,7 +98,10 @@ export class GeneratorApp extends LitElement {
     this.defaultMonth();
     this.syncMonthHint();
     this.wireGenerate();
-    applyLang(this, this.uiLang);
+    // document.body, not `this`: the static about/FAQ section in the HTML shell
+    // lives outside fk-root (Lit owns fk-root's children) but carries data-i18n
+    // too, so the language toggle must reach it.
+    applyLang(document.body, this.uiLang);
     this.setLangButtons();
 
     // restore remembered colegio (independent of Recorda'm), then the rest
@@ -156,7 +159,7 @@ export class GeneratorApp extends LitElement {
         // shareable and honest — a hard refresh still serves the right shell, and
         // crawlers hit each URL directly regardless.
         history.pushState(null, '', target === 'ca' ? `${import.meta.env.BASE_URL}ca/` : import.meta.env.BASE_URL);
-        applyLang(this, target);
+        applyLang(document.body, target); // body: also reaches the shell's static about/FAQ
         this.syncColegiLabel(); // applyLang just wiped the picked colegio back to the placeholder
         this.syncMonthHint(); // the month example is language-dependent
         this.setLangButtons();
@@ -171,7 +174,7 @@ export class GeneratorApp extends LitElement {
     const lang: Lang = isCatalanPath(location.pathname) ? 'ca' : 'es';
     if (lang === this.uiLang) return;
     this.uiLang = lang;
-    applyLang(this, lang);
+    applyLang(document.body, lang); // body: also reaches the shell's static about/FAQ
     this.syncColegiLabel();
     this.syncMonthHint();
     this.setLangButtons();
@@ -828,7 +831,12 @@ export class GeneratorApp extends LitElement {
     const bar = this.q('#privacyBar');
     const spacer = this.q('#barSpacer');
     const sync = () => {
-      spacer.style.height = bar.hidden ? '0px' : `${bar.getBoundingClientRect().height}px`;
+      const h = bar.hidden ? 0 : bar.getBoundingClientRect().height;
+      spacer.style.height = `${h}px`;
+      // The shell's static about/FAQ section renders after fk-root, so IT is
+      // the last thing in flow now — publish the bar's height as a CSS var so
+      // .about's padding-bottom can reserve the same clearance (see app.css).
+      document.documentElement.style.setProperty('--privacy-bar-h', `${h}px`);
     };
     this.barRO = new ResizeObserver(sync);
     this.barRO.observe(bar);

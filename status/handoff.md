@@ -208,12 +208,29 @@ gate before deploying, so a red suite cannot reach the live site.
 - **No `robots.txt` is possible.** It is only honoured at the origin root, which
   we do not own — one under `/farma-kit/` would be silently ignored. Absent
   already means allow-all.
-- The **`<noscript>`** block is the only crawlable copy for crawlers that don't
-  run JS. It must stay **outside** `<fk-root>`: Lit renders there in light DOM and
-  does *not* clear pre-existing children, so the same markup inside would sit
-  visible underneath the app.
-- The sitemap is ceremonial (one URL) and its Search Console status has read
-  "Couldn't fetch" while the page indexed fine anyway — don't chase it.
+- Each shell carries a visible **static about/FAQ section** (`.about`) at the
+  bottom of `<body>` — the app is client-rendered, so this is the page's real
+  crawlable text. Its copy deliberately exists in **three places per language**
+  that must stay in sync: the shell's HTML, the `seo*` keys in `src/lib/i18n.ts`
+  (the runtime toggle re-translates the section — `generator-app.ts` calls
+  `applyLang(document.body, …)`, not `applyLang(this, …)`, for exactly this
+  reason), and the `FAQPage` JSON-LD in the shell's `<head>` (Google requires
+  parity with visible content). Like `<noscript>`, it must stay **outside**
+  `<fk-root>`: Lit renders there in light DOM and does *not* clear pre-existing
+  children, so the same markup inside would sit visible underneath the app.
+- The JSON-LD blocks (`WebApplication` + `FAQPage`) are data blocks, never
+  executed, so the meta CSP's `script-src 'self'` does not block them
+  (verified: no console errors).
+- The **`<noscript>`** block is a short fallback for crawlers that don't run JS;
+  the `.about` section above carries the substance.
+- The sitemap lists both language URLs with reciprocal `xhtml:link` hreflang
+  alternates; bump its `<lastmod>` on meaningful page changes. Its Search
+  Console status has read "Couldn't fetch" while the page indexed fine anyway —
+  don't chase it.
+- Titles are **keyword-first** («…cupones precinto para la receta electrónica —
+  Farma-Kit»): nobody searches the brand, they search the task. The shell
+  `<title>` must match `docTitle` in `src/lib/i18n.ts`, or the title flickers
+  on load.
 
 ## Status
 
@@ -245,6 +262,17 @@ gate before deploying, so a red suite cannot reach the live site.
   share the header row with the title, squeezing it to almost one word per line
   and pushing the page into horizontal scroll. Both controls now sit in a
   `.util-bar` above the header instead.
+- SEO pass 2026-07-19 (see *Search / sharing* above): static about/FAQ section
+  in both shells, `WebApplication` + `FAQPage` JSON-LD, keyword-first titles
+  («receta electrónica» is the discovery term — the tool itself is unknown, so
+  people can only find it through what it's *for*), hreflang alternates in the
+  sitemap, crawlable cross-links between the language versions (the toggle is a
+  button, invisible to link crawlers), font preloads for the two above-the-fold
+  faces, and a `theme-color` meta kept in sync by `theme.ts`. Copy grounded in
+  the terms the audience actually uses: «hojas de cupones precinto»/«fulls de
+  cupons precinte», «facturación de recetas», MUFACE/ISFAS/MUGEJU. Adding a
+  language (Euskera/Galician) = new shell dir + hreflang on all shells + sitemap
+  entry + dict in `i18n.ts` — same recipe as `ca/`.
 
 ## Next up
 

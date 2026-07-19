@@ -4,14 +4,20 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <!-- Matches lang="ca" above: this shell is the Catalan entry point, loaded
-         at /ca/ so Google can index it as its own page (see ../index.html for
-         the Spanish default). main.ts still detects/toggles language at
-         runtime; this only fixes what a crawler sees on first load. -->
-    <title>Farma-Kit - Emplenador de fulls de cupons precinte</title>
+    <!-- Font preloads and theme-color — see index.html for the reasoning. -->
+    <link rel="preload" href="/fonts/space-grotesk-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <meta name="theme-color" content="#f4efe6" />
+    <!-- Keyword-first title (see index.html). Matches lang="ca" above: this
+         shell is the Catalan entry point, loaded at /ca/ so Google can index it
+         as its own page (see ../index.html for the Spanish default). main.ts
+         still detects/toggles language at runtime; this only fixes what a
+         crawler sees on first load. Keep in sync with docTitle in
+         src/lib/i18n.ts. -->
+    <title>Emplenar fulls de cupons precinte per a la recepta electrònica — Farma-Kit</title>
     <meta
       name="description"
-      content="Emplena la capçalera dels fulls de cupons precinte per a la recepta electrònica. Gratuït, sense registre i sense enviar dades: tot es processa al teu navegador."
+      content="Emplena i imprimeix la capçalera dels fulls de cupons precinte de la recepta electrònica de la teva farmàcia. Gratuït, sense registre i sense enviar dades a cap servidor."
     />
     <!-- The page is one client-rendered app; without this, /farma-kit/ca,
          /farma-kit/ca/ and /farma-kit/ca/index.html look like three pages. -->
@@ -28,10 +34,10 @@
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Farma-Kit" />
     <meta property="og:url" content="https://nuncaeslupus.github.io/farma-kit/ca/" />
-    <meta property="og:title" content="Farma-Kit · Emplenador de fulls de cupons precinte" />
+    <meta property="og:title" content="Farma-Kit · Fulls de cupons precinte per a la recepta electrònica" />
     <meta
       property="og:description"
-      content="Emplena la capçalera dels fulls de cupons precinte per a la recepta electrònica. Gratuït, sense registre i sense enviar dades: tot es processa al teu navegador."
+      content="Emplena i imprimeix la capçalera dels fulls de cupons precinte de la recepta electrònica de la teva farmàcia. Gratuït, sense registre i sense enviar dades a cap servidor."
     />
     <meta property="og:image" content="https://nuncaeslupus.github.io/farma-kit/og-card.png" />
     <meta property="og:image:width" content="1200" />
@@ -40,12 +46,85 @@
     <meta property="og:locale" content="ca_ES" />
     <meta property="og:locale:alternate" content="es_ES" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Farma-Kit · Emplenador de fulls de cupons precinte" />
+    <meta name="twitter:title" content="Farma-Kit · Fulls de cupons precinte per a la recepta electrònica" />
     <meta
       name="twitter:description"
-      content="Emplena la capçalera dels fulls de cupons precinte per a la recepta electrònica. Gratuït, sense registre i sense enviar dades."
+      content="Emplena la capçalera dels fulls de cupons precinte de la recepta electrònica. Gratuït, sense registre i sense enviar dades."
     />
     <meta name="twitter:image" content="https://nuncaeslupus.github.io/farma-kit/og-card.png" />
+
+    <!-- Structured data — data blocks, never executed, so the meta-CSP below
+         doesn't apply. Keep the FAQPage text in sync with the visible .about
+         section at the bottom of <body>. See index.html. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Farma-Kit",
+        "alternateName": "Emplenador de fulls de cupons precinte",
+        "url": "https://nuncaeslupus.github.io/farma-kit/ca/",
+        "image": "https://nuncaeslupus.github.io/farma-kit/og-card.png",
+        "description": "Eina gratuïta per a farmàcies: emplena i imprimeix la capçalera dels fulls de cupons precinte de la recepta electrònica (UP, mes i any, numeració i segell del titular). El PDF es genera al navegador, sense enviar dades a cap servidor.",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Any",
+        "browserRequirements": "Requereix JavaScript",
+        "inLanguage": ["ca", "es"],
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+        "audience": { "@type": "Audience", "audienceType": "Farmacèutics i oficines de farmàcia" },
+        "license": "https://github.com/nuncaeslupus/farma-kit/blob/main/LICENSE",
+        "sameAs": ["https://github.com/nuncaeslupus/farma-kit"]
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "inLanguage": "ca",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Què són els fulls de cupons precinte?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Són els fulls oficials que cada Col·legi de Farmacèutics distribueix a les farmàcies, normalment a través del majorista, i on s'enganxen els cupons precinte dels envasos dispensats amb recepta electrònica: són el justificant per a la facturació i el control de les dispensacions del sistema públic de salut i de les mutualitats (MUFACE, ISFAS, MUGEJU). En castellà es coneixen com a «hojas de cupones precinto»."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Què emplena exactament aquesta eina?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Només la capçalera de cada full: la UP de la farmàcia, el mes i l'any, la numeració correlativa dels fulls i, si ho necessites, les dades del segell del titular. El resultat és un PDF a punt per imprimir sobre els fulls oficials de cupons; el full en si mai no s'imprimeix, només les teves dades."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "És gratuït? Cal registrar-se?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Sí: és una eina gratuïta i de codi obert (llicència MIT, codi a GitHub). No hi ha registre, no hi ha comptes i el lloc no fa servir cookies."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Què passa amb les dades de la meva farmàcia?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No surten del teu ordinador: el PDF es genera localment, al teu propi navegador, i no s'envia res a cap servidor. L'opció «Recorda'm» desa les dades únicament al teu navegador per a la propera visita."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Amb quins col·legis de farmacèutics funciona?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Avui hi ha disponibles els fulls dels col·legis de Barcelona, Girona, Lleida i Tarragona, que comparteixen un mateix model. Si el teu col·legi encara no hi apareix, demana'l des de la mateixa aplicació i n'afegirem la plantilla."
+            }
+          }
+        ]
+      }
+    </script>
 
     <!-- Meta-CSP as defense in depth: GitHub Pages serves static files and can't
          set response headers, so this is the only way to ship a CSP at all. Now
@@ -59,6 +138,52 @@
   </head>
   <body>
     <fk-root></fk-root>
+    <!-- Static about/FAQ — see index.html for the reasoning. Catalan here to
+         match this shell; the runtime toggle re-translates it via data-i18n.
+         Keep in sync with the seo* keys in src/lib/i18n.ts and the FAQPage
+         JSON-LD in <head>. -->
+    <section class="about" aria-labelledby="aboutTitle">
+      <h2 id="aboutTitle" data-i18n="seoTitle">Preguntes freqüents</h2>
+      <h3 data-i18n="seoQ1">Què són els fulls de cupons precinte?</h3>
+      <p data-i18n="seoA1">
+        Són els fulls oficials que cada Col·legi de Farmacèutics distribueix a les farmàcies,
+        normalment a través del majorista, i on s'enganxen els cupons precinte dels envasos
+        dispensats amb recepta electrònica: són el justificant per a la facturació i el control de
+        les dispensacions del sistema públic de salut i de les mutualitats (MUFACE, ISFAS, MUGEJU).
+        En castellà es coneixen com a «hojas de cupones precinto».
+      </p>
+      <h3 data-i18n="seoQ2">Què emplena exactament aquesta eina?</h3>
+      <p data-i18n="seoA2">
+        Només la capçalera de cada full: la UP de la farmàcia, el mes i l'any, la numeració
+        correlativa dels fulls i, si ho necessites, les dades del segell del titular. El resultat és
+        un PDF a punt per imprimir sobre els fulls oficials de cupons; el full en si mai no
+        s'imprimeix, només les teves dades.
+      </p>
+      <h3 data-i18n="seoQ3">És gratuït? Cal registrar-se?</h3>
+      <p data-i18n="seoA3" data-i18n-html>
+        Sí: és una eina gratuïta i de codi obert (llicència MIT,
+        <a href="https://github.com/nuncaeslupus/farma-kit" target="_blank" rel="noopener">codi a GitHub</a>).
+        No hi ha registre, no hi ha comptes i el lloc no fa servir cookies.
+      </p>
+      <h3 data-i18n="seoQ4">Què passa amb les dades de la meva farmàcia?</h3>
+      <p data-i18n="seoA4">
+        No surten del teu ordinador: el PDF es genera localment, al teu propi navegador, i no
+        s'envia res a cap servidor. L'opció «Recorda'm» desa les dades únicament al teu navegador
+        per a la propera visita.
+      </p>
+      <h3 data-i18n="seoQ5">Amb quins col·legis de farmacèutics funciona?</h3>
+      <p data-i18n="seoA5">
+        Avui hi ha disponibles els fulls dels col·legis de Barcelona, Girona, Lleida i Tarragona,
+        que comparteixen un mateix model. Si el teu col·legi encara no hi apareix, demana'l des de
+        la mateixa aplicació i n'afegirem la plantilla.
+      </p>
+      <!-- Crawlable cross-links between the language versions — see index.html. -->
+      <p class="about-langs">
+        <a href="/farma-kit/" hreflang="es" lang="es">Versión en español</a>
+        <span aria-hidden="true">·</span>
+        <a href="/farma-kit/ca/" hreflang="ca" lang="ca">Versió en català</a>
+      </p>
+    </section>
     <!-- Real text for crawlers that don't run JS (Google does; most others don't).
          It lives in <noscript> deliberately: Lit renders fk-root in LIGHT DOM and
          does NOT clear pre-existing children, so the same markup placed inside

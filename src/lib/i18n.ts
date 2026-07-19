@@ -34,7 +34,6 @@ export const I18N: { ca: Dict; es: Dict } = {
     // a card number and offers credit-card autofill. Verified by bisection.
     num: 'Quantitat de fulls',
     pages: 'Pàgines a imprimir',
-    dismiss: 'No mostrar més',
     segell: 'Generar també les dades del segell',
     cognoms: 'Cognoms del titular',
     nom: 'Nom del titular',
@@ -67,7 +66,6 @@ export const I18N: { ca: Dict; es: Dict } = {
     loadErr: "No s'ha pogut carregar la llista de plantilles. Comprova la connexió i torna-ho a provar.",
     tplErr: "No s'ha pogut carregar la plantilla. Comprova la connexió i torna-ho a provar.",
     retry: 'Torna-ho a provar',
-    showAgain: "Mostra l'avís legal",
     continuar: 'Continuar',
     cancel: 'Cancel·lar',
     warnAhead: (mes: string) =>
@@ -76,6 +74,7 @@ export const I18N: { ca: Dict; es: Dict } = {
       "Compte! S'estan generant les primeres pàgines per al mes <strong>" +
       mes +
       '</strong>, que està acabant. És correcte?',
+    // Accessible name of the pre-generate warning dialog (visually hidden).
     alertLabel: 'Alerta!',
     alertText: 'Aquesta pàgina no pertany a cap Col·legi de Farmacèutics',
     theme_dark: 'Fosc',
@@ -119,7 +118,6 @@ export const I18N: { ca: Dict; es: Dict } = {
     full: 'Hoja inicial',
     num: 'Cantidad de hojas',
     pages: 'Páginas a imprimir',
-    dismiss: 'No mostrar más',
     segell: 'Generar también los datos del sello',
     cognoms: 'Apellidos del titular',
     nom: 'Nombre del titular',
@@ -149,7 +147,6 @@ export const I18N: { ca: Dict; es: Dict } = {
     loadErr: 'No se pudo cargar la lista de plantillas. Comprueba la conexión y vuelve a intentarlo.',
     tplErr: 'No se pudo cargar la plantilla. Comprueba la conexión y vuelve a intentarlo.',
     retry: 'Reintentar',
-    showAgain: 'Mostrar el aviso legal',
     continuar: 'Continuar',
     cancel: 'Cancelar',
     warnAhead: (mes: string) =>

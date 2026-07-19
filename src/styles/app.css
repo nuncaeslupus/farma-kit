@@ -1218,6 +1218,50 @@ select[aria-invalid='true']:focus {
   height: 13px;
 }
 
+/* ---------- static about/FAQ (lives in the HTML shells, outside fk-root) ----------
+   Crawlable content below the app. Same column as .wrap; muted like .lead so it
+   reads as reference material, not part of the form flow. The bottom padding
+   clears the fixed .privacy-bar: this section is the last thing in flow, so the
+   in-app #barSpacer no longer covers it — --privacy-bar-h is published by
+   wirePrivacyBarSpacing(), 52px is the same pre-hydration guess as .bar-spacer. */
+.about {
+  width: 100%;
+  max-width: 940px;
+  margin: 0 auto;
+  padding: 8px 24px calc(28px + var(--privacy-bar-h, 52px));
+  color: var(--muted);
+}
+.about h2 {
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  border-top: 1px solid var(--line);
+  margin: 0 0 4px;
+  padding-top: 20px;
+}
+.about h3 {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--ink);
+  margin: 14px 0 3px;
+}
+.about p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.about-langs {
+  margin-top: 18px;
+  font-size: 12.5px;
+}
+.about-langs span {
+  margin: 0 6px;
+  color: var(--faint);
+  opacity: 0.6;
+}
+
 /* footer contact link */
 .page-foot {
   text-align: center;

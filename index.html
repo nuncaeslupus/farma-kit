@@ -4,12 +4,24 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <!-- Matches lang="es" above and the app's Spanish default; applyLang()
-         swaps it (and document.title) to Catalan at runtime when chosen. -->
-    <title>Farma-Kit - Rellenador de hojas de cupones precinto</title>
+    <!-- Fonts load via @font-face in CSS, which the browser only discovers after
+         the stylesheet — preloading the two above-the-fold faces (h1/wordmark 600,
+         body 400) removes that round of late discovery. Font preloads require
+         `crossorigin` even same-origin: fonts are fetched in CORS mode, and a
+         mismatched mode would double-download. -->
+    <link rel="preload" href="/fonts/space-grotesk-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <!-- Mirrors --paper; theme.ts keeps it in sync with the light/dark toggle. -->
+    <meta name="theme-color" content="#f4efe6" />
+    <!-- Keyword-first titles: nobody searches the brand — they search «hojas de
+         cupones precinto» and «receta electrónica». Matches lang="es" above and
+         the app's Spanish default; applyLang() swaps it (and document.title) to
+         Catalan at runtime when chosen — keep in sync with docTitle in
+         src/lib/i18n.ts. -->
+    <title>Rellenar hojas de cupones precinto para la receta electrónica — Farma-Kit</title>
     <meta
       name="description"
-      content="Rellena la cabecera de las hojas de cupones precinto para la receta electrónica. Gratis, sin registro y sin enviar datos: todo se procesa en tu navegador."
+      content="Rellena e imprime la cabecera de las hojas de cupones precinto de la receta electrónica de tu farmacia. Gratis, sin registro y sin enviar datos a ningún servidor."
     />
     <!-- The page is one client-rendered app; without this, /farma-kit,
          /farma-kit/ and /farma-kit/index.html look like three pages. -->
@@ -27,10 +39,10 @@
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Farma-Kit" />
     <meta property="og:url" content="https://nuncaeslupus.github.io/farma-kit/" />
-    <meta property="og:title" content="Farma-Kit · Rellenador de hojas de cupones precinto" />
+    <meta property="og:title" content="Farma-Kit · Hojas de cupones precinto para la receta electrónica" />
     <meta
       property="og:description"
-      content="Rellena la cabecera de las hojas de cupones precinto para la receta electrónica. Gratis, sin registro y sin enviar datos: todo se procesa en tu navegador."
+      content="Rellena e imprime la cabecera de las hojas de cupones precinto de la receta electrónica de tu farmacia. Gratis, sin registro y sin enviar datos a ningún servidor."
     />
     <meta property="og:image" content="https://nuncaeslupus.github.io/farma-kit/og-card.png" />
     <meta property="og:image:width" content="1200" />
@@ -39,12 +51,86 @@
     <meta property="og:locale" content="es_ES" />
     <meta property="og:locale:alternate" content="ca_ES" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Farma-Kit · Rellenador de hojas de cupones precinto" />
+    <meta name="twitter:title" content="Farma-Kit · Hojas de cupones precinto para la receta electrónica" />
     <meta
       name="twitter:description"
-      content="Rellena la cabecera de las hojas de cupones precinto para la receta electrónica. Gratis, sin registro y sin enviar datos."
+      content="Rellena la cabecera de las hojas de cupones precinto de la receta electrónica. Gratis, sin registro y sin enviar datos."
     />
     <meta name="twitter:image" content="https://nuncaeslupus.github.io/farma-kit/og-card.png" />
+
+    <!-- Structured data. These are data blocks, never executed, so the strict
+         meta-CSP below doesn't apply to them — crawlers read them from the raw
+         markup. Keep the FAQPage text in sync with the visible .about section
+         at the bottom of <body> (Google requires visible parity). -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Farma-Kit",
+        "alternateName": "Rellenador de hojas de cupones precinto",
+        "url": "https://nuncaeslupus.github.io/farma-kit/",
+        "image": "https://nuncaeslupus.github.io/farma-kit/og-card.png",
+        "description": "Herramienta gratuita para farmacias: rellena e imprime la cabecera de las hojas de cupones precinto de la receta electrónica (UP, mes y año, numeración y sello del titular). El PDF se genera en el navegador, sin enviar datos a ningún servidor.",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Any",
+        "browserRequirements": "Requiere JavaScript",
+        "inLanguage": ["es", "ca"],
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+        "audience": { "@type": "Audience", "audienceType": "Farmacéuticos y oficinas de farmacia" },
+        "license": "https://github.com/nuncaeslupus/farma-kit/blob/main/LICENSE",
+        "sameAs": ["https://github.com/nuncaeslupus/farma-kit"]
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "inLanguage": "es",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "¿Qué son las hojas de cupones precinto?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Son las hojas oficiales que cada Colegio de Farmacéuticos distribuye a las farmacias, normalmente a través del mayorista, y donde se pegan los cupones precinto de los envases dispensados con receta electrónica: son el justificante para la facturación y el control de las dispensaciones del sistema público de salud y de las mutualidades (MUFACE, ISFAS, MUGEJU). En Cataluña se conocen como «fulls de cupons precinte»."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Qué rellena exactamente esta herramienta?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Solo la cabecera de cada hoja: la UP de la farmacia, el mes y el año, la numeración correlativa de las hojas y, si lo necesitas, los datos del sello del titular. El resultado es un PDF listo para imprimir sobre las hojas oficiales de cupones; la hoja en sí nunca se imprime, solo tus datos."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Es gratis? ¿Hay que registrarse?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Sí: es una herramienta gratuita y de código abierto (licencia MIT, código en GitHub). No hay registro, no hay cuentas y el sitio no usa cookies."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Qué pasa con los datos de mi farmacia?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No salen de tu ordenador: el PDF se genera localmente, en tu propio navegador, y no se envía nada a ningún servidor. La opción «Recuérdame» guarda los datos únicamente en tu navegador para la próxima visita."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Con qué colegios de farmacéuticos funciona?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Hoy están disponibles las hojas de los colegios de Barcelona, Girona, Lleida y Tarragona, que comparten un mismo modelo. Si tu colegio todavía no aparece, pídelo desde la propia aplicación y añadiremos su plantilla."
+            }
+          }
+        ]
+      }
+    </script>
 
     <!-- Meta-CSP as defense in depth: GitHub Pages serves static files and can't
          set response headers, so this is the only way to ship a CSP at all. Now
@@ -58,6 +144,61 @@
   </head>
   <body>
     <fk-root></fk-root>
+    <!-- Static about/FAQ: real, visible, crawlable content — the app itself is
+         client-rendered, so without this the page has almost no indexable text
+         for crawlers that don't run JS. It sits OUTSIDE fk-root (Lit renders
+         into fk-root and must own its children) and applyLang() is called on
+         document.body, so the language toggle translates it via data-i18n like
+         the rest of the UI. Keep the text in sync with the seo* keys in
+         src/lib/i18n.ts and the FAQPage JSON-LD in <head>. -->
+    <section class="about" aria-labelledby="aboutTitle">
+      <h2 id="aboutTitle" data-i18n="seoTitle">Preguntas frecuentes</h2>
+      <h3 data-i18n="seoQ1">¿Qué son las hojas de cupones precinto?</h3>
+      <p data-i18n="seoA1">
+        Son las hojas oficiales que cada Colegio de Farmacéuticos distribuye a las farmacias,
+        normalmente a través del mayorista, y donde se pegan los cupones precinto de los envases
+        dispensados con receta electrónica: son el justificante para la facturación y el control de
+        las dispensaciones del sistema público de salud y de las mutualidades (MUFACE, ISFAS,
+        MUGEJU). En Cataluña se conocen como «fulls de cupons precinte».
+      </p>
+      <h3 data-i18n="seoQ2">¿Qué rellena exactamente esta herramienta?</h3>
+      <p data-i18n="seoA2">
+        Solo la cabecera de cada hoja: la UP de la farmacia, el mes y el año, la numeración
+        correlativa de las hojas y, si lo necesitas, los datos del sello del titular. El resultado
+        es un PDF listo para imprimir sobre las hojas oficiales de cupones; la hoja en sí nunca se
+        imprime, solo tus datos.
+      </p>
+      <h3 data-i18n="seoQ3">¿Es gratis? ¿Hay que registrarse?</h3>
+      <p data-i18n="seoA3" data-i18n-html>
+        Sí: es una herramienta gratuita y de código abierto (licencia MIT,
+        <a href="https://github.com/nuncaeslupus/farma-kit" target="_blank" rel="noopener">código en GitHub</a>).
+        No hay registro, no hay cuentas y el sitio no usa cookies.
+      </p>
+      <h3 data-i18n="seoQ4">¿Qué pasa con los datos de mi farmacia?</h3>
+      <p data-i18n="seoA4">
+        No salen de tu ordenador: el PDF se genera localmente, en tu propio navegador, y no se envía
+        nada a ningún servidor. La opción «Recuérdame» guarda los datos únicamente en tu navegador
+        para la próxima visita.
+      </p>
+      <h3 data-i18n="seoQ5">¿Con qué colegios de farmacéuticos funciona?</h3>
+      <p data-i18n="seoA5">
+        Hoy están disponibles las hojas de los colegios de Barcelona, Girona, Lleida y Tarragona,
+        que comparten un mismo modelo. Si tu colegio todavía no aparece, pídelo desde la propia
+        aplicación y añadiremos su plantilla.
+      </p>
+      <!-- Crawlable cross-links between the language versions (the toggle above
+           is a JS button, invisible to link-following crawlers). Each link
+           self-labels in its own language, so this line needs no data-i18n.
+           Absolute /farma-kit/ on purpose: the dev server serves under the same
+           base (vite.config.ts), so these work in both environments — while
+           relative hrefs would resolve to the wrong place from the
+           no-trailing-slash URL variants. -->
+      <p class="about-langs">
+        <a href="/farma-kit/" hreflang="es" lang="es">Versión en español</a>
+        <span aria-hidden="true">·</span>
+        <a href="/farma-kit/ca/" hreflang="ca" lang="ca">Versió en català</a>
+      </p>
+    </section>
     <!-- Real text for crawlers that don't run JS (Google does; most others don't).
          It lives in <noscript> deliberately: Lit renders fk-root in LIGHT DOM and
          does NOT clear pre-existing children, so the same markup placed inside

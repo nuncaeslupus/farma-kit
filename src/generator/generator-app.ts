@@ -230,10 +230,12 @@ export class GeneratorApp extends LitElement {
         this.setActive(this.activeIdx - 1);
       } else if (e.key === 'Enter') {
         e.preventDefault();
-        // No arrow navigation yet (activeIdx === -1) but the query narrowed the
-        // list: Enter selects the first match, so type-and-Enter works.
+        // A highlighted option wins; otherwise, only when the user has typed a
+        // query, Enter selects the top match (type-and-Enter). With an empty
+        // search, Enter selects nothing — never auto-pick a random first colegio.
         const opts = this.visibleOpts();
-        (opts[this.activeIdx] ?? opts[0])?.click();
+        const query = this.i('colegiSearch').value.trim();
+        (opts[this.activeIdx] ?? (query ? opts[0] : undefined))?.click();
       }
     });
     list.addEventListener('click', (e) => {

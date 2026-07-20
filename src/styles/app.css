@@ -134,6 +134,14 @@ a:hover {
   align-items: center;
   gap: 9px;
   min-width: 0;
+  /* It's an <a> to the tool home — keep it looking like the brand, not a link. */
+  text-decoration: none;
+  color: inherit;
+}
+.app-brand:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
 }
 /* Brand mark: the Hygieia glyph, no green tile, painted in two theme-aware inks
    via stacked masks — snake in --accent (green→teal), bowl in --ink (dark→light),

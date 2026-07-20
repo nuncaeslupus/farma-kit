@@ -80,55 +80,6 @@
         "sameAs": ["https://github.com/nuncaeslupus/farma-kit"]
       }
     </script>
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        "inLanguage": "gl",
-        "mainEntity": [
-          {
-            "@type": "Question",
-            "name": "Que son as follas de cupóns precinto?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Son as follas oficiais que cada Colexio de Farmacéuticos distribúe ás farmacias, normalmente a través do distribuidor, e onde se pegan os cupóns precinto dos envases dispensados con receita electrónica: son o xustificante para a facturación e o control das dispensacións do sistema público de saúde e das mutualidades (MUFACE, ISFAS, MUGEJU)."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "Que enche exactamente esta ferramenta?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Só a cabeceira de cada folla: a UP da farmacia, o mes e o ano, a numeración correlativa das follas e, se o precisas, os datos do selo do titular. O resultado é un PDF listo para imprimir sobre as follas oficiais de cupóns; a folla en si nunca se imprime, só os teus datos. As follas podes conseguilas a través do teu distribuidor ou imprimíndoas se o teu Colexio de Farmacéuticos che proporciona o modelo."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "É de balde? Hai que rexistrarse?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Si: é unha ferramenta gratuíta e de código aberto (licenza MIT, código en GitHub). Non hai rexistro, non hai contas e o sitio non usa cookies."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "Que pasa cos datos da miña farmacia?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Non saen do teu ordenador: o PDF xérase localmente, no teu propio navegador, e non se envía nada a ningún servidor. A opción «Lémbrame» garda os datos unicamente no teu navegador para a próxima visita."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "Con que colexios de farmacéuticos funciona?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Hoxe están dispoñibles as follas dos colexios de Barcelona, Girona, Lleida e Tarragona, que comparten un mesmo modelo. Se o teu colexio aínda non aparece, pídeo desde a propia aplicación e engadiremos o seu modelo."
-            }
-          }
-        ]
-      }
-    </script>
 
     <!-- Meta-CSP as defense in depth: GitHub Pages serves static files and can't
          set response headers, so this is the only way to ship a CSP at all. Now
@@ -153,42 +104,6 @@
          match this shell; the runtime toggle re-translates it via data-i18n.
          Keep in sync with the seo* keys in src/lib/i18n.ts and the FAQPage
          JSON-LD in <head>. -->
-    <section class="about" aria-labelledby="aboutTitle">
-      <h2 id="aboutTitle" data-i18n="seoTitle">Preguntas frecuentes</h2>
-      <h3 data-i18n="seoQ1">Que son as follas de cupóns precinto?</h3>
-      <p data-i18n="seoA1">
-        Son as follas oficiais que cada Colexio de Farmacéuticos distribúe ás farmacias, normalmente
-        a través do distribuidor, e onde se pegan os cupóns precinto dos envases dispensados con
-        receita electrónica: son o xustificante para a facturación e o control das dispensacións do
-        sistema público de saúde e das mutualidades (MUFACE, ISFAS, MUGEJU).
-      </p>
-      <h3 data-i18n="seoQ2">Que enche exactamente esta ferramenta?</h3>
-      <p data-i18n="seoA2">
-        Só a cabeceira de cada folla: a UP da farmacia, o mes e o ano, a numeración correlativa das
-        follas e, se o precisas, os datos do selo do titular. O resultado é un PDF listo para
-        imprimir sobre as follas oficiais de cupóns; a folla en si nunca se imprime, só os teus
-        datos. As follas podes conseguilas a través do teu distribuidor ou imprimíndoas se o teu
-        Colexio de Farmacéuticos che proporciona o modelo.
-      </p>
-      <h3 data-i18n="seoQ3">É de balde? Hai que rexistrarse?</h3>
-      <p data-i18n="seoA3" data-i18n-html>
-        Si: é unha ferramenta gratuíta e de código aberto (licenza MIT,
-        <a href="https://github.com/nuncaeslupus/farma-kit" target="_blank" rel="noopener">código en GitHub</a>).
-        Non hai rexistro, non hai contas e o sitio non usa cookies.
-      </p>
-      <h3 data-i18n="seoQ4">Que pasa cos datos da miña farmacia?</h3>
-      <p data-i18n="seoA4">
-        Non saen do teu ordenador: o PDF xérase localmente, no teu propio navegador, e non se envía
-        nada a ningún servidor. A opción «Lémbrame» garda os datos unicamente no teu navegador para
-        a próxima visita.
-      </p>
-      <h3 data-i18n="seoQ5">Con que colexios de farmacéuticos funciona?</h3>
-      <p data-i18n="seoA5">
-        Hoxe están dispoñibles as follas dos colexios de Barcelona, Girona, Lleida e Tarragona, que
-        comparten un mesmo modelo. Se o teu colexio aínda non aparece, pídeo desde a propia
-        aplicación e engadiremos o seu modelo.
-      </p>
-    </section>
     <!-- Real text for crawlers that don't run JS (Google does; most others don't).
          It lives in <noscript> deliberately: Lit renders fk-root in LIGHT DOM and
          does NOT clear pre-existing children, so the same markup placed inside

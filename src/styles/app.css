@@ -520,8 +520,12 @@ select {
 [data-theme='dark'] select {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23aca286' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
 }
+/* Lighter than --faint so a hint (10000, 1, 50…) reads as a hint, not as an
+   already-filled value. Opacity blends toward the field background, so it stays
+   right in both themes. */
 input::placeholder {
   color: var(--faint);
+  opacity: 0.55;
 }
 input:focus,
 select:focus {

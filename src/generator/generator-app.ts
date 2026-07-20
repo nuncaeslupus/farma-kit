@@ -1324,10 +1324,12 @@ export class GeneratorApp extends LitElement {
         ${footerTemplate({
           onShare: () => this.share(),
           onContact: () => this.contactar(),
-          faqHref:
-            this.uiLang === 'es'
-              ? `${import.meta.env.BASE_URL}faq/`
-              : `${import.meta.env.BASE_URL}${this.uiLang}/faq/`,
+          // Relative to the current tool URL (which always has a trailing slash:
+          // /farma-kit/, /farma-kit/eu/, …), so it points to the current
+          // language's FAQ even after an in-place language switch — the template
+          // isn't re-rendered on switch, so an absolute uiLang-based href goes
+          // stale (e.g. Euskera tool → Spanish FAQ).
+          faqHref: 'faq/',
         })}
         <div class="bar-spacer" id="barSpacer" aria-hidden="true"></div>
 

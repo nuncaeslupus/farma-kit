@@ -141,6 +141,13 @@
       http-equiv="Content-Security-Policy"
       content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"
     />
+
+    <!-- Render-blocking so it applies before app.css (which Vite injects via JS in
+         dev): while <fk-root> is still empty, reserve a viewport so the static
+         about/FAQ below it stays off-screen instead of flashing, unstyled, at the
+         top. Once Lit fills fk-root it is no longer :empty and this rule is inert
+         (no permanent gap). -->
+    <style>fk-root:empty{display:block;min-height:100vh}</style>
   </head>
   <body>
     <fk-root></fk-root>

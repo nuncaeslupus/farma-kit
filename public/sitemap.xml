@@ -47,4 +47,40 @@
     <xhtml:link rel="alternate" hreflang="gl" href="https://nuncaeslupus.github.io/farma-kit/gl/" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://nuncaeslupus.github.io/farma-kit/" />
   </url>
+  <url>
+    <loc>https://nuncaeslupus.github.io/farma-kit/faq/</loc>
+    <lastmod>2026-07-20</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://nuncaeslupus.github.io/farma-kit/faq/" />
+    <xhtml:link rel="alternate" hreflang="ca" href="https://nuncaeslupus.github.io/farma-kit/ca/faq/" />
+    <xhtml:link rel="alternate" hreflang="eu" href="https://nuncaeslupus.github.io/farma-kit/eu/faq/" />
+    <xhtml:link rel="alternate" hreflang="gl" href="https://nuncaeslupus.github.io/farma-kit/gl/faq/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://nuncaeslupus.github.io/farma-kit/faq/" />
+  </url>
+  <url>
+    <loc>https://nuncaeslupus.github.io/farma-kit/ca/faq/</loc>
+    <lastmod>2026-07-20</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://nuncaeslupus.github.io/farma-kit/faq/" />
+    <xhtml:link rel="alternate" hreflang="ca" href="https://nuncaeslupus.github.io/farma-kit/ca/faq/" />
+    <xhtml:link rel="alternate" hreflang="eu" href="https://nuncaeslupus.github.io/farma-kit/eu/faq/" />
+    <xhtml:link rel="alternate" hreflang="gl" href="https://nuncaeslupus.github.io/farma-kit/gl/faq/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://nuncaeslupus.github.io/farma-kit/faq/" />
+  </url>
+  <url>
+    <loc>https://nuncaeslupus.github.io/farma-kit/eu/faq/</loc>
+    <lastmod>2026-07-20</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://nuncaeslupus.github.io/farma-kit/faq/" />
+    <xhtml:link rel="alternate" hreflang="ca" href="https://nuncaeslupus.github.io/farma-kit/ca/faq/" />
+    <xhtml:link rel="alternate" hreflang="eu" href="https://nuncaeslupus.github.io/farma-kit/eu/faq/" />
+    <xhtml:link rel="alternate" hreflang="gl" href="https://nuncaeslupus.github.io/farma-kit/gl/faq/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://nuncaeslupus.github.io/farma-kit/faq/" />
+  </url>
+  <url>
+    <loc>https://nuncaeslupus.github.io/farma-kit/gl/faq/</loc>
+    <lastmod>2026-07-20</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://nuncaeslupus.github.io/farma-kit/faq/" />
+    <xhtml:link rel="alternate" hreflang="ca" href="https://nuncaeslupus.github.io/farma-kit/ca/faq/" />
+    <xhtml:link rel="alternate" hreflang="eu" href="https://nuncaeslupus.github.io/farma-kit/eu/faq/" />
+    <xhtml:link rel="alternate" hreflang="gl" href="https://nuncaeslupus.github.io/farma-kit/gl/faq/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://nuncaeslupus.github.io/farma-kit/faq/" />
+  </url>
 </urlset>

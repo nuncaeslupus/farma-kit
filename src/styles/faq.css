@@ -1,0 +1,61 @@
+/* Static FAQ pages (/faq, /ca/faq, /eu/faq, /gl/faq). The header (.util-bar)
+   and footer (.page-foot) are the SAME chrome as the tool (from app.css,
+   mounted by faq.ts) — this only frames them like the tool's .wrap and styles
+   the FAQ body. */
+body.faqPage {
+  min-height: 100dvh;
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+}
+.faqShell {
+  max-width: 940px;
+  margin: 0 auto;
+  padding: 8px 24px 20px;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+.faqMain {
+  flex: 1;
+  padding: 8px 0 40px;
+}
+.faqMain h1 {
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: 28px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin: 16px 0 20px;
+}
+.faqMain section {
+  border-top: 1px solid var(--line);
+  padding: 20px 0;
+}
+.faqMain h2 {
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--ink);
+  margin: 0 0 8px;
+}
+.faqMain p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.faqMain a {
+  color: var(--accent-ink);
+}
+.faqBack {
+  display: inline-block;
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+  text-decoration: none;
+}
+.faqBack:hover {
+  color: var(--accent-ink);
+}

@@ -86,55 +86,6 @@
         "sameAs": ["https://github.com/nuncaeslupus/farma-kit"]
       }
     </script>
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        "inLanguage": "es",
-        "mainEntity": [
-          {
-            "@type": "Question",
-            "name": "¿Qué son las hojas de cupones precinto?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Son las hojas oficiales que cada Colegio de Farmacéuticos distribuye a las farmacias, normalmente a través del mayorista, y donde se pegan los cupones precinto de los envases dispensados con receta electrónica: son el justificante para la facturación y el control de las dispensaciones del sistema público de salud y de las mutualidades (MUFACE, ISFAS, MUGEJU)."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "¿Qué rellena exactamente esta herramienta?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Solo la cabecera de cada hoja: la UP de la farmacia, el mes y el año, la numeración correlativa de las hojas y, si lo necesitas, los datos del sello del titular. El resultado es un PDF listo para imprimir sobre las hojas oficiales de cupones; la hoja en sí nunca se imprime, solo tus datos. Las hojas las puedes conseguir a través de tu mayorista o imprimiéndolas si tu Colegio de Farmacéuticos te proporciona la plantilla."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "¿Es gratis? ¿Hay que registrarse?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Sí: es una herramienta gratuita y de código abierto (licencia MIT, código en GitHub). No hay registro, no hay cuentas y el sitio no usa cookies."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "¿Qué pasa con los datos de mi farmacia?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "No salen de tu ordenador: el PDF se genera localmente, en tu propio navegador, y no se envía nada a ningún servidor. La opción «Recuérdame» guarda los datos únicamente en tu navegador para la próxima visita."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "¿Con qué colegios de farmacéuticos funciona?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Hoy están disponibles las hojas de los colegios de Barcelona, Girona, Lleida y Tarragona, que comparten un mismo modelo. Si tu colegio todavía no aparece, pídelo desde la propia aplicación y añadiremos su plantilla."
-            }
-          }
-        ]
-      }
-    </script>
 
     <!-- Meta-CSP as defense in depth: GitHub Pages serves static files and can't
          set response headers, so this is the only way to ship a CSP at all. Now
@@ -162,42 +113,6 @@
          document.body, so the language toggle translates it via data-i18n like
          the rest of the UI. Keep the text in sync with the seo* keys in
          src/lib/i18n.ts and the FAQPage JSON-LD in <head>. -->
-    <section class="about" aria-labelledby="aboutTitle">
-      <h2 id="aboutTitle" data-i18n="seoTitle">Preguntas frecuentes</h2>
-      <h3 data-i18n="seoQ1">¿Qué son las hojas de cupones precinto?</h3>
-      <p data-i18n="seoA1">
-        Son las hojas oficiales que cada Colegio de Farmacéuticos distribuye a las farmacias,
-        normalmente a través del mayorista, y donde se pegan los cupones precinto de los envases
-        dispensados con receta electrónica: son el justificante para la facturación y el control de
-        las dispensaciones del sistema público de salud y de las mutualidades (MUFACE, ISFAS,
-        MUGEJU).
-      </p>
-      <h3 data-i18n="seoQ2">¿Qué rellena exactamente esta herramienta?</h3>
-      <p data-i18n="seoA2">
-        Solo la cabecera de cada hoja: la UP de la farmacia, el mes y el año, la numeración
-        correlativa de las hojas y, si lo necesitas, los datos del sello del titular. El resultado
-        es un PDF listo para imprimir sobre las hojas oficiales de cupones; la hoja en sí nunca se
-        imprime, solo tus datos. Las hojas las puedes conseguir a través de tu mayorista o imprimiéndolas si tu Colegio de Farmacéuticos te proporciona la plantilla.
-      </p>
-      <h3 data-i18n="seoQ3">¿Es gratis? ¿Hay que registrarse?</h3>
-      <p data-i18n="seoA3" data-i18n-html>
-        Sí: es una herramienta gratuita y de código abierto (licencia MIT,
-        <a href="https://github.com/nuncaeslupus/farma-kit" target="_blank" rel="noopener">código en GitHub</a>).
-        No hay registro, no hay cuentas y el sitio no usa cookies.
-      </p>
-      <h3 data-i18n="seoQ4">¿Qué pasa con los datos de mi farmacia?</h3>
-      <p data-i18n="seoA4">
-        No salen de tu ordenador: el PDF se genera localmente, en tu propio navegador, y no se envía
-        nada a ningún servidor. La opción «Recuérdame» guarda los datos únicamente en tu navegador
-        para la próxima visita.
-      </p>
-      <h3 data-i18n="seoQ5">¿Con qué colegios de farmacéuticos funciona?</h3>
-      <p data-i18n="seoA5">
-        Hoy están disponibles las hojas de los colegios de Barcelona, Girona, Lleida y Tarragona,
-        que comparten un mismo modelo. Si tu colegio todavía no aparece, pídelo desde la propia
-        aplicación y añadiremos su plantilla.
-      </p>
-    </section>
     <!-- Real text for crawlers that don't run JS (Google does; most others don't).
          It lives in <noscript> deliberately: Lit renders fk-root in LIGHT DOM and
          does NOT clear pre-existing children, so the same markup placed inside

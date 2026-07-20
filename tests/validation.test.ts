@@ -1,22 +1,29 @@
 import { describe, test, expect } from 'vitest';
-import { CP2PROV, titleCase, isNif, VAL, isCatalanPath, pageRangeExceeds } from '../src/lib/validation';
+import { CP2PROV, titleCase, isNif, VAL, langFromPath, pageRangeExceeds } from '../src/lib/validation';
 
-// The path is the ONLY language signal (/ = es, /ca/ = ca) — there is no stored
-// preference or navigator.language detection anymore: both used to override the
-// root URL, so a link to the Spanish version could render Catalan anyway.
-describe('isCatalanPath', () => {
+// The path is the ONLY language signal (/ = es, /ca/, /eu/, /gl/ the others) —
+// there is no stored preference or navigator.language detection anymore: both
+// used to override the root URL, so a link to the Spanish version could render
+// another language anyway.
+describe('langFromPath', () => {
   test.each([
-    ['/farma-kit/ca/', true],
-    ['/farma-kit/ca', true],
-    ['/farma-kit/ca/index.html', true],
-    ['/farma-kit/', false],
-    ['/farma-kit/index.html', false],
-    // must not false-positive on words that merely start with "ca"
-    ['/farma-kit/casa/', false],
-    // anchored: a "ca" segment in a hosting prefix must not match
-    ['/ca/farma-kit/', false],
+    ['/farma-kit/ca/', 'ca'],
+    ['/farma-kit/ca', 'ca'],
+    ['/farma-kit/ca/index.html', 'ca'],
+    ['/farma-kit/eu/', 'eu'],
+    ['/farma-kit/eu/index.html', 'eu'],
+    ['/farma-kit/gl/', 'gl'],
+    ['/farma-kit/gl/index.html', 'gl'],
+    ['/farma-kit/', 'es'],
+    ['/farma-kit/index.html', 'es'],
+    // must not false-positive on words that merely start with a locale code
+    ['/farma-kit/casa/', 'es'],
+    ['/farma-kit/global/', 'es'],
+    // anchored: a locale segment in a hosting prefix must not match
+    ['/ca/farma-kit/', 'es'],
+    ['/eu/farma-kit/', 'es'],
   ])('%p -> %p', (path, expected) => {
-    expect(isCatalanPath(path)).toBe(expected);
+    expect(langFromPath(path)).toBe(expected);
   });
 });
 

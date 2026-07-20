@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="eu">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <!-- Font preloads and theme-color — see index.html for the reasoning. -->
+    <link rel="preload" href="/fonts/space-grotesk-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <meta name="theme-color" content="#f4efe6" />
+    <!-- Keyword-first title (see index.html). Matches lang="eu" above: this
+         shell is the Basque entry point, loaded at /eu/ so Google can index it
+         as its own page (see ../index.html for the Spanish default). main.ts
+         still detects/toggles language at runtime; this only fixes what a
+         crawler sees on first load. Keep in sync with docTitle in
+         src/lib/i18n.ts. -->
+    <title>Zigilu-kupoien orriak bete errezeta elektronikorako — FarmaKit</title>
+    <meta
+      name="description"
+      content="Bete eta inprimatu zure farmaziako errezeta elektronikoaren zigilu-kupoien orrien goiburua. Doan, izena eman gabe eta daturik inongo zerbitzarira bidali gabe."
+    />
+    <!-- The page is one client-rendered app; without this, /farma-kit/eu,
+         /farma-kit/eu/ and /farma-kit/eu/index.html look like three pages. -->
+    <link rel="canonical" href="https://nuncaeslupus.github.io/farma-kit/eu/" />
+
+    <!-- Reciprocal hreflang — see index.html. -->
+    <link rel="alternate" hreflang="es" href="https://nuncaeslupus.github.io/farma-kit/" />
+    <link rel="alternate" hreflang="ca" href="https://nuncaeslupus.github.io/farma-kit/ca/" />
+    <link rel="alternate" hreflang="eu" href="https://nuncaeslupus.github.io/farma-kit/eu/" />
+    <link rel="alternate" hreflang="gl" href="https://nuncaeslupus.github.io/farma-kit/gl/" />
+    <link rel="alternate" hreflang="x-default" href="https://nuncaeslupus.github.io/farma-kit/" />
+
+    <!-- Link previews (WhatsApp/Telegram is how this actually gets passed around,
+         and those scrapers run no JS — they read these tags, never the app).
+         URLs must be absolute: scrapers don't resolve relative paths. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="FarmaKit" />
+    <meta property="og:url" content="https://nuncaeslupus.github.io/farma-kit/eu/" />
+    <meta property="og:title" content="FarmaKit · Zigilu-kupoien orriak errezeta elektronikorako" />
+    <meta
+      property="og:description"
+      content="Bete eta inprimatu zure farmaziako errezeta elektronikoaren zigilu-kupoien orrien goiburua. Doan, izena eman gabe eta daturik inongo zerbitzarira bidali gabe."
+    />
+    <meta property="og:image" content="https://nuncaeslupus.github.io/farma-kit/og-card-eu.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="FarmaKit — zigilu-kupoien orriak betetzeko tresna" />
+    <meta property="og:locale" content="eu_ES" />
+    <meta property="og:locale:alternate" content="es_ES" />
+    <meta property="og:locale:alternate" content="ca_ES" />
+    <meta property="og:locale:alternate" content="gl_ES" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="FarmaKit · Zigilu-kupoien orriak errezeta elektronikorako" />
+    <meta
+      name="twitter:description"
+      content="Bete errezeta elektronikoaren zigilu-kupoien orrien goiburua. Doan, izena eman gabe eta daturik bidali gabe."
+    />
+    <meta name="twitter:image" content="https://nuncaeslupus.github.io/farma-kit/og-card-eu.png" />
+
+    <!-- Structured data — data blocks, never executed, so the meta-CSP below
+         doesn't apply. Keep the FAQPage text in sync with the visible .about
+         section at the bottom of <body>. See index.html. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "FarmaKit",
+        "alternateName": "Zigilu-kupoien orriak betetzeko tresna",
+        "url": "https://nuncaeslupus.github.io/farma-kit/eu/",
+        "image": "https://nuncaeslupus.github.io/farma-kit/og-card-eu.png",
+        "description": "Farmazietarako doako tresna: bete eta inprimatu errezeta elektronikoaren zigilu-kupoien orrien goiburua (UP, hilabetea eta urtea, zenbakera eta titularraren zigilua). PDFa nabigatzailean sortzen da, daturik inongo zerbitzarira bidali gabe.",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Any",
+        "browserRequirements": "JavaScript behar du",
+        "inLanguage": ["eu", "es", "ca", "gl"],
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+        "audience": { "@type": "Audience", "audienceType": "Farmazialariak eta farmazia-bulegoak" },
+        "license": "https://github.com/nuncaeslupus/farma-kit/blob/main/LICENSE",
+        "sameAs": ["https://github.com/nuncaeslupus/farma-kit"]
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "inLanguage": "eu",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Zer dira zigilu-kupoien orriak?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Farmazialarien Elkargo bakoitzak farmaziei banatzen dizkien orri ofizialak dira, normalean handizkariaren bidez, eta bertan itsasten dira errezeta elektronikoarekin emandako ontzien zigilu-kupoiak: osasun-sistema publikoaren eta mutualitateen (MUFACE, ISFAS, MUGEJU) dispentsazioen fakturazioaren eta kontrolaren egiaztagiria dira."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Zer betetzen du zehazki tresna honek?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Orri bakoitzaren goiburua baino ez: farmaziaren UP, hilabetea eta urtea, orrien zenbakera korrelatiboa eta, behar baduzu, titularraren zigiluaren datuak. Emaitza kupoien orri ofizialen gainean inprimatzeko prest dagoen PDF bat da; orria bera ez da inoiz inprimatzen, zure datuak baino ez. Orriak zure handizkariaren bidez lor ditzakezu, edo zuk zeuk inprimatuz, zure Farmazialarien Elkargoak txantiloia ematen badizu."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Doakoa da? Izena eman behar da?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Bai: doako eta kode irekiko tresna bat da (MIT lizentzia, kodea GitHuben). Ez dago izen-ematerik, ez dago konturik, eta guneak ez du cookierik erabiltzen."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Zer gertatzen da nire farmaziaren datuekin?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Ez dira zure ordenagailutik ateratzen: PDFa lokalki sortzen da, zure nabigatzailean bertan, eta ez da ezer inongo zerbitzarira bidaltzen. «Gogoratu ni» aukerak datuak zure nabigatzailean bakarrik gordetzen ditu, hurrengo bisitarako."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Zein farmazialarien elkargorekin funtzionatzen du?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Gaur egun Barcelona, Girona, Lleida eta Tarragonako elkargoen orriak daude eskuragarri, eredu bera partekatzen dutenak. Zure elkargoa oraindik ez bada agertzen, eskatu aplikazioan bertan, eta haren txantiloia gehituko dugu."
+            }
+          }
+        ]
+      }
+    </script>
+
+    <!-- Meta-CSP as defense in depth: GitHub Pages serves static files and can't
+         set response headers, so this is the only way to ship a CSP at all. Now
+         that fonts are self-hosted (see src/styles/fonts.css), everything the app
+         needs is same-origin. style-src keeps 'unsafe-inline' because Lit writes
+         inline styles. -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
+
+    <!-- Render-blocking so it applies before app.css (which Vite injects via JS in
+         dev): while <fk-root> is still empty, reserve a viewport so the static
+         about/FAQ below it stays off-screen instead of flashing, unstyled, at the
+         top. Once Lit fills fk-root it is no longer :empty and this rule is inert
+         (no permanent gap). -->
+    <style>fk-root:empty{display:block;min-height:100vh}</style>
+  </head>
+  <body>
+    <fk-root></fk-root>
+    <!-- Static about/FAQ — see index.html for the reasoning. Basque here to
+         match this shell; the runtime toggle re-translates it via data-i18n.
+         Keep in sync with the seo* keys in src/lib/i18n.ts and the FAQPage
+         JSON-LD in <head>. -->
+    <section class="about" aria-labelledby="aboutTitle">
+      <h2 id="aboutTitle" data-i18n="seoTitle">Ohiko galderak</h2>
+      <h3 data-i18n="seoQ1">Zer dira zigilu-kupoien orriak?</h3>
+      <p data-i18n="seoA1">
+        Farmazialarien Elkargo bakoitzak farmaziei banatzen dizkien orri ofizialak dira, normalean
+        handizkariaren bidez, eta bertan itsasten dira errezeta elektronikoarekin emandako ontzien
+        zigilu-kupoiak: osasun-sistema publikoaren eta mutualitateen (MUFACE, ISFAS, MUGEJU)
+        dispentsazioen fakturazioaren eta kontrolaren egiaztagiria dira.
+      </p>
+      <h3 data-i18n="seoQ2">Zer betetzen du zehazki tresna honek?</h3>
+      <p data-i18n="seoA2">
+        Orri bakoitzaren goiburua baino ez: farmaziaren UP, hilabetea eta urtea, orrien zenbakera
+        korrelatiboa eta, behar baduzu, titularraren zigiluaren datuak. Emaitza kupoien orri
+        ofizialen gainean inprimatzeko prest dagoen PDF bat da; orria bera ez da inoiz inprimatzen,
+        zure datuak baino ez. Orriak zure handizkariaren bidez lor ditzakezu, edo zuk zeuk
+        inprimatuz, zure Farmazialarien Elkargoak txantiloia ematen badizu.
+      </p>
+      <h3 data-i18n="seoQ3">Doakoa da? Izena eman behar da?</h3>
+      <p data-i18n="seoA3" data-i18n-html>
+        Bai: doako eta kode irekiko tresna bat da (MIT lizentzia,
+        <a href="https://github.com/nuncaeslupus/farma-kit" target="_blank" rel="noopener">kodea GitHuben</a>).
+        Ez dago izen-ematerik, ez dago konturik, eta guneak ez du cookierik erabiltzen.
+      </p>
+      <h3 data-i18n="seoQ4">Zer gertatzen da nire farmaziaren datuekin?</h3>
+      <p data-i18n="seoA4">
+        Ez dira zure ordenagailutik ateratzen: PDFa lokalki sortzen da, zure nabigatzailean bertan,
+        eta ez da ezer inongo zerbitzarira bidaltzen. «Gogoratu ni» aukerak datuak zure
+        nabigatzailean bakarrik gordetzen ditu, hurrengo bisitarako.
+      </p>
+      <h3 data-i18n="seoQ5">Zein farmazialarien elkargorekin funtzionatzen du?</h3>
+      <p data-i18n="seoA5">
+        Gaur egun Barcelona, Girona, Lleida eta Tarragonako elkargoen orriak daude eskuragarri,
+        eredu bera partekatzen dutenak. Zure elkargoa oraindik ez bada agertzen, eskatu aplikazioan
+        bertan, eta haren txantiloia gehituko dugu.
+      </p>
+    </section>
+    <!-- Real text for crawlers that don't run JS (Google does; most others don't).
+         It lives in <noscript> deliberately: Lit renders fk-root in LIGHT DOM and
+         does NOT clear pre-existing children, so the same markup placed inside
+         fk-root would stay on screen underneath the app. Verified. -->
+    <noscript>
+      <h1>FarmaKit — Zigilu-kupoien orriak betetzeko tresna</h1>
+      <p>
+        Farmazia baten zigilu-kupoien orrien (errezeta-taloitegien) goiburua betetzeko doako tresna:
+        UP, hilabetea eta urtea, orrien zenbakera eta titularraren zigiluaren datuak. Farmazialarien
+        Elkargoaren orri ofizialen gainean inprimatzeko prest dagoen PDF bat sortzen du.
+      </p>
+      <p>
+        JavaScript behar du, dokumentua zure nabigatzailean bertan sortzen delako: zure datuak ez
+        dira inongo zerbitzarira bidaltzen. Gaztelaniaz, katalanez, euskaraz eta galegoz eskuragarri.
+      </p>
+    </noscript>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

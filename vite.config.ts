@@ -8,14 +8,16 @@ export default defineConfig({
   base: '/farma-kit/',
   build: {
     rollupOptions: {
-      // Two HTML shells (index.html, ca/index.html) so Google can index the
-      // Catalan version at its own URL instead of the single Spanish shell
-      // the client-side language toggle can't change for a crawler. Vite keeps
-      // each input's directory in the output, so this lands at dist/ca/index.html
-      // → served at /farma-kit/ca/.
+      // One HTML shell per language (index.html + {ca,eu,gl}/index.html) so
+      // Google can index each version at its own URL instead of the single
+      // Spanish shell the client-side language toggle can't change for a
+      // crawler. Vite keeps each input's directory in the output, so e.g.
+      // ca/index.html lands at dist/ca/index.html → served at /farma-kit/ca/.
       input: {
         main: 'index.html',
         ca: 'ca/index.html',
+        eu: 'eu/index.html',
+        gl: 'gl/index.html',
       },
     },
   },

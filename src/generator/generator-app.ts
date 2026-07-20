@@ -3,7 +3,7 @@ import { customElement } from 'lit/decorators.js';
 import { COLEGIOS } from '../lib/colegios';
 import { I18N, applyLang, type Lang } from '../lib/i18n';
 import { slug, type Template } from '../lib/template';
-import { CP2PROV, titleCase, VAL, isCatalanPath, pageRangeExceeds } from '../lib/validation';
+import { CP2PROV, titleCase, VAL, langFromPath, pageRangeExceeds } from '../lib/validation';
 import { applyStoredTheme, toggleTheme } from '../lib/theme';
 import { generatePdf } from '../lib/pdf/generate';
 
@@ -70,12 +70,13 @@ export class GeneratorApp extends LitElement {
   }
 
   async firstUpdated() {
-    // The URL is the single source of truth for language: / is Spanish, /ca/ is
-    // Catalan (two crawlable shells, see index.html and ca/index.html). There
-    // used to be a stored preference + navigator.language detection here, but a
-    // stored 'ca' silently overrode the root URL, so the crawlable link to the
-    // Spanish version rendered Catalan anyway — a link that "did not work".
-    this.uiLang = isCatalanPath(location.pathname) ? 'ca' : 'es';
+    // The URL is the single source of truth for language: / is Spanish, /ca/,
+    // /eu/ and /gl/ are the other locales (four crawlable shells, see index.html
+    // and {ca,eu,gl}/index.html). There used to be a stored preference +
+    // navigator.language detection here, but a stored non-default silently
+    // overrode the root URL, so the crawlable link to the Spanish version
+    // rendered another language anyway — a link that "did not work".
+    this.uiLang = langFromPath(location.pathname);
     applyStoredTheme();
     // Apply the language BEFORE the awaited index fetch. The render() templates
     // default to Catalan text, so deferring this until after the network round-trip
@@ -175,7 +176,7 @@ export class GeneratorApp extends LitElement {
     window.addEventListener('popstate', this.onPopLang);
   }
   private onPopLang = () => {
-    const lang: Lang = isCatalanPath(location.pathname) ? 'ca' : 'es';
+    const lang: Lang = langFromPath(location.pathname);
     if (lang === this.uiLang) return;
     this.uiLang = lang;
     applyLang(document.body, lang); // body: also reaches the shell's static about/FAQ
@@ -412,20 +413,47 @@ export class GeneratorApp extends LitElement {
   }
   private demanar(name: string) {
     if (!name) return;
-    const es = this.uiLang === 'es';
-    const col = (es ? 'Colegio de Farmacéuticos de ' : 'Col·legi de Farmacèutics de ') + name;
-    const subject = `${MAIL_TAG} ` + (es ? 'Pedir plantilla para el ' : 'Demanar plantilla per al ') + col;
-    const body = es
-      ? `Hola,\n\nNecesito la plantilla para el ${col}. Adjunto la máxima información posible sobre el modelo de hoja:\n\n` +
+    // Basque parenthesizes the place ("... Elkargoa (Barcelona)") to sidestep the
+    // genitive suffix a "de [name]" calque would need; es/ca/gl read naturally.
+    const col: string = {
+      es: `Colegio de Farmacéuticos de ${name}`,
+      ca: `Col·legi de Farmacèutics de ${name}`,
+      eu: `Farmazialarien Elkargoa (${name})`,
+      gl: `Colexio de Farmacéuticos de ${name}`,
+    }[this.uiLang];
+    const subjectText: string = {
+      es: `Pedir plantilla para el ${col}`,
+      ca: `Demanar plantilla per al ${col}`,
+      eu: `Txantiloi-eskaera: ${col}`,
+      gl: `Pedir modelo para o ${col}`,
+    }[this.uiLang];
+    const subject = `${MAIL_TAG} ${subjectText}`;
+    const body: string = {
+      es:
+        `Hola,\n\nNecesito la plantilla para el ${col}. Adjunto la máxima información posible sobre el modelo de hoja:\n\n` +
         `· CN de las hojas (para pedirlas al mayorista): [...]\n` +
         `· Campos a rellenar y sus formatos (o ejemplos): [...]\n\n\n` +
         `· Me consta que esta hoja es válida para los colegios de: ${name}, [Añadir todos los conocidos]\n\n` +
-        `Adjunto el PDF de la hoja oficial proporcionada por el ${col}.\n\nGracias.`
-      : `Hola,\n\nNecessito la plantilla per al ${col}. Adjunto la màxima informació possible sobre el model de full:\n\n` +
+        `Adjunto el PDF de la hoja oficial proporcionada por el ${col}.\n\nGracias.`,
+      ca:
+        `Hola,\n\nNecessito la plantilla per al ${col}. Adjunto la màxima informació possible sobre el model de full:\n\n` +
         `· CN dels fulls (per demanar-los al majorista): [...]\n` +
         `· Camps a emplenar i els seus formats (o exemples): [...]\n\n\n` +
         `· Em consta que aquest full és vàlid per als col·legis de: ${name}, [Afegir tots els coneguts]\n\n` +
-        `Adjunto el PDF del full oficial proporcionat pel ${col}.\n\nGràcies.`;
+        `Adjunto el PDF del full oficial proporcionat pel ${col}.\n\nGràcies.`,
+      eu:
+        `Kaixo,\n\nTxantiloia behar dut elkargo honetarako: ${col}. Orri-ereduari buruzko ahalik eta informazio gehien eransten dut:\n\n` +
+        `· Orrien CN (handizkariari eskatzeko): [...]\n` +
+        `· Bete beharreko eremuak eta haien formatuak (edo adibideak): [...]\n\n\n` +
+        `· Badakit orri hau elkargo hauetarako balio duela: ${name}, [Gehitu ezagutzen dituzun guztiak]\n\n` +
+        `Elkargoak emandako orri ofizialaren PDFa eransten dut.\n\nEskerrik asko.`,
+      gl:
+        `Ola,\n\nNecesito o modelo para o ${col}. Achego a máxima información posible sobre o modelo de folla:\n\n` +
+        `· CN das follas (para pedilas ao distribuidor): [...]\n` +
+        `· Campos a encher e os seus formatos (ou exemplos): [...]\n\n\n` +
+        `· Sei que esta folla é válida para os colexios de: ${name}, [Engadir todos os coñecidos]\n\n` +
+        `Achego o PDF da folla oficial proporcionada polo ${col}.\n\nGrazas.`,
+    }[this.uiLang];
     openMail(
       `mailto:${REQUEST_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
     );
@@ -433,14 +461,19 @@ export class GeneratorApp extends LitElement {
 
   /** General feedback ("this template doesn't fit", etc.) — same inbox as Demanar. */
   private contactar() {
-    const es = this.uiLang === 'es';
     const colegio = this.i('colegi').value;
-    const subject = `${MAIL_TAG} ` + (es ? 'Contacto' : 'Contacte');
-    const body =
-      (es
-        ? 'Hola,\n\n(Escribe aquí tu consulta, problema o sugerencia. Por ejemplo: "uso esta plantilla pero no encaja bien".)\n'
-        : 'Hola,\n\n(Escriu aquí la teva consulta, problema o suggeriment. Per exemple: "faig servir aquesta plantilla però no encaixa bé".)\n') +
-      (colegio ? `\n${es ? 'Colegio' : 'Col·legi'}: ${colegio}\n` : '');
+    const subjectText = { es: 'Contacto', ca: 'Contacte', eu: 'Kontaktua', gl: 'Contacto' }[
+      this.uiLang
+    ];
+    const subject = `${MAIL_TAG} ${subjectText}`;
+    const intro: string = {
+      es: 'Hola,\n\n(Escribe aquí tu consulta, problema o sugerencia. Por ejemplo: "uso esta plantilla pero no encaja bien".)\n',
+      ca: 'Hola,\n\n(Escriu aquí la teva consulta, problema o suggeriment. Per exemple: "faig servir aquesta plantilla però no encaixa bé".)\n',
+      eu: 'Kaixo,\n\n(Idatzi hemen zure kontsulta, arazoa edo iradokizuna. Adibidez: "txantiloi hau erabiltzen dut, baina ez da ondo egokitzen".)\n',
+      gl: 'Ola,\n\n(Escribe aquí a túa consulta, problema ou suxestión. Por exemplo: "uso este modelo pero non encaixa ben".)\n',
+    }[this.uiLang];
+    const colLabel = { es: 'Colegio', ca: 'Col·legi', eu: 'Elkargoa', gl: 'Colexio' }[this.uiLang];
+    const body = intro + (colegio ? `\n${colLabel}: ${colegio}\n` : '');
     openMail(
       `mailto:${REQUEST_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
     );
@@ -858,11 +891,13 @@ export class GeneratorApp extends LitElement {
     this.warnOpener = null;
   }
   private mesPhrase(y: number, m: number) {
-    const name = new Date(y, m, 1).toLocaleDateString(this.uiLang === 'es' ? 'es-ES' : 'ca-ES', {
-      month: 'long',
-    });
-    if (this.uiLang === 'es') return 'de ' + name + ' de ' + y;
-    const prep = /^[aeiouàèéíòóúh]/i.test(name) ? "d'" : 'de ';
+    const locale = { es: 'es-ES', ca: 'ca-ES', eu: 'eu-ES', gl: 'gl-ES' }[this.uiLang];
+    const name = new Date(y, m, 1).toLocaleDateString(locale, { month: 'long' });
+    // Basque takes no Romance preposition: "[year]ko [month]" (e.g. "2026ko uztaila").
+    if (this.uiLang === 'eu') return `${y}ko ${name}`;
+    // Catalan elides the preposition before a vowel/h ("d'abril" vs "de març");
+    // es and gl never elide. All three then close with " de [year]".
+    const prep = this.uiLang === 'ca' && /^[aeiouàèéíòóúh]/i.test(name) ? "d'" : 'de ';
     return prep + name + ' de ' + y;
   }
   private computeWarning(): string | null {
@@ -1176,8 +1211,10 @@ export class GeneratorApp extends LitElement {
           </div>
           <div class="util-controls">
           <div class="seg" role="group" aria-label="Idioma">
-            <a href="${import.meta.env.BASE_URL}ca/" data-lang="ca">Català</a>
             <a href="${import.meta.env.BASE_URL}" data-lang="es">Español</a>
+            <a href="${import.meta.env.BASE_URL}ca/" data-lang="ca">Català</a>
+            <a href="${import.meta.env.BASE_URL}eu/" data-lang="eu">Euskara</a>
+            <a href="${import.meta.env.BASE_URL}gl/" data-lang="gl">Galego</a>
           </div>
           <button type="button" class="theme-switch" id="themeBtn" role="switch" aria-checked="false" aria-label="Tema clar / fosc">
             <span class="ts-knob">

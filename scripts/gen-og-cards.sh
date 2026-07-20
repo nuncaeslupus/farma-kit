@@ -16,10 +16,12 @@ FONTS="file://$PUBLIC/fonts"
 CHROME="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
 [ -n "$CHROME" ] || { echo "error: need google-chrome or chromium on PATH" >&2; exit 1; }
 
-# Inline the mark SVGs — headless Chrome will not load them via file:// mask-image.
-# CSS `fill` on the paths overrides their fill="#000" presentation attribute.
-SNAKE_SVG="$(cat "$PUBLIC/brand/farmakit-snake.svg")"
-BOWL_SVG="$(cat "$PUBLIC/brand/farmakit-bowl.svg")"
+# The mark SVGs are inlined into the HTML (headless Chrome will not load them via
+# file:// mask-image). They are cat'd in verbatim rather than expanded through the
+# shell, so any $/backtick/backslash in the markup stays literal. CSS `fill` on the
+# paths overrides their fill="#000" presentation attribute.
+SNAKE="$PUBLIC/brand/farmakit-snake.svg"
+BOWL="$PUBLIC/brand/farmakit-bowl.svg"
 
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
@@ -29,7 +31,10 @@ trap 'rm -rf "$WORK"' EXIT
 render() {
   local lang="$1" outfile="$2" headline="$3" sub="$4" tagline="$5"
   local html="$WORK/card-$lang.html"
-  cat > "$html" <<HTML
+  # Split heredoc: the mark SVGs are cat'd in verbatim between the fragments so
+  # their bytes never pass through shell expansion (only $lang/$FONTS/$headline… do).
+  {
+    cat <<HTML
 <!doctype html><html lang="$lang"><head><meta charset="utf-8"><style>
 @font-face{font-family:'Space Grotesk';font-weight:600;src:url('$FONTS/space-grotesk-latin-600-normal.woff2') format('woff2')}
 @font-face{font-family:'IBM Plex Sans';font-weight:400;src:url('$FONTS/ibm-plex-sans-latin-400-normal.woff2') format('woff2')}
@@ -49,7 +54,13 @@ html,body{width:1200px;height:630px}
 .sub{font-family:'IBM Plex Sans';font-weight:400;font-size:33px;color:#6d665a;margin-top:8px}
 .tag{font-family:'IBM Plex Sans';font-weight:400;font-size:26px;line-height:1.32;color:#6d665a;margin-top:28px;max-width:600px}
 </style></head><body><div class="card">
-<div class="mark"><div class="snake">$SNAKE_SVG</div><div class="bowl">$BOWL_SVG</div></div>
+<div class="mark"><div class="snake">
+HTML
+    cat "$SNAKE"
+    printf '</div><div class="bowl">'
+    cat "$BOWL"
+    cat <<HTML
+</div></div>
 <div class="col">
 <div class="wm">Farma<b>Kit</b></div>
 <div class="hl">$headline</div>
@@ -57,6 +68,7 @@ html,body{width:1200px;height:630px}
 <div class="tag">$tagline</div>
 </div></div></body></html>
 HTML
+  } > "$html"
   "$CHROME" --headless --disable-gpu --no-sandbox --hide-scrollbars \
     --force-device-scale-factor=1 --allow-file-access-from-files \
     --window-size=1200,630 --virtual-time-budget=3000 \

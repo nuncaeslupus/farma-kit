@@ -18,10 +18,12 @@ describe('langFromPath', () => {
     ['/farma-kit/index.html', 'es'],
     // FAQ pages live at /{lang}/faq/ — the locale must still resolve there
     ['/farma-kit/ca/faq/', 'ca'],
+    ['/farma-kit/ca/faq', 'ca'],
     ['/farma-kit/eu/faq/', 'eu'],
     ['/farma-kit/gl/faq/', 'gl'],
     ['/farma-kit/eu/faq/index.html', 'eu'],
     ['/farma-kit/faq/', 'es'],
+    ['/farma-kit/faq', 'es'],
     // must not false-positive on words that merely start with a locale code
     ['/farma-kit/casa/', 'es'],
     ['/farma-kit/global/', 'es'],

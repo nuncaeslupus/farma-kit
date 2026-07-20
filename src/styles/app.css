@@ -138,6 +138,11 @@ a:hover {
   text-decoration: none;
   color: inherit;
 }
+.app-brand:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
 /* Brand mark: the Hygieia glyph, no green tile, painted in two theme-aware inks
    via stacked masks — snake in --accent (green→teal), bowl in --ink (dark→light),
    so both keep contrast on whichever background the theme sets. */

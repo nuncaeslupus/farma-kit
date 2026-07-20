@@ -12,7 +12,7 @@ import './styles/faq.css';
 import { render } from 'lit';
 import { headerTemplate, footerTemplate } from './components/chrome';
 import { applyStoredTheme, toggleTheme } from './lib/theme';
-import { applyLang, type Lang } from './lib/i18n';
+import { applyLang, type Lang, I18N } from './lib/i18n';
 import { langFromPath } from './lib/validation';
 
 const BASE = import.meta.env.BASE_URL;
@@ -34,13 +34,32 @@ const CONTACT: Record<Lang, { subject: string; body: string }> = {
   gl: { subject: 'Contacto', body: 'Ola,\n\n' },
 };
 
+let shareTimer: ReturnType<typeof setTimeout> | undefined;
+/** Flash the "link copied" toast (same feedback as the app's clipboard path). */
+function flashShare(): void {
+  const toast = document.getElementById('shareToast');
+  const status = document.getElementById('shareStatus');
+  if (!toast) return;
+  clearTimeout(shareTimer);
+  const msg = I18N[lang].shareCopied as string;
+  toast.textContent = msg;
+  toast.classList.add('show');
+  if (status) status.textContent = msg;
+  shareTimer = setTimeout(() => {
+    toast.classList.remove('show');
+    if (status) status.textContent = '';
+  }, 2000);
+}
 function onShare(): void {
   const data = { title: document.title, url: location.href };
   if (navigator.share) {
     navigator.share(data).catch(() => {});
     return;
   }
-  navigator.clipboard?.writeText(location.href).catch(() => {});
+  navigator.clipboard
+    ?.writeText(location.href)
+    .then(flashShare)
+    .catch(() => {});
 }
 function onContact(): void {
   const { subject, body } = CONTACT[lang];

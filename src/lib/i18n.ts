@@ -101,7 +101,7 @@ export const I18N: { ca: Dict; es: Dict } = {
       "Són els fulls oficials que cada Col·legi de Farmacèutics distribueix a les farmàcies, normalment a través del majorista, i on s'enganxen els cupons precinte dels envasos dispensats amb recepta electrònica: són el justificant per a la facturació i el control de les dispensacions del sistema públic de salut i de les mutualitats (MUFACE, ISFAS, MUGEJU).",
     seoQ2: 'Què emplena exactament aquesta eina?',
     seoA2:
-      "Només la capçalera de cada full: la UP de la farmàcia, el mes i l'any, la numeració correlativa dels fulls i, si ho necessites, les dades del segell del titular. El resultat és un PDF a punt per imprimir sobre els fulls oficials de cupons; el full en si mai no s'imprimeix, només les teves dades.",
+      "Només la capçalera de cada full: la UP de la farmàcia, el mes i l'any, la numeració correlativa dels fulls i, si ho necessites, les dades del segell del titular. El resultat és un PDF a punt per imprimir sobre els fulls oficials de cupons; el full en si mai no s'imprimeix, només les teves dades. Els fulls els pots aconseguir a través del teu majorista o imprimint-los si el teu Col·legi de Farmacèutics te'n proporciona la plantilla.",
     seoQ3: 'És gratuït? Cal registrar-se?',
     seoA3:
       'Sí: és una eina gratuïta i de codi obert (llicència MIT, <a href="https://github.com/nuncaeslupus/farma-kit" target="_blank" rel="noopener">codi a GitHub</a>). No hi ha registre, no hi ha comptes i el lloc no fa servir cookies.',
@@ -201,10 +201,10 @@ export const I18N: { ca: Dict; es: Dict } = {
     seoTitle: 'Preguntas frecuentes',
     seoQ1: '¿Qué son las hojas de cupones precinto?',
     seoA1:
-      'Son las hojas oficiales que cada Colegio de Farmacéuticos distribuye a las farmacias, normalmente a través del mayorista, y donde se pegan los cupones precinto de los envases dispensados con receta electrónica: son el justificante para la facturación y el control de las dispensaciones del sistema público de salud y de las mutualidades (MUFACE, ISFAS, MUGEJU). En Cataluña se conocen como «fulls de cupons precinte».',
+      'Son las hojas oficiales que cada Colegio de Farmacéuticos distribuye a las farmacias, normalmente a través del mayorista, y donde se pegan los cupones precinto de los envases dispensados con receta electrónica: son el justificante para la facturación y el control de las dispensaciones del sistema público de salud y de las mutualidades (MUFACE, ISFAS, MUGEJU).',
     seoQ2: '¿Qué rellena exactamente esta herramienta?',
     seoA2:
-      'Solo la cabecera de cada hoja: la UP de la farmacia, el mes y el año, la numeración correlativa de las hojas y, si lo necesitas, los datos del sello del titular. El resultado es un PDF listo para imprimir sobre las hojas oficiales de cupones; la hoja en sí nunca se imprime, solo tus datos.',
+      'Solo la cabecera de cada hoja: la UP de la farmacia, el mes y el año, la numeración correlativa de las hojas y, si lo necesitas, los datos del sello del titular. El resultado es un PDF listo para imprimir sobre las hojas oficiales de cupones; la hoja en sí nunca se imprime, solo tus datos. Las hojas las puedes conseguir a través de tu mayorista o imprimiéndolas si tu Colegio de Farmacéuticos te proporciona la plantilla.',
     seoQ3: '¿Es gratis? ¿Hay que registrarse?',
     seoA3:
       'Sí: es una herramienta gratuita y de código abierto (licencia MIT, <a href="https://github.com/nuncaeslupus/farma-kit" target="_blank" rel="noopener">código en GitHub</a>). No hay registro, no hay cuentas y el sitio no usa cookies.',

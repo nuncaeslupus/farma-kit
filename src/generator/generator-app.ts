@@ -417,14 +417,14 @@ export class GeneratorApp extends LitElement {
     const subject = `${MAIL_TAG} ` + (es ? 'Pedir plantilla para el ' : 'Demanar plantilla per al ') + col;
     const body = es
       ? `Hola,\n\nNecesito la plantilla para el ${col}. Adjunto la máxima información posible sobre el modelo de hoja:\n\n` +
-        `· CN de las hojas (para pedirlas al mayorista): \n` +
-        `· Campos a rellenar y sus formatos (o ejemplos): \n\n\n` +
-        `· Me consta que esta hoja es válida para los colegios de: ${name}, \n\n` +
+        `· CN de las hojas (para pedirlas al mayorista): [...]\n` +
+        `· Campos a rellenar y sus formatos (o ejemplos): [...]\n\n\n` +
+        `· Me consta que esta hoja es válida para los colegios de: ${name}, [Añadir todos los conocidos]\n\n` +
         `Adjunto el PDF de la hoja oficial proporcionada por el ${col}.\n\nGracias.`
       : `Hola,\n\nNecessito la plantilla per al ${col}. Adjunto la màxima informació possible sobre el model de full:\n\n` +
-        `· CN dels fulls (per demanar-los al majorista): \n` +
-        `· Camps a emplenar i els seus formats (o exemples): \n\n\n` +
-        `· Em consta que aquest full és vàlid per als col·legis de: ${name}, \n\n` +
+        `· CN dels fulls (per demanar-los al majorista): [...]\n` +
+        `· Camps a emplenar i els seus formats (o exemples): [...]\n\n\n` +
+        `· Em consta que aquest full és vàlid per als col·legis de: ${name}, [Afegir tots els coneguts]\n\n` +
         `Adjunto el PDF del full oficial proporcionat pel ${col}.\n\nGràcies.`;
     openMail(
       `mailto:${REQUEST_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,

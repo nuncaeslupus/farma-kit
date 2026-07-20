@@ -1,6 +1,6 @@
 # Handoff
 
-Maintainer notes for [Farma-Kit](../README.md). The README is for people *using*
+Maintainer notes for [FarmaKit](../README.md). The README is for people *using*
 the app; this is everything you need to *work on* it — architecture, the sheet
 templates, the editor, the traps that have already bitten, and where things stand.
 
@@ -228,7 +228,7 @@ gate before deploying, so a red suite cannot reach the live site.
   Console status has read "Couldn't fetch" while the page indexed fine anyway —
   don't chase it.
 - Titles are **keyword-first** («…cupones precinto para la receta electrónica —
-  Farma-Kit»): nobody searches the brand, they search the task. The shell
+  FarmaKit»): nobody searches the brand, they search the task. The shell
   `<title>` must match `docTitle` in `src/lib/i18n.ts`, or the title flickers
   on load.
 

@@ -113,6 +113,9 @@ export function pageRangeExceeds(start: number, count: number, cells: number): b
  * switcher <a> in generator-app.ts and vite.config.ts's inputs.
  */
 export function langFromPath(pathname: string): Lang {
-  const m = /\/(ca|eu|gl)(\/|\/index\.html)?$/.exec(pathname);
+  // The locale segment is the last one, optionally followed by /faq (the FAQ
+  // pages live at /{lang}/faq/). Still end-anchored so a hosting prefix
+  // (/ca/farma-kit/) or a word starting with a code (/casa/) never matches.
+  const m = /\/(ca|eu|gl)(\/faq)?(\/|\/index\.html)?$/.exec(pathname);
   return (m?.[1] as Lang) ?? 'es';
 }

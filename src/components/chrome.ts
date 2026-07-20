@@ -10,10 +10,15 @@ const BASE = import.meta.env.BASE_URL;
 
 /** Top utility bar. `langHref(lang)` gives the URL each language link points to
  * (the tool passes the tool URLs, the FAQ pages pass the FAQ URLs). */
-export function headerTemplate(opts: { langHref: (lang: string) => string }): TemplateResult {
+export function headerTemplate(opts: {
+  langHref: (lang: string) => string;
+  /** The brand links to the tool in the current language (tool page → self;
+   * FAQ page → its tool). */
+  homeHref: string;
+}): TemplateResult {
   return html`
     <div class="util-bar">
-      <div class="app-brand">
+      <a class="app-brand" href="${opts.homeHref}">
         <span
           class="app-badge"
           aria-hidden="true"
@@ -23,7 +28,7 @@ export function headerTemplate(opts: { langHref: (lang: string) => string }): Te
           <span class="app-name">Farma<span class="kit">Kit</span></span>
           <span class="app-tag" data-i18n="tagline">Eines per a la farmàcia</span>
         </div>
-      </div>
+      </a>
       <div class="util-controls">
         <div class="seg" role="group" aria-label="Idioma">
           <a href="${opts.langHref('es')}" data-lang="es">Español</a>

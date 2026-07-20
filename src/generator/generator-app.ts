@@ -1204,6 +1204,9 @@ export class GeneratorApp extends LitElement {
       <main class="wrap">
         ${headerTemplate({
           langHref: (l) => (l === 'es' ? import.meta.env.BASE_URL : `${import.meta.env.BASE_URL}${l}/`),
+          // Relative to the current tool URL, so the brand stays on the current
+          // language even after an in-place switch (no re-render — see faqHref).
+          homeHref: './',
         })}
         <header>
           <div class="brand">

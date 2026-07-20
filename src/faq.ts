@@ -69,7 +69,8 @@ function onContact(): void {
 
 const top = document.getElementById('faqTop');
 const bottom = document.getElementById('faqBottom');
-if (top) render(headerTemplate({ langHref }), top);
+// The brand links back to the tool for this language (../ from /{lang}/faq/).
+if (top) render(headerTemplate({ langHref, homeHref: '../' }), top);
 if (bottom) render(footerTemplate({ onShare, onContact, faqHref: langHref(lang) }), bottom);
 
 // Translate the chrome's data-i18n labels + the static FAQ content to this URL's

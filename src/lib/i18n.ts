@@ -5,7 +5,7 @@ export const I18N: { ca: Dict; es: Dict } = {
   ca: {
     // Keyword-first (people search «cupons precinte» / «recepta electrònica»,
     // not the brand). Must stay in sync with ca/index.html's <title>.
-    docTitle: 'Emplenar fulls de cupons precinte per a la recepta electrònica — Farma-Kit',
+    docTitle: 'Emplenar fulls de cupons precinte per a la recepta electrònica — FarmaKit',
     appTitle:
       'Emplenador de <span class="lo">fulls de cupons precinte</span><br>per a la recepta electrònica',
     intro:
@@ -115,7 +115,7 @@ export const I18N: { ca: Dict; es: Dict } = {
   es: {
     // Keyword-first (people search «cupones precinto» / «receta electrónica»,
     // not the brand). Must stay in sync with index.html's <title>.
-    docTitle: 'Rellenar hojas de cupones precinto para la receta electrónica — Farma-Kit',
+    docTitle: 'Rellenar hojas de cupones precinto para la receta electrónica — FarmaKit',
     appTitle:
       'Rellenador de <span class="lo">hojas de cupones precinto</span><br>para la receta electrónica',
     intro:

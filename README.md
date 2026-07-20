@@ -1,10 +1,10 @@
-# Farma-Kit
+# FarmaKit
 
 Fills in the header of Spanish pharmacy **coupon sheets** (*fulls de cupons precinte* / *hojas de cupones precinto*) for the electronic prescription system.
 
 **→ [nuncaeslupus.github.io/farma-kit](https://nuncaeslupus.github.io/farma-kit/)**
 
-![The Farma-Kit form: pick your col·legi, fill in the pharmacy's data, generate the PDF.](docs/screenshot.png)
+![The FarmaKit form: pick your col·legi, fill in the pharmacy's data, generate the PDF.](docs/screenshot.png)
 
 You print the output *on top of* the official coupon sheets supplied by the wholesaler — the app prints only the pharmacy's data, never the sheet itself.
 

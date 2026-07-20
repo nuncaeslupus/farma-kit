@@ -77,6 +77,12 @@ export class GeneratorApp extends LitElement {
     // Spanish version rendered Catalan anyway — a link that "did not work".
     this.uiLang = isCatalanPath(location.pathname) ? 'ca' : 'es';
     applyStoredTheme();
+    // Apply the language BEFORE the awaited index fetch. The render() templates
+    // default to Catalan text, so deferring this until after the network round-trip
+    // flashed Catalan and then swapped to Spanish. document.body also reaches the
+    // static about/FAQ in the HTML shell (outside fk-root), which carries data-i18n.
+    applyLang(document.body, this.uiLang);
+    this.setLangButtons();
 
     this.indexOk = await this.loadIndex();
 
@@ -93,11 +99,10 @@ export class GeneratorApp extends LitElement {
     this.defaultMonth();
     this.syncMonthHint();
     this.wireGenerate();
-    // document.body, not `this`: the static about/FAQ section in the HTML shell
-    // lives outside fk-root (Lit owns fk-root's children) but carries data-i18n
-    // too, so the language toggle must reach it.
-    applyLang(document.body, this.uiLang);
-    this.setLangButtons();
+    // buildColegis() rendered the picker AFTER the early applyLang above, and its
+    // "not available"/"request" labels carry Catalan defaults — translate the list
+    // now (same as retryIndex does after a rebuild).
+    applyLang(this.q('#colegiList'), this.uiLang);
 
     // restore remembered colegio (independent of Recorda'm), then the rest
     let saved: string | null = null;

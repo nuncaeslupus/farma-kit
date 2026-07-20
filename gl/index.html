@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="gl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <!-- Font preloads and theme-color — see index.html for the reasoning. -->
+    <link rel="preload" href="/fonts/space-grotesk-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <meta name="theme-color" content="#f4efe6" />
+    <!-- Keyword-first title (see index.html). Matches lang="gl" above: this
+         shell is the Galician entry point, loaded at /gl/ so Google can index it
+         as its own page (see ../index.html for the Spanish default). main.ts
+         still detects/toggles language at runtime; this only fixes what a
+         crawler sees on first load. Keep in sync with docTitle in
+         src/lib/i18n.ts. -->
+    <title>Encher follas de cupóns precinto para a receita electrónica — FarmaKit</title>
+    <meta
+      name="description"
+      content="Enche e imprime a cabeceira das follas de cupóns precinto da receita electrónica da túa farmacia. De balde, sen rexistro e sen enviar datos a ningún servidor."
+    />
+    <!-- The page is one client-rendered app; without this, /farma-kit/gl,
+         /farma-kit/gl/ and /farma-kit/gl/index.html look like three pages. -->
+    <link rel="canonical" href="https://nuncaeslupus.github.io/farma-kit/gl/" />
+
+    <!-- Reciprocal hreflang — see index.html. -->
+    <link rel="alternate" hreflang="es" href="https://nuncaeslupus.github.io/farma-kit/" />
+    <link rel="alternate" hreflang="ca" href="https://nuncaeslupus.github.io/farma-kit/ca/" />
+    <link rel="alternate" hreflang="eu" href="https://nuncaeslupus.github.io/farma-kit/eu/" />
+    <link rel="alternate" hreflang="gl" href="https://nuncaeslupus.github.io/farma-kit/gl/" />
+    <link rel="alternate" hreflang="x-default" href="https://nuncaeslupus.github.io/farma-kit/" />
+
+    <!-- Link previews (WhatsApp/Telegram is how this actually gets passed around,
+         and those scrapers run no JS — they read these tags, never the app).
+         URLs must be absolute: scrapers don't resolve relative paths. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="FarmaKit" />
+    <meta property="og:url" content="https://nuncaeslupus.github.io/farma-kit/gl/" />
+    <meta property="og:title" content="FarmaKit · Follas de cupóns precinto para a receita electrónica" />
+    <meta
+      property="og:description"
+      content="Enche e imprime a cabeceira das follas de cupóns precinto da receita electrónica da túa farmacia. De balde, sen rexistro e sen enviar datos a ningún servidor."
+    />
+    <meta property="og:image" content="https://nuncaeslupus.github.io/farma-kit/og-card-gl.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="FarmaKit — enchedor de follas de cupóns precinto" />
+    <meta property="og:locale" content="gl_ES" />
+    <meta property="og:locale:alternate" content="es_ES" />
+    <meta property="og:locale:alternate" content="ca_ES" />
+    <meta property="og:locale:alternate" content="eu_ES" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="FarmaKit · Follas de cupóns precinto para a receita electrónica" />
+    <meta
+      name="twitter:description"
+      content="Enche a cabeceira das follas de cupóns precinto da receita electrónica. De balde, sen rexistro e sen enviar datos."
+    />
+    <meta name="twitter:image" content="https://nuncaeslupus.github.io/farma-kit/og-card-gl.png" />
+
+    <!-- Structured data — data blocks, never executed, so the meta-CSP below
+         doesn't apply. Keep the FAQPage text in sync with the visible .about
+         section at the bottom of <body>. See index.html. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "FarmaKit",
+        "alternateName": "Enchedor de follas de cupóns precinto",
+        "url": "https://nuncaeslupus.github.io/farma-kit/gl/",
+        "image": "https://nuncaeslupus.github.io/farma-kit/og-card-gl.png",
+        "description": "Ferramenta gratuíta para farmacias: enche e imprime a cabeceira das follas de cupóns precinto da receita electrónica (UP, mes e ano, numeración e selo do titular). O PDF xérase no navegador, sen enviar datos a ningún servidor.",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Any",
+        "browserRequirements": "Require JavaScript",
+        "inLanguage": ["gl", "es", "ca", "eu"],
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+        "audience": { "@type": "Audience", "audienceType": "Farmacéuticos e oficinas de farmacia" },
+        "license": "https://github.com/nuncaeslupus/farma-kit/blob/main/LICENSE",
+        "sameAs": ["https://github.com/nuncaeslupus/farma-kit"]
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "inLanguage": "gl",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Que son as follas de cupóns precinto?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Son as follas oficiais que cada Colexio de Farmacéuticos distribúe ás farmacias, normalmente a través do distribuidor, e onde se pegan os cupóns precinto dos envases dispensados con receita electrónica: son o xustificante para a facturación e o control das dispensacións do sistema público de saúde e das mutualidades (MUFACE, ISFAS, MUGEJU)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Que enche exactamente esta ferramenta?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Só a cabeceira de cada folla: a UP da farmacia, o mes e o ano, a numeración correlativa das follas e, se o precisas, os datos do selo do titular. O resultado é un PDF listo para imprimir sobre as follas oficiais de cupóns; a folla en si nunca se imprime, só os teus datos. As follas podes conseguilas a través do teu distribuidor ou imprimíndoas se o teu Colexio de Farmacéuticos che proporciona o modelo."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "É de balde? Hai que rexistrarse?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Si: é unha ferramenta gratuíta e de código aberto (licenza MIT, código en GitHub). Non hai rexistro, non hai contas e o sitio non usa cookies."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Que pasa cos datos da miña farmacia?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Non saen do teu ordenador: o PDF xérase localmente, no teu propio navegador, e non se envía nada a ningún servidor. A opción «Lémbrame» garda os datos unicamente no teu navegador para a próxima visita."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Con que colexios de farmacéuticos funciona?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Hoxe están dispoñibles as follas dos colexios de Barcelona, Girona, Lleida e Tarragona, que comparten un mesmo modelo. Se o teu colexio aínda non aparece, pídeo desde a propia aplicación e engadiremos o seu modelo."
+            }
+          }
+        ]
+      }
+    </script>
+
+    <!-- Meta-CSP as defense in depth: GitHub Pages serves static files and can't
+         set response headers, so this is the only way to ship a CSP at all. Now
+         that fonts are self-hosted (see src/styles/fonts.css), everything the app
+         needs is same-origin. style-src keeps 'unsafe-inline' because Lit writes
+         inline styles. -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
+
+    <!-- Render-blocking so it applies before app.css (which Vite injects via JS in
+         dev): while <fk-root> is still empty, reserve a viewport so the static
+         about/FAQ below it stays off-screen instead of flashing, unstyled, at the
+         top. Once Lit fills fk-root it is no longer :empty and this rule is inert
+         (no permanent gap). -->
+    <style>fk-root:empty{display:block;min-height:100vh}</style>
+  </head>
+  <body>
+    <fk-root></fk-root>
+    <!-- Static about/FAQ — see index.html for the reasoning. Galician here to
+         match this shell; the runtime toggle re-translates it via data-i18n.
+         Keep in sync with the seo* keys in src/lib/i18n.ts and the FAQPage
+         JSON-LD in <head>. -->
+    <section class="about" aria-labelledby="aboutTitle">
+      <h2 id="aboutTitle" data-i18n="seoTitle">Preguntas frecuentes</h2>
+      <h3 data-i18n="seoQ1">Que son as follas de cupóns precinto?</h3>
+      <p data-i18n="seoA1">
+        Son as follas oficiais que cada Colexio de Farmacéuticos distribúe ás farmacias, normalmente
+        a través do distribuidor, e onde se pegan os cupóns precinto dos envases dispensados con
+        receita electrónica: son o xustificante para a facturación e o control das dispensacións do
+        sistema público de saúde e das mutualidades (MUFACE, ISFAS, MUGEJU).
+      </p>
+      <h3 data-i18n="seoQ2">Que enche exactamente esta ferramenta?</h3>
+      <p data-i18n="seoA2">
+        Só a cabeceira de cada folla: a UP da farmacia, o mes e o ano, a numeración correlativa das
+        follas e, se o precisas, os datos do selo do titular. O resultado é un PDF listo para
+        imprimir sobre as follas oficiais de cupóns; a folla en si nunca se imprime, só os teus
+        datos. As follas podes conseguilas a través do teu distribuidor ou imprimíndoas se o teu
+        Colexio de Farmacéuticos che proporciona o modelo.
+      </p>
+      <h3 data-i18n="seoQ3">É de balde? Hai que rexistrarse?</h3>
+      <p data-i18n="seoA3" data-i18n-html>
+        Si: é unha ferramenta gratuíta e de código aberto (licenza MIT,
+        <a href="https://github.com/nuncaeslupus/farma-kit" target="_blank" rel="noopener">código en GitHub</a>).
+        Non hai rexistro, non hai contas e o sitio non usa cookies.
+      </p>
+      <h3 data-i18n="seoQ4">Que pasa cos datos da miña farmacia?</h3>
+      <p data-i18n="seoA4">
+        Non saen do teu ordenador: o PDF xérase localmente, no teu propio navegador, e non se envía
+        nada a ningún servidor. A opción «Lémbrame» garda os datos unicamente no teu navegador para
+        a próxima visita.
+      </p>
+      <h3 data-i18n="seoQ5">Con que colexios de farmacéuticos funciona?</h3>
+      <p data-i18n="seoA5">
+        Hoxe están dispoñibles as follas dos colexios de Barcelona, Girona, Lleida e Tarragona, que
+        comparten un mesmo modelo. Se o teu colexio aínda non aparece, pídeo desde a propia
+        aplicación e engadiremos o seu modelo.
+      </p>
+    </section>
+    <!-- Real text for crawlers that don't run JS (Google does; most others don't).
+         It lives in <noscript> deliberately: Lit renders fk-root in LIGHT DOM and
+         does NOT clear pre-existing children, so the same markup placed inside
+         fk-root would stay on screen underneath the app. Verified. -->
+    <noscript>
+      <h1>FarmaKit — Enchedor de follas de cupóns precinto</h1>
+      <p>
+        Utilidade gratuíta para encher a cabeceira das follas de cupóns precinto (talonarios de
+        receitas) dunha farmacia: UP, mes e ano, numeración das follas e os datos do selo do
+        titular. Xera un PDF listo para imprimir sobre as follas oficiais do Colexio de Farmacéuticos.
+      </p>
+      <p>
+        Necesita JavaScript, porque o documento xérase no teu propio navegador: os teus datos non se
+        envían a ningún servidor. Dispoñible en castelán, catalán, éuscaro e galego.
+      </p>
+    </noscript>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

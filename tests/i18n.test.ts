@@ -1,15 +1,19 @@
 import { describe, test, expect } from 'vitest';
 import { I18N, applyLang } from '../src/lib/i18n';
 
+const LANGS = ['ca', 'es', 'eu', 'gl'] as const;
+
 describe('I18N dictionary', () => {
-  test('ca and es define exactly the same keys', () => {
-    // A key present in one language but not the other renders blank/stale for the
-    // other half of the users — the kind of drift that has slipped through before.
-    expect(Object.keys(I18N.es).sort()).toEqual(Object.keys(I18N.ca).sort());
+  test('every language defines exactly the same keys as es', () => {
+    // A key present in one language but not another renders blank/stale for that
+    // slice of users — the kind of drift that has slipped through before, and the
+    // check that catches an untranslated key when a new locale is added.
+    const es = Object.keys(I18N.es).sort();
+    for (const lang of LANGS) expect(Object.keys(I18N[lang]).sort(), lang).toEqual(es);
   });
 
   test('no value is left empty', () => {
-    for (const lang of ['ca', 'es'] as const)
+    for (const lang of LANGS)
       for (const [k, v] of Object.entries(I18N[lang]))
         if (typeof v === 'string') expect(v, `${lang}.${k}`).not.toBe('');
   });

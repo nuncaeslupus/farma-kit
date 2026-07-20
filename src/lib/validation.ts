@@ -1,3 +1,5 @@
+import type { Lang } from './i18n';
+
 /* Pure, DOM-free pharmacy-form logic. Lives apart from generator-app.ts (a Lit
    component that registers a custom element and touches the DOM on import) so this
    can be imported — by the component AND by tests — with no side effects. The
@@ -100,14 +102,17 @@ export function pageRangeExceeds(start: number, count: number, cells: number): b
 }
 
 /**
- * True when a URL path is the Catalan entry point: /ca, /ca/ or /ca/index.html
- * at the END of the path (a direct hit GitHub Pages serves), but not /casa —
- * and anchored, so a "ca" segment anywhere else in a hosting prefix can never
- * match. This is the ONLY language signal: / is Spanish, /ca/ is Catalan. A
- * stored preference (and navigator.language detection) used to override the
- * root URL, which made the crawlable link to the Spanish version render
- * Catalan anyway.
+ * The UI language, derived SOLELY from the URL path — the only language signal.
+ * A locale segment (/ca, /eu, /gl) as /xx, /xx/ or /xx/index.html at the END of
+ * the path (a direct hit GitHub Pages serves) selects that language; anything
+ * else — including / — is Spanish. Anchored to the end so a "ca" (etc.) segment
+ * inside a hosting prefix can never match, and so /casa isn't Catalan. A stored
+ * preference (and navigator.language detection) used to override the root URL,
+ * which made the crawlable link to the Spanish version render another language
+ * anyway. Keep in sync with the locale shells (ca/eu/gl/index.html), the
+ * switcher <a> in generator-app.ts and vite.config.ts's inputs.
  */
-export function isCatalanPath(pathname: string): boolean {
-  return /\/ca(\/|\/index\.html)?$/.test(pathname);
+export function langFromPath(pathname: string): Lang {
+  const m = /\/(ca|eu|gl)(\/|\/index\.html)?$/.exec(pathname);
+  return (m?.[1] as Lang) ?? 'es';
 }

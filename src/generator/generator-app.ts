@@ -3,7 +3,7 @@ import { customElement } from 'lit/decorators.js';
 import { COLEGIOS } from '../lib/colegios';
 import { I18N, applyLang, type Lang } from '../lib/i18n';
 import { slug, type Template } from '../lib/template';
-import { CP2PROV, titleCase, VAL, isCatalanPath, pageRangeExceeds } from '../lib/validation';
+import { CP2PROV, titleCase, VAL, langFromPath, pageRangeExceeds } from '../lib/validation';
 import { applyStoredTheme, toggleTheme } from '../lib/theme';
 import { generatePdf } from '../lib/pdf/generate';
 
@@ -70,12 +70,13 @@ export class GeneratorApp extends LitElement {
   }
 
   async firstUpdated() {
-    // The URL is the single source of truth for language: / is Spanish, /ca/ is
-    // Catalan (two crawlable shells, see index.html and ca/index.html). There
-    // used to be a stored preference + navigator.language detection here, but a
-    // stored 'ca' silently overrode the root URL, so the crawlable link to the
-    // Spanish version rendered Catalan anyway — a link that "did not work".
-    this.uiLang = isCatalanPath(location.pathname) ? 'ca' : 'es';
+    // The URL is the single source of truth for language: / is Spanish, /ca/,
+    // /eu/ and /gl/ are the other locales (four crawlable shells, see index.html
+    // and {ca,eu,gl}/index.html). There used to be a stored preference +
+    // navigator.language detection here, but a stored non-default silently
+    // overrode the root URL, so the crawlable link to the Spanish version
+    // rendered another language anyway — a link that "did not work".
+    this.uiLang = langFromPath(location.pathname);
     applyStoredTheme();
     // Apply the language BEFORE the awaited index fetch. The render() templates
     // default to Catalan text, so deferring this until after the network round-trip
@@ -175,7 +176,7 @@ export class GeneratorApp extends LitElement {
     window.addEventListener('popstate', this.onPopLang);
   }
   private onPopLang = () => {
-    const lang: Lang = isCatalanPath(location.pathname) ? 'ca' : 'es';
+    const lang: Lang = langFromPath(location.pathname);
     if (lang === this.uiLang) return;
     this.uiLang = lang;
     applyLang(document.body, lang); // body: also reaches the shell's static about/FAQ
@@ -1176,8 +1177,10 @@ export class GeneratorApp extends LitElement {
           </div>
           <div class="util-controls">
           <div class="seg" role="group" aria-label="Idioma">
-            <a href="${import.meta.env.BASE_URL}ca/" data-lang="ca">Català</a>
             <a href="${import.meta.env.BASE_URL}" data-lang="es">Español</a>
+            <a href="${import.meta.env.BASE_URL}ca/" data-lang="ca">Català</a>
+            <a href="${import.meta.env.BASE_URL}eu/" data-lang="eu">Euskara</a>
+            <a href="${import.meta.env.BASE_URL}gl/" data-lang="gl">Galego</a>
           </div>
           <button type="button" class="theme-switch" id="themeBtn" role="switch" aria-checked="false" aria-label="Tema clar / fosc">
             <span class="ts-knob">

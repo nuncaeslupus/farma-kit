@@ -99,6 +99,10 @@ export class GeneratorApp extends LitElement {
     this.defaultMonth();
     this.syncMonthHint();
     this.wireGenerate();
+    // buildColegis() rendered the picker AFTER the early applyLang above, and its
+    // "not available"/"request" labels carry Catalan defaults — translate the list
+    // now (same as retryIndex does after a rebuild).
+    applyLang(this.q('#colegiList'), this.uiLang);
 
     // restore remembered colegio (independent of Recorda'm), then the rest
     let saved: string | null = null;

@@ -6,7 +6,6 @@ import { I18N, applyLang, type Lang } from '../lib/i18n';
 import { slug, type Template } from '../lib/template';
 import { CP2PROV, titleCase, VAL, langFromPath, pageRangeExceeds } from '../lib/validation';
 import { applyStoredTheme, toggleTheme } from '../lib/theme';
-import { generatePdf } from '../lib/pdf/generate';
 
 /* Base64 only to keep the address out of the bundle and the public repo as a
    plain string, where email harvesters regex for it. It is a speed bump against
@@ -1109,6 +1108,9 @@ export class GeneratorApp extends LitElement {
       }
 
       bar.style.width = '70%';
+      // Dynamic: pdf-lib + fontkit are ~700 KB of the bundle and are useless
+      // until this click, so they load off the critical path (mobile LCP).
+      const { generatePdf } = await import('../lib/pdf/generate');
       const bytes = await generatePdf(tpl, pages, null);
       // Release the previous document's blob: each run allocates a new one and the
       // browser holds it until revoked. Safe by now — an earlier tab has long since

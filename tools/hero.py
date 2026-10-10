@@ -255,7 +255,7 @@ def pdf_badge() -> list[str]:
 
 
 #: The real Barcelona coupon sheet, cropped to its header and first coupon rows
-#: (rendered once from the col·legi's PDF; see docs/hero-sheet.png).
+#: (rendered once from the col·legi's PDF, cut through the third coupon row).
 SHEET_PNG = ROOT / "docs" / "hero-sheet.png"
 SHEET_TEMPLATE = ROOT / "public" / "templates" / "catalunya.json"
 #: The values printed on it: each template field's own sample, page 1 instead of 5.
@@ -323,57 +323,67 @@ def rotated(px: float, py: float, cx: float, cy: float, deg: float) -> tuple[flo
     return cx + dx * math.cos(t) - dy * math.sin(t), cy + dx * math.sin(t) + dy * math.cos(t)
 
 
+def torn(x: float, y: float, w: float, h: float, curl: float) -> str:
+    """The cut sheet's outline: top-right corner folded, bottom edge torn."""
+    teeth, depth = 24, 5.0
+    step = w / teeth
+    edge = " ".join(
+        f"L{x + w - step * (i + 0.5):.1f},{y + h - (depth if i % 2 == 0 else 0):.1f}"
+        for i in range(teeth)
+    )
+    return f"M{x},{y} H{x + w - curl} L{x + w},{y + curl} V{y + h} {edge} L{x},{y + h} Z"
+
+
 def sheets() -> list[str]:
-    """A pad of coupon sheets on the desk: tilted, stacked, its corner lifting."""
-    x, y, w = 668, 258, 410
+    """A pad of coupon sheets on the desk, tilted; the top sheet is cut short."""
+    x, y, w = 694, 268, 360
     data, pw, ph = tinted_sheet()
     k = w / 594.96  # PDF points to sheet pixels on the hero
     h = w * ph / pw
-    cx, cy, tilt = x + w / 2, y + h / 2, -3.0
-    curl = 34
+    cx, cy, tilt = x + w / 2, y + h / 2, 3.0
+    curl = 20
+    outline = torn(x, y, w, h, curl)
     out = [
         caption(668, 248, "LA HOJA DE CUPONES · BARCELONA"),
         "<defs>"
         '<filter id="shadow" x="-10%" y="-10%" width="125%" height="135%">'
-        '<feDropShadow dx="3" dy="9" stdDeviation="9" flood-color="#3b3227" '
-        'flood-opacity="0.22"/></filter>'
+        '<feDropShadow dx="2" dy="8" stdDeviation="8" flood-color="#3b3227" '
+        'flood-opacity="0.2"/></filter>'
         '<linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">'
         '<stop offset="0" stop-color="#ffffff" stop-opacity="0"/>'
-        '<stop offset="1" stop-color="#ffffff" stop-opacity="1"/></linearGradient>'
-        '<linearGradient id="fold" x1="0" y1="0" x2="1" y2="1">'
-        '<stop offset="0" stop-color="#ffffff"/><stop offset="0.55" stop-color="#ece6da"/>'
-        '<stop offset="1" stop-color="#d6cdbd"/></linearGradient>'
+        '<stop offset="1" stop-color="#ffffff" stop-opacity="0.95"/></linearGradient>'
+        '<linearGradient id="fold" x1="1" y1="0" x2="0" y2="1">'
+        '<stop offset="0" stop-color="#d9d0c0"/><stop offset="0.6" stop-color="#efe9de"/>'
+        '<stop offset="1" stop-color="#ffffff"/></linearGradient>'
+        f'<clipPath id="page"><path d="{outline}"/></clipPath>'
         "</defs>",
         f'<g transform="rotate({tilt} {cx} {cy})">',
         '<g filter="url(#shadow)">',
     ]
-    # The pad's thickness: the sheets underneath, showing at the bottom and right.
-    for d in (7, 5.5, 4, 2.5, 1):
+    # The pad's thickness: the sheets underneath, showing along the right edge.
+    for d in (6, 4.5, 3, 1.5):
         out.append(
-            f'<rect x="{x + d}" y="{y + d}" width="{w}" height="{h}" fill="#fbfaf7" '
+            f'<path d="{torn(x + d, y + d * 0.4, w, h, 0)}" fill="#fbfaf7" '
             f'stroke="#d9d2c4" stroke-width="0.6"/>'
         )
-    # The top sheet, with its bottom-right corner folded up.
-    out.append(
-        f'<path d="M{x},{y} h{w} v{h - curl} l{-curl},{curl} h{-(w - curl)} z" fill="#ffffff"/>'
-    )
-    out.append("</g>")
     out += [
-        f'<clipPath id="page"><path d="M{x},{y} h{w} v{h - curl} l{-curl},{curl} '
-        f'h{-(w - curl)} z"/></clipPath>',
+        f'<path d="{outline}" fill="#ffffff"/>',
+        "</g>",
         '<g clip-path="url(#page)">',
         f'<image x="{x}" y="{y}" width="{w}" height="{h}" href="data:image/png;base64,{data}"/>',
-        f'<rect x="{x}" y="{y + h - 44}" width="{w}" height="44" fill="url(#fade)"/>',
+        f'<rect x="{x}" y="{y + h - 70}" width="{w}" height="70" fill="url(#fade)"/>',
         "</g>",
-        f'<path d="M{x + w},{y + h - curl} l{-curl},{curl} l{curl * 0.18},{-curl * 0.82} z" '
-        f'fill="url(#fold)" stroke="#cfc6b6" stroke-width="0.6"/>',
+        # The folded corner: the cut-off triangle turned over onto the sheet.
+        f'<path d="M{x + w - curl},{y} L{x + w},{y + curl} '
+        f'L{x + w - curl * 0.9},{y + curl * 0.9} Z" fill="url(#fold)" '
+        f'stroke="#cfc6b6" stroke-width="0.6"/>',
     ]
     out += printed(x, y, k)
     out.append("</g>")
     # Leaders, from points on the tilted sheet to labels on the right.
     lx = 1110
     sx, sy = rotated(x + 553 * k + 2, y + 52, cx, cy, tilt)
-    ox, oy = rotated(x + w - 24, y + 186, cx, cy, tilt)
+    ox, oy = rotated(x + w - 22, y + 190, cx, cy, tilt)
     out += [
         f'<line x1="{sx}" y1="{sy}" x2="{lx - 6}" y2="{sy}" stroke="{TEAL}" stroke-width="1.2"/>',
         f'<circle cx="{sx}" cy="{sy}" r="3" fill="{TEAL}"/>',

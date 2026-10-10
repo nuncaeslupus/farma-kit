@@ -336,7 +336,7 @@ def torn(x: float, y: float, w: float, h: float, curl: float) -> str:
 
 def sheets() -> list[str]:
     """A pad of coupon sheets on the desk, tilted; the top sheet is cut short."""
-    x, y, w = 694, 268, 360
+    x, y, w = 704, 282, 334
     data, pw, ph = tinted_sheet()
     k = w / 594.96  # PDF points to sheet pixels on the hero
     h = w * ph / pw

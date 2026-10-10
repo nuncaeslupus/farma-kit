@@ -1340,17 +1340,18 @@ select[aria-invalid='true']:focus {
    to the right, where it never covers a field (the form's boxes are opaque and
    sit above it). Decorative, so it is a pseudo-element: nothing for a screen
    reader to announce. Drawn by tools/hero.py (`make hero`), the same pad as the
-   README banner. Hidden on phones, where there is no room beside the text. */
+   README banner. It sits high, so its printed values are beside the title and
+   the description runs under its blank coupon rows. Hidden on phones. */
 .wrap > header {
   position: relative;
 }
 .wrap > header::after {
   content: '';
   position: absolute;
-  top: -22px;
+  top: -50px;
   right: -40px;
   z-index: -1;
-  width: 420px;
+  width: 390px;
   aspect-ratio: 460 / 380;
   background: url('../assets/sheet-sample.png') no-repeat center / contain;
   /* Fade the cut sheet out towards the form. */
@@ -1362,25 +1363,73 @@ select[aria-invalid='true']:focus {
 [data-theme='dark'] .wrap > header::after {
   opacity: 0.24;
 }
-/* The description stops where the sheet starts, so the page's text never runs
-   through the sheet's printed values. */
-.wrap > header + .lead {
-  max-width: calc(100% - 360px);
-}
 @media (max-width: 980px) {
   .wrap > header::after {
     width: 320px;
     right: -12px;
-  }
-  .wrap > header + .lead {
-    max-width: calc(100% - 290px);
   }
 }
 @media (max-width: 640px) {
   .wrap > header::after {
     display: none;
   }
-  .wrap > header + .lead {
-    max-width: none;
+}
+
+/* Desktop: the whole tool fits one laptop screen (1366x768 and up) without
+   scrolling, so the vertical rhythm is tighter than on touch screens. */
+@media (min-width: 900px) {
+  .logo {
+    width: 44px;
+    height: 44px;
+  }
+  .util-bar {
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+  }
+  .lead {
+    margin: 4px 0 4px;
+  }
+  .colegi-pick {
+    margin: 8px 0 6px;
+  }
+  .colegi-pick .pick-label {
+    margin-bottom: 5px;
+  }
+  .gate-hint {
+    margin-top: 4px;
+  }
+  details.instr {
+    margin-bottom: 8px;
+  }
+  details.instr summary {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+  .col {
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+  .group-sub {
+    margin-bottom: 6px;
+  }
+  .field {
+    margin-bottom: 6px;
+  }
+  .field label {
+    margin-bottom: 2px;
+  }
+  input:not([type='checkbox']),
+  select {
+    height: 30px;
+  }
+  .pages-line {
+    padding-top: 6px;
+    padding-bottom: 7px;
+  }
+  .actions {
+    margin-top: 8px;
+  }
+  .page-foot {
+    margin-top: 10px;
   }
 }

@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import base64
 import json
+import math
 import os
 import shutil
 import subprocess
@@ -315,39 +316,74 @@ def printed(x0: float, y0: float, k: float) -> list[str]:
     return out
 
 
+def rotated(px: float, py: float, cx: float, cy: float, deg: float) -> tuple[float, float]:
+    """Where a point on the tilted pad ends up on the hero."""
+    t = math.radians(deg)
+    dx, dy = px - cx, py - cy
+    return cx + dx * math.cos(t) - dy * math.sin(t), cy + dx * math.sin(t) + dy * math.cos(t)
+
+
 def sheets() -> list[str]:
-    x, y, w = 664, 262, 420
+    """A pad of coupon sheets on the desk: tilted, stacked, its corner lifting."""
+    x, y, w = 668, 258, 410
     data, pw, ph = tinted_sheet()
     k = w / 594.96  # PDF points to sheet pixels on the hero
     h = w * ph / pw
-    out = [caption(x + 20, y - 12, "LA HOJA DE CUPONES · BARCELONA")]
-    for dx in (24, 12):
-        out.append(
-            f'<rect x="{x + dx}" y="{y + dx / 2}" width="{w}" height="{h}" fill="#ffffff" '
-            f'stroke="{FRAME}"/>'
-        )
-    out += [
-        f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="#ffffff" stroke="{FRAME}"/>',
-        f'<image x="{x}" y="{y}" width="{w}" height="{h}" href="data:image/png;base64,{data}"/>',
-        '<defs><linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">'
+    cx, cy, tilt = x + w / 2, y + h / 2, -3.0
+    curl = 34
+    out = [
+        caption(668, 248, "LA HOJA DE CUPONES · BARCELONA"),
+        "<defs>"
+        '<filter id="shadow" x="-10%" y="-10%" width="125%" height="135%">'
+        '<feDropShadow dx="3" dy="9" stdDeviation="9" flood-color="#3b3227" '
+        'flood-opacity="0.22"/></filter>'
+        '<linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">'
         '<stop offset="0" stop-color="#ffffff" stop-opacity="0"/>'
-        '<stop offset="1" stop-color="#ffffff" stop-opacity="1"/></linearGradient></defs>',
-        f'<rect x="{x + 1}" y="{y + h - 40}" width="{w - 2}" height="39" fill="url(#fade)"/>',
+        '<stop offset="1" stop-color="#ffffff" stop-opacity="1"/></linearGradient>'
+        '<linearGradient id="fold" x1="0" y1="0" x2="1" y2="1">'
+        '<stop offset="0" stop-color="#ffffff"/><stop offset="0.55" stop-color="#ece6da"/>'
+        '<stop offset="1" stop-color="#d6cdbd"/></linearGradient>'
+        "</defs>",
+        f'<g transform="rotate({tilt} {cx} {cy})">',
+        '<g filter="url(#shadow)">',
+    ]
+    # The pad's thickness: the sheets underneath, showing at the bottom and right.
+    for d in (7, 5.5, 4, 2.5, 1):
+        out.append(
+            f'<rect x="{x + d}" y="{y + d}" width="{w}" height="{h}" fill="#fbfaf7" '
+            f'stroke="#d9d2c4" stroke-width="0.6"/>'
+        )
+    # The top sheet, with its bottom-right corner folded up.
+    out.append(
+        f'<path d="M{x},{y} h{w} v{h - curl} l{-curl},{curl} h{-(w - curl)} z" fill="#ffffff"/>'
+    )
+    out.append("</g>")
+    out += [
+        f'<clipPath id="page"><path d="M{x},{y} h{w} v{h - curl} l{-curl},{curl} '
+        f'h{-(w - curl)} z"/></clipPath>',
+        '<g clip-path="url(#page)">',
+        f'<image x="{x}" y="{y}" width="{w}" height="{h}" href="data:image/png;base64,{data}"/>',
+        f'<rect x="{x}" y="{y + h - 44}" width="{w}" height="44" fill="url(#fade)"/>',
+        "</g>",
+        f'<path d="M{x + w},{y + h - curl} l{-curl},{curl} l{curl * 0.18},{-curl * 0.82} z" '
+        f'fill="url(#fold)" stroke="#cfc6b6" stroke-width="0.6"/>',
     ]
     out += printed(x, y, k)
-    lx = x + w + 34
+    out.append("</g>")
+    # Leaders, from points on the tilted sheet to labels on the right.
+    lx = 1110
+    sx, sy = rotated(x + 553 * k + 2, y + 52, cx, cy, tilt)
+    ox, oy = rotated(x + w - 24, y + 186, cx, cy, tilt)
     out += [
-        f'<line x1="{x + 553 * k + 2}" y1="{y + 40}" x2="{lx - 6}" y2="{y + 40}" '
-        f'stroke="{TEAL}" stroke-width="1.2"/>',
-        f'<circle cx="{x + 553 * k + 2}" cy="{y + 40}" r="3" fill="{TEAL}"/>',
-        text(lx, y + 36, "lo imprime", size=12, fill=TEAL, weight=600),
-        text(lx, y + 52, "FarmaKit", size=12, fill=TEAL, weight=600),
-        f'<line x1="{x + w - 30}" y1="{y + 170}" x2="{lx - 6}" y2="{y + 170}" stroke="{DIM}" '
-        f'stroke-width="1.2"/>',
-        f'<circle cx="{x + w - 30}" cy="{y + 170}" r="3" fill="{DIM}"/>',
-        text(lx, y + 166, "la hoja", size=12, fill=DIM),
-        text(lx, y + 182, "oficial, del", size=12, fill=DIM),
-        text(lx, y + 198, "mayorista", size=12, fill=DIM),
+        f'<line x1="{sx}" y1="{sy}" x2="{lx - 6}" y2="{sy}" stroke="{TEAL}" stroke-width="1.2"/>',
+        f'<circle cx="{sx}" cy="{sy}" r="3" fill="{TEAL}"/>',
+        text(lx, sy - 4, "lo imprime", size=12, fill=TEAL, weight=600),
+        text(lx, sy + 12, "FarmaKit", size=12, fill=TEAL, weight=600),
+        f'<line x1="{ox}" y1="{oy}" x2="{lx - 6}" y2="{oy}" stroke="{DIM}" stroke-width="1.2"/>',
+        f'<circle cx="{ox}" cy="{oy}" r="3" fill="{DIM}"/>',
+        text(lx, oy - 4, "la hoja", size=12, fill=DIM),
+        text(lx, oy + 12, "oficial, del", size=12, fill=DIM),
+        text(lx, oy + 28, "mayorista", size=12, fill=DIM),
     ]
     return out
 

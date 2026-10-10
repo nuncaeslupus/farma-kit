@@ -5,8 +5,10 @@ headless Chromium (the README shows the PNG: GitHub's `<img>` view of an SVG loa
 no fonts). Set in the app's own fonts from public/fonts and drawn around its mark
 (public/favicon.svg); needs Pillow to crop the screenshot.
 
-Same drafting-sheet family as the author's other repos. The form values are the
-screenshot's fictional pharmacy; no counts or versions on the sheet.
+Same drafting-sheet family as the author's other repos. The coupon sheet is the
+real Barcelona one (docs/hero-sheet.png, cropped once from the col·legi's PDF),
+printed in a muted tone; the teal values are each template field's own sample,
+placed at the template's own boxes. No counts or versions on it.
 
 Usage, from the repository root:
 
@@ -16,6 +18,7 @@ Usage, from the repository root:
 from __future__ import annotations
 
 import base64
+import json
 import os
 import shutil
 import subprocess
@@ -141,11 +144,12 @@ def wordmark() -> list[str]:
         f'<text x="170" y="122" font-family="{DISPLAY}" font-size="78" font-weight="600" '
         f'letter-spacing="-1.5"><tspan fill="{INK}">Farma</tspan>'
         f'<tspan fill="{TEAL}">Kit</tspan></text>',
-        text(68, 182, "Fills in Spanish pharmacy coupon sheets, in seconds.", size=25, fill=SOFT),
+        text(68, 182, "Rellena las hojas de cupones precinto en segundos.", size=25, fill=SOFT),
         text(
             68,
             210,
-            "The header of the hojas de cupones precinto, for the electronic prescription.",
+            "La cabecera de la receta electrónica, impresa sobre la hoja oficial. "
+            "Desde tu navegador.",
             size=15,
             fill=DIM,
         ),
@@ -155,14 +159,14 @@ def wordmark() -> list[str]:
 def title_block() -> list[str]:
     x, y, w, h = 842, 62, 376, 64
     half = w / 2 - 20
-    cells = [(0.0, "RUNS IN", "your browser"), (half, "OUTPUT", "a PDF to print")]
+    cells = [(0.0, "FUNCIONA EN", "tu navegador"), (half, "RESULTADO", "un PDF para imprimir")]
     out = [
         f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="{GROUND}" stroke="{FRAME}" '
         f'stroke-width="1.2"/>',
         f'<line x1="{x}" y1="{y + h / 2 + 4}" x2="{x + w}" y2="{y + h / 2 + 4}" stroke="{FRAME}"/>',
         f'<line x1="{x + half}" y1="{y + h / 2 + 4}" x2="{x + half}" y2="{y + h}" '
         f'stroke="{FRAME}"/>',
-        text(x + 10, y + 14, "PROJECT", size=8, fill=DIM, family=MONO, spacing=1.5),
+        text(x + 10, y + 14, "PROYECTO", size=8, fill=DIM, family=MONO, spacing=1.5),
         text(x + 10, y + 31, "farma-kit", size=15, weight=600, family=MONO),
     ]
     for cx, label, value in cells:
@@ -198,11 +202,11 @@ def field(
 def form() -> list[str]:
     x, y, w, h = 64, 262, 420, 262
     out = [
-        caption(x, y - 12, "THE FORM"),
+        caption(x, y - 12, "EL FORMULARIO"),
         f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="8" fill="{CARD}" stroke="{FRAME}"/>',
     ]
     fx, half = x + 18, (w - 36 - 12) / 2
-    out += field(fx, y + 26, w - 36, "Col·legi de farmacèutics", "Girona")
+    out += field(fx, y + 26, w - 36, "Colegio de Farmacéuticos", "Barcelona")
     out.append(
         f'<path d="M{fx + w - 58},{y + 43} l5,5 l5,-5" fill="none" stroke="{SOFT}" '
         f'stroke-width="1.4"/>'
@@ -244,67 +248,115 @@ def pdf_badge() -> list[str]:
         f'stroke-width="1.6" stroke-dasharray="5 3"/>',
         f'<path d="M{x + 106},{y + 28} L{x + 114},{y + 34} L{x + 106},{y + 40}" fill="none" '
         f'stroke="{TEAL}" stroke-width="1.6"/>',
-        text(x + 27, y + 96, "made in your", size=11.5, fill=DIM, anchor="middle"),
-        text(x + 27, y + 112, "browser", size=11.5, fill=DIM, anchor="middle"),
+        text(x + 27, y + 96, "hecho en tu", size=11.5, fill=DIM, anchor="middle"),
+        text(x + 27, y + 112, "navegador", size=11.5, fill=DIM, anchor="middle"),
     ]
 
 
-def sheet(x: float, y: float, top: bool) -> list[str]:
-    """One coupon sheet: the official printed grid, and the header FarmaKit fills in."""
-    w, h = 300, 262
-    out = [
-        f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="#ffffff" stroke="{FRAME}"/>',
-    ]
-    if not top:
-        return out
-    # The official, pre-printed part: a header frame and the coupon slots.
-    out += [
-        f'<rect x="{x + 12}" y="{y + 12}" width="{w - 24}" height="66" fill="none" '
-        f'stroke="{FRAME}" stroke-width="0.8"/>',
-        f'<line x1="{x + 186}" y1="{y + 12}" x2="{x + 186}" y2="{y + 78}" stroke="{FRAME}" '
-        f'stroke-width="0.8"/>',
-    ]
-    for j in range(4):
-        for i in range(5):
-            out.append(
-                f'<rect x="{x + 12 + i * 55.2}" y="{y + 90 + j * 40}" width="49" height="34" '
-                f'rx="2" fill="none" stroke="#cfc7b8" stroke-dasharray="3 2"/>'
-            )
-    # What FarmaKit prints on top of it.
-    printed = [("UP 12345", 0), ("07/2026", 1), ("Hoja 1 de 50", 2)]
-    for s, i in printed:
-        out.append(text(x + 22, y + 32 + i * 18, s, size=12, family=MONO, weight=600, fill=TEAL))
-    stamp = ["Rubinat i Perfumat", "C/ Poltergeist, 5", "17001 Girona"]
-    for i, s in enumerate(stamp):
-        out.append(text(x + 192, y + 32 + i * 16, s, size=8.4, family=MONO, fill=TEAL))
+#: The real Barcelona coupon sheet, cropped to its header and first coupon rows
+#: (rendered once from the col·legi's PDF; see docs/hero-sheet.png).
+SHEET_PNG = ROOT / "docs" / "hero-sheet.png"
+SHEET_TEMPLATE = ROOT / "public" / "templates" / "catalunya.json"
+#: The values printed on it: each template field's own sample, page 1 instead of 5.
+SAMPLE_OVERRIDES = {"page": "0001"}
+TEMPLATE_TONE = (150, 141, 128)  # the official sheet, printed in a muted warm grey
+
+
+def tinted_sheet() -> tuple[str, float, float]:
+    """The sheet crop as a data URI, its black ink recoloured to the template tone."""
+    import io
+
+    from PIL import Image, ImageOps  # type: ignore[import-not-found, unused-ignore]
+
+    with Image.open(SHEET_PNG) as im:
+        grey = im.convert("L")
+        tinted = ImageOps.colorize(grey, black=TEMPLATE_TONE, white=(255, 255, 255))
+        buf = io.BytesIO()
+        tinted.save(buf, format="PNG", optimize=True)
+        size = grey.size
+    return base64.b64encode(buf.getvalue()).decode(), size[0], size[1]
+
+
+def printed(x0: float, y0: float, k: float) -> list[str]:
+    """What FarmaKit prints, at the template's own boxes (PDF points, scaled by k)."""
+    template = json.loads(SHEET_TEMPLATE.read_text())
+    out = []
+    for f in template["fields"]:
+        value = SAMPLE_OVERRIDES.get(f["key"], f.get("sample", ""))
+        box, style = f["box"], f["style"]
+        family = MONO if style["font"] == "mono" else SANS
+        weight = 700 if style["bold"] else 400
+        size = style["size"] * k
+        bx, by, bw, bh = (x0 + box["x"] * k, y0 + box["y"] * k, box["w"] * k, box["h"] * k)
+        base = by + bh / 2 + size * 0.36
+        cells = f.get("cells", 1)
+        if cells > 1:
+            # One character per pre-printed cell, centred in it.
+            cw = bw / cells
+            for i, ch in enumerate(value[:cells]):
+                out.append(
+                    text(
+                        bx + cw * (i + 0.5),
+                        base,
+                        ch,
+                        size=size,
+                        family=family,
+                        weight=weight,
+                        fill=TEAL,
+                        anchor="middle",
+                    )
+                )
+            continue
+        anchor = {"left": "start", "right": "end"}.get(style["halign"], "middle")
+        tx = {"start": bx + 2, "end": bx + bw - 2}.get(anchor, bx + bw / 2)
+        out.append(
+            text(tx, base, value, size=size, family=family, weight=weight, fill=TEAL, anchor=anchor)
+        )
     return out
 
 
 def sheets() -> list[str]:
-    x, y = 664, 262
-    out = [caption(x + 20, y - 12, "THE COUPON SHEET")]
-    out += sheet(x + 40, y + 16, False) + sheet(x + 20, y + 8, False) + sheet(x, y, True)
+    x, y, w = 664, 262, 420
+    data, pw, ph = tinted_sheet()
+    k = w / 594.96  # PDF points to sheet pixels on the hero
+    h = w * ph / pw
+    out = [caption(x + 20, y - 12, "LA HOJA DE CUPONES · BARCELONA")]
+    for dx in (24, 12):
+        out.append(
+            f'<rect x="{x + dx}" y="{y + dx / 2}" width="{w}" height="{h}" fill="#ffffff" '
+            f'stroke="{FRAME}"/>'
+        )
     out += [
-        f'<line x1="{x + 350}" y1="{y + 44}" x2="{x + 400}" y2="{y + 44}" stroke="{TEAL}" '
+        f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="#ffffff" stroke="{FRAME}"/>',
+        f'<image x="{x}" y="{y}" width="{w}" height="{h}" href="data:image/png;base64,{data}"/>',
+        '<defs><linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">'
+        '<stop offset="0" stop-color="#ffffff" stop-opacity="0"/>'
+        '<stop offset="1" stop-color="#ffffff" stop-opacity="1"/></linearGradient></defs>',
+        f'<rect x="{x + 1}" y="{y + h - 40}" width="{w - 2}" height="39" fill="url(#fade)"/>',
+    ]
+    out += printed(x, y, k)
+    lx = x + w + 34
+    out += [
+        f'<line x1="{x + 553 * k + 2}" y1="{y + 40}" x2="{lx - 6}" y2="{y + 40}" '
+        f'stroke="{TEAL}" stroke-width="1.2"/>',
+        f'<circle cx="{x + 553 * k + 2}" cy="{y + 40}" r="3" fill="{TEAL}"/>',
+        text(lx, y + 36, "lo imprime", size=12, fill=TEAL, weight=600),
+        text(lx, y + 52, "FarmaKit", size=12, fill=TEAL, weight=600),
+        f'<line x1="{x + w - 30}" y1="{y + 170}" x2="{lx - 6}" y2="{y + 170}" stroke="{DIM}" '
         f'stroke-width="1.2"/>',
-        f'<circle cx="{x + 350}" cy="{y + 44}" r="3" fill="{TEAL}"/>',
-        text(x + 408, y + 40, "printed by", size=12, fill=TEAL, weight=600),
-        text(x + 408, y + 56, "FarmaKit", size=12, fill=TEAL, weight=600),
-        f'<line x1="{x + 300}" y1="{y + 170}" x2="{x + 400}" y2="{y + 170}" stroke="{DIM}" '
-        f'stroke-width="1.2"/>',
-        f'<circle cx="{x + 300}" cy="{y + 170}" r="3" fill="{DIM}"/>',
-        text(x + 408, y + 166, "the official", size=12, fill=DIM),
-        text(x + 408, y + 182, "sheet, from", size=12, fill=DIM),
-        text(x + 408, y + 198, "your wholesaler", size=12, fill=DIM),
+        f'<circle cx="{x + w - 30}" cy="{y + 170}" r="3" fill="{DIM}"/>',
+        text(lx, y + 166, "la hoja", size=12, fill=DIM),
+        text(lx, y + 182, "oficial, del", size=12, fill=DIM),
+        text(lx, y + 198, "mayorista", size=12, fill=DIM),
     ]
     return out
 
 
 def strip() -> list[str]:
     items = [
-        ("private", "nothing uploaded, no cookies"),
-        ("per col·legi", "each layout traced from a real sheet"),
-        ("remembers", "your data stays in this browser"),
+        ("privado", "nada sale de tu navegador, sin cookies"),
+        ("por colegio", "cada plantilla, calcada de una hoja real"),
+        ("recuérdame", "tus datos se quedan en este navegador"),
     ]
     x0, y, w, h, gap = 64, 556, 376, 40, 9
     out = []

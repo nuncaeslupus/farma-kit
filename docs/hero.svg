@@ -1,0 +1,248 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640">
+  <rect width="1280" height="640" fill="#f3efe7"/>
+  <line x1="0" y1="0" x2="0" y2="640" stroke="#e6e0d4" stroke-width="0.9"/>
+  <line x1="20" y1="0" x2="20" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="40" y1="0" x2="40" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="60" y1="0" x2="60" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="80" y1="0" x2="80" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="100" y1="0" x2="100" y2="640" stroke="#e6e0d4" stroke-width="0.9"/>
+  <line x1="120" y1="0" x2="120" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="140" y1="0" x2="140" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="160" y1="0" x2="160" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="180" y1="0" x2="180" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="200" y1="0" x2="200" y2="640" stroke="#e6e0d4" stroke-width="0.9"/>
+  <line x1="220" y1="0" x2="220" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="240" y1="0" x2="240" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="260" y1="0" x2="260" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="280" y1="0" x2="280" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="300" y1="0" x2="300" y2="640" stroke="#e6e0d4" stroke-width="0.9"/>
+  <line x1="320" y1="0" x2="320" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="340" y1="0" x2="340" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="360" y1="0" x2="360" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="380" y1="0" x2="380" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="400" y1="0" x2="400" y2="640" stroke="#e6e0d4" stroke-width="0.9"/>
+  <line x1="420" y1="0" x2="420" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="440" y1="0" x2="440" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="460" y1="0" x2="460" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="480" y1="0" x2="480" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="500" y1="0" x2="500" y2="640" stroke="#e6e0d4" stroke-width="0.9"/>
+  <line x1="520" y1="0" x2="520" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="540" y1="0" x2="540" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="560" y1="0" x2="560" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="580" y1="0" x2="580" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="600" y1="0" x2="600" y2="640" stroke="#e6e0d4" stroke-width="0.9"/>
+  <line x1="620" y1="0" x2="620" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="640" y1="0" x2="640" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="660" y1="0" x2="660" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="680" y1="0" x2="680" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="700" y1="0" x2="700" y2="640" stroke="#e6e0d4" stroke-width="0.9"/>
+  <line x1="720" y1="0" x2="720" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="740" y1="0" x2="740" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="760" y1="0" x2="760" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="780" y1="0" x2="780" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="800" y1="0" x2="800" y2="640" stroke="#e6e0d4" stroke-width="0.9"/>
+  <line x1="820" y1="0" x2="820" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="840" y1="0" x2="840" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="860" y1="0" x2="860" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="880" y1="0" x2="880" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="900" y1="0" x2="900" y2="640" stroke="#e6e0d4" stroke-width="0.9"/>
+  <line x1="920" y1="0" x2="920" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="940" y1="0" x2="940" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="960" y1="0" x2="960" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="980" y1="0" x2="980" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="1000" y1="0" x2="1000" y2="640" stroke="#e6e0d4" stroke-width="0.9"/>
+  <line x1="1020" y1="0" x2="1020" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="1040" y1="0" x2="1040" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="1060" y1="0" x2="1060" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="1080" y1="0" x2="1080" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="1100" y1="0" x2="1100" y2="640" stroke="#e6e0d4" stroke-width="0.9"/>
+  <line x1="1120" y1="0" x2="1120" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="1140" y1="0" x2="1140" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="1160" y1="0" x2="1160" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="1180" y1="0" x2="1180" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="1200" y1="0" x2="1200" y2="640" stroke="#e6e0d4" stroke-width="0.9"/>
+  <line x1="1220" y1="0" x2="1220" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="1240" y1="0" x2="1240" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="1260" y1="0" x2="1260" y2="640" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="0" y1="0" x2="1280" y2="0" stroke="#e6e0d4" stroke-width="0.9"/>
+  <line x1="0" y1="20" x2="1280" y2="20" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="0" y1="40" x2="1280" y2="40" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="0" y1="60" x2="1280" y2="60" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="0" y1="80" x2="1280" y2="80" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="0" y1="100" x2="1280" y2="100" stroke="#e6e0d4" stroke-width="0.9"/>
+  <line x1="0" y1="120" x2="1280" y2="120" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="0" y1="140" x2="1280" y2="140" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="0" y1="160" x2="1280" y2="160" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="0" y1="180" x2="1280" y2="180" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="0" y1="200" x2="1280" y2="200" stroke="#e6e0d4" stroke-width="0.9"/>
+  <line x1="0" y1="220" x2="1280" y2="220" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="0" y1="240" x2="1280" y2="240" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="0" y1="260" x2="1280" y2="260" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="0" y1="280" x2="1280" y2="280" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="0" y1="300" x2="1280" y2="300" stroke="#e6e0d4" stroke-width="0.9"/>
+  <line x1="0" y1="320" x2="1280" y2="320" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="0" y1="340" x2="1280" y2="340" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="0" y1="360" x2="1280" y2="360" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="0" y1="380" x2="1280" y2="380" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="0" y1="400" x2="1280" y2="400" stroke="#e6e0d4" stroke-width="0.9"/>
+  <line x1="0" y1="420" x2="1280" y2="420" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="0" y1="440" x2="1280" y2="440" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="0" y1="460" x2="1280" y2="460" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="0" y1="480" x2="1280" y2="480" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="0" y1="500" x2="1280" y2="500" stroke="#e6e0d4" stroke-width="0.9"/>
+  <line x1="0" y1="520" x2="1280" y2="520" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="0" y1="540" x2="1280" y2="540" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="0" y1="560" x2="1280" y2="560" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="0" y1="580" x2="1280" y2="580" stroke="#e6e0d4" stroke-width="0.4"/>
+  <line x1="0" y1="600" x2="1280" y2="600" stroke="#e6e0d4" stroke-width="0.9"/>
+  <line x1="0" y1="620" x2="1280" y2="620" stroke="#e6e0d4" stroke-width="0.4"/>
+  <rect x="16" y="16" width="1248" height="608" fill="none" stroke="#e6e0d4"/>
+  <rect x="30" y="30" width="1220" height="580" fill="none" stroke="#a39a8b" stroke-width="1.5"/>
+  <text x="106.25" y="27" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="9" font-weight="400" fill="#7a7266" text-anchor="middle" letter-spacing="0" xml:space="preserve">8</text>
+  <text x="106.25" y="621" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="9" font-weight="400" fill="#7a7266" text-anchor="middle" letter-spacing="0" xml:space="preserve">8</text>
+  <line x1="182.5" y1="16" x2="182.5" y2="30" stroke="#a39a8b"/>
+  <line x1="182.5" y1="610" x2="182.5" y2="624" stroke="#a39a8b"/>
+  <text x="258.75" y="27" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="9" font-weight="400" fill="#7a7266" text-anchor="middle" letter-spacing="0" xml:space="preserve">7</text>
+  <text x="258.75" y="621" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="9" font-weight="400" fill="#7a7266" text-anchor="middle" letter-spacing="0" xml:space="preserve">7</text>
+  <line x1="335.0" y1="16" x2="335.0" y2="30" stroke="#a39a8b"/>
+  <line x1="335.0" y1="610" x2="335.0" y2="624" stroke="#a39a8b"/>
+  <text x="411.25" y="27" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="9" font-weight="400" fill="#7a7266" text-anchor="middle" letter-spacing="0" xml:space="preserve">6</text>
+  <text x="411.25" y="621" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="9" font-weight="400" fill="#7a7266" text-anchor="middle" letter-spacing="0" xml:space="preserve">6</text>
+  <line x1="487.5" y1="16" x2="487.5" y2="30" stroke="#a39a8b"/>
+  <line x1="487.5" y1="610" x2="487.5" y2="624" stroke="#a39a8b"/>
+  <text x="563.75" y="27" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="9" font-weight="400" fill="#7a7266" text-anchor="middle" letter-spacing="0" xml:space="preserve">5</text>
+  <text x="563.75" y="621" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="9" font-weight="400" fill="#7a7266" text-anchor="middle" letter-spacing="0" xml:space="preserve">5</text>
+  <line x1="640.0" y1="16" x2="640.0" y2="30" stroke="#a39a8b"/>
+  <line x1="640.0" y1="610" x2="640.0" y2="624" stroke="#a39a8b"/>
+  <text x="716.25" y="27" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="9" font-weight="400" fill="#7a7266" text-anchor="middle" letter-spacing="0" xml:space="preserve">4</text>
+  <text x="716.25" y="621" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="9" font-weight="400" fill="#7a7266" text-anchor="middle" letter-spacing="0" xml:space="preserve">4</text>
+  <line x1="792.5" y1="16" x2="792.5" y2="30" stroke="#a39a8b"/>
+  <line x1="792.5" y1="610" x2="792.5" y2="624" stroke="#a39a8b"/>
+  <text x="868.75" y="27" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="9" font-weight="400" fill="#7a7266" text-anchor="middle" letter-spacing="0" xml:space="preserve">3</text>
+  <text x="868.75" y="621" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="9" font-weight="400" fill="#7a7266" text-anchor="middle" letter-spacing="0" xml:space="preserve">3</text>
+  <line x1="945.0" y1="16" x2="945.0" y2="30" stroke="#a39a8b"/>
+  <line x1="945.0" y1="610" x2="945.0" y2="624" stroke="#a39a8b"/>
+  <text x="1021.25" y="27" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="9" font-weight="400" fill="#7a7266" text-anchor="middle" letter-spacing="0" xml:space="preserve">2</text>
+  <text x="1021.25" y="621" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="9" font-weight="400" fill="#7a7266" text-anchor="middle" letter-spacing="0" xml:space="preserve">2</text>
+  <line x1="1097.5" y1="16" x2="1097.5" y2="30" stroke="#a39a8b"/>
+  <line x1="1097.5" y1="610" x2="1097.5" y2="624" stroke="#a39a8b"/>
+  <text x="1173.75" y="27" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="9" font-weight="400" fill="#7a7266" text-anchor="middle" letter-spacing="0" xml:space="preserve">1</text>
+  <text x="1173.75" y="621" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="9" font-weight="400" fill="#7a7266" text-anchor="middle" letter-spacing="0" xml:space="preserve">1</text>
+  <text x="23" y="105.5" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="9" font-weight="400" fill="#7a7266" text-anchor="middle" letter-spacing="0" xml:space="preserve">A</text>
+  <text x="1257" y="105.5" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="9" font-weight="400" fill="#7a7266" text-anchor="middle" letter-spacing="0" xml:space="preserve">A</text>
+  <line x1="16" y1="175.0" x2="30" y2="175.0" stroke="#a39a8b"/>
+  <line x1="1250" y1="175.0" x2="1264" y2="175.0" stroke="#a39a8b"/>
+  <text x="23" y="250.5" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="9" font-weight="400" fill="#7a7266" text-anchor="middle" letter-spacing="0" xml:space="preserve">B</text>
+  <text x="1257" y="250.5" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="9" font-weight="400" fill="#7a7266" text-anchor="middle" letter-spacing="0" xml:space="preserve">B</text>
+  <line x1="16" y1="320.0" x2="30" y2="320.0" stroke="#a39a8b"/>
+  <line x1="1250" y1="320.0" x2="1264" y2="320.0" stroke="#a39a8b"/>
+  <text x="23" y="395.5" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="9" font-weight="400" fill="#7a7266" text-anchor="middle" letter-spacing="0" xml:space="preserve">C</text>
+  <text x="1257" y="395.5" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="9" font-weight="400" fill="#7a7266" text-anchor="middle" letter-spacing="0" xml:space="preserve">C</text>
+  <line x1="16" y1="465.0" x2="30" y2="465.0" stroke="#a39a8b"/>
+  <line x1="1250" y1="465.0" x2="1264" y2="465.0" stroke="#a39a8b"/>
+  <text x="23" y="540.5" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="9" font-weight="400" fill="#7a7266" text-anchor="middle" letter-spacing="0" xml:space="preserve">D</text>
+  <text x="1257" y="540.5" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="9" font-weight="400" fill="#7a7266" text-anchor="middle" letter-spacing="0" xml:space="preserve">D</text>
+  <circle cx="48" cy="48" r="7" fill="none" stroke="#0f5d5c"/>
+  <line x1="37" y1="48" x2="59" y2="48" stroke="#0f5d5c"/>
+  <line x1="48" y1="37" x2="48" y2="59" stroke="#0f5d5c"/>
+  <circle cx="48" cy="592" r="7" fill="none" stroke="#0f5d5c"/>
+  <line x1="37" y1="592" x2="59" y2="592" stroke="#0f5d5c"/>
+  <line x1="48" y1="581" x2="48" y2="603" stroke="#0f5d5c"/>
+  <image x="50" y="38" width="112" height="112" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiB2aWV3Qm94PSIwIDAgNTEyIDUxMiI+PHN0eWxlPi5zbmFrZXtmaWxsOiMwZjVkNWN9LmJvd2x7ZmlsbDojMjAxZDE4fUBtZWRpYShwcmVmZXJzLWNvbG9yLXNjaGVtZTpkYXJrKXsuc25ha2V7ZmlsbDojNWZjN2MwfS5ib3dse2ZpbGw6I2Y5ZjRlYX19PC9zdHlsZT48c3ZnIHg9IjE2IiB5PSIxNiIgd2lkdGg9IjQ4MCIgaGVpZ2h0PSI0ODAiIHZpZXdCb3g9Ii0zMDggMzIgMjIwNCAyMjA0Ij48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLDIxOTgpIHNjYWxlKDAuMSwtMC4xKSI+PHBhdGggY2xhc3M9InNuYWtlIiBkPSJNOTA4NSAyMDc2NCBjLTE2IC0yIC03MyAtOSAtMTI1IC0xNSAtMjY1IC0zMCAtNTczIC05NiAtODk1IC0xOTMgLTE0OCAtNDQgLTQzMiAtMTQ1IC00NjkgLTE2NyAtMTEgLTYgLTQyIC0xOSAtNzAgLTI5IC0xMjUgLTQ0IC00NzggLTIyNyAtNjg1IC0zNTUgLTEyOCAtNzkgLTMxOCAtMjE0IC00NzAgLTMzMyAtMTI0IC05OCAtNDk1IC00MzAgLTUwMyAtNDUxIC0xIC01IC00NCAtNTMgLTk1IC0xMDcgLTE5NyAtMjEzIC0zNTUgLTQzMSAtNDM5IC02MDggLTUzIC0xMTEgLTc0IC0xOTAgLTc0IC0yNzMgMCAtNTUgNCAtNjcgMjkgLTk1IDI3IC0zMCAzNCAtMzMgODMgLTMyIDI5IDEgOTggMTMgMTUzIDI3IDU1IDE0IDE4NiA0NCAyOTAgNjYgMTA1IDIzIDMyNSA3MCA0OTAgMTA1IDE2NSAzNiAzMTggNjggMzQwIDcyIDIyIDMgOTkgMjAgMTcwIDM2IDcyIDE2IDE5MSA0MiAyNjUgNTggNzQgMTYgMjkzIDYzIDQ4NSAxMDUgMTkzIDQyIDQ0NSA5NiA1NjAgMTIxIDI2NCA1NyAzNzAgNjUgNDcyIDM1IDEzOSAtNDEgMjIxIC0xMTUgNDExIC0zNjYgMjE2IC0yODcgMzM4IC00OTYgMzk2IC02ODQgNDIgLTEzMyA1MyAtMzExIDMxIC01MDMgLTI2IC0yMjkgLTc2IC00OTQgLTEyMSAtNjMzIC0zNSAtMTA4IC05OCAtMjE5IC0xNTkgLTI4MSAtMTExIC0xMTMgLTEyNyAtMTE4IC0xMDU1IC0zMjUgLTEwMiAtMjMgLTIxNiAtNDcgLTI1MyAtNTUgLTM4IC04IC05NCAtMjAgLTEyNSAtMjggLTMxIC04IC0xNzggLTQwIC0zMjcgLTcxIC0yNTAgLTUyIC00NDcgLTk0IC05MTAgLTE5NiAtMjA4IC00NiAtMjU0IC02NyAtMjc5IC0xMjkgLTIxIC01MyAtMjAgLTY1IDkgLTEyOCA1MSAtMTA5IDE3NiAtMjE1IDQwMCAtMzM5IDY2NiAtMzY3IDEyNTQgLTU0NiAyMDI0IC02MTQgMTQ5IC0xMyA1NzcgLTcgNzIxIDExIDQ1MyA1NSA4MDAgMTUxIDExMjUgMzEwIDM5NSAxOTMgNjgxIDQzMyA5OTIgODMwIDI4IDM2IDExMCAxNTUgMTgzIDI2NSAzMTggNDc5IDQ0MyA2MzEgNjQ1IDc4MyA3NyA1NyAyMjkgMTM5IDMyOSAxNzcgODYgMzIgMzExIDc1IDM5NCA3NSAxNTcgLTEgMzgxIC00NCA1MjcgLTEwMyAzNzYgLTE1MSA3MTggLTUyMiA4ODEgLTk1NiAxMjAgLTMxOCAxNTYgLTc5NSA5MCAtMTE3NiAtNjkgLTM5MCAtMTg0IC03MTUgLTM3OSAtMTA2NyAtNDk3IC04OTcgLTExNzIgLTE0NjcgLTI0NjIgLTIwODAgLTM5NyAtMTg5IC03MzQgLTMyOCAtMTMwMCAtNTM4IC0xOTUgLTcyIC0xMDA3IC0zNDIgLTExOTAgLTM5NSAtMjE0IC02MiAtMTA2OSAtMzM2IC0xMjIxIC0zOTEgLTY3IC0yNCAtMTI0IC00NCAtMTI4IC00NCAtNiAwIC0yMTEgLTc0IC0zNzEgLTEzNCAtNDkgLTE5IC0xNDYgLTU1IC0yMTUgLTc5IC0xNzUgLTY0IC00MTEgLTE1NiAtNTcwIC0yMjIgLTc0IC0zMiAtMTgyIC03NiAtMjQwIC0xMDAgLTI3OCAtMTE0IC04MzAgLTM4NCAtMTAyOSAtNTA1IC03MTUgLTQzMyAtMTA2NiAtNzM2IC0xMzc0IC0xMTg1IC0yODMgLTQxNSAtNDM4IC05OTcgLTM5OCAtMTUwMiAxNCAtMTc1IDQ5IC0zODggNzEgLTQzOCA1IC0xMSAxOCAtNTEgMzAgLTg5IDExIC0zOCAyNCAtNzQgMjggLTgwIDUgLTYgMTQgLTMxIDIxIC01NiA3IC0yNSA0NiAtMTE0IDg3IC0xOTggNDEgLTg0IDc0IC0xNTYgNzQgLTE1OCAwIC0xMSAxMjYgLTE4MyAyMTEgLTI4OSA4NyAtMTA5IDI5NiAtMzE2IDQ0MCAtNDM2IDEzNyAtMTE0IDQzNiAtMzA4IDY1OCAtNDI2IDU4IC0zMSAxNDQgLTc3IDE5MSAtMTAzIDEwNCAtNTcgMjYyIC0xMzAgMzk1IC0xODIgNTUgLTIyIDE0NSAtNTggMjAwIC04MCAxMDYgLTQyIDIzNCAtODggMjQ3IC04OCA0IDAgOCAzMjYgOCA3MjQgbDAgNzI0IC03NyA0MyBjLTQzIDIzIC0xMTQgNjEgLTE1OCA4MyAtMTEwIDU3IC0yMTEgMTI0IC0zMzUgMjIxIC0xMDMgODEgLTI0MyAyMTUgLTI2MyAyNTIgLTYgMTAgLTM0IDQ3IC02MyA4MyAtMTg2IDIzMSAtMjYyIDQ2MCAtMjUxIDc1NSA2IDE0MyAyNSAyMzkgNzYgMzc2IDI4IDc0IDEwNiAxODQgMjAwIDI4MiA3MyA3NiAzMTIgMjc3IDMzMCAyNzcgNCAwIDE5IDEwIDMyIDIzIDY1IDYzIDYwNyAzNDkgODc0IDQ2MiAxMTkgNTEgMzk0IDE2OSA0NTAgMTk0IDk4IDQ0IDU2NiAyMTIgOTI1IDMzMSAyOTQgOTggMTA4NiAzNDAgMTI3MCAzODggMjIxIDU4IDExMzUgMzQ0IDEzNTAgNDI0IDM2NCAxMzQgNzU5IDI4NSA4OTUgMzQxIDQzNyAxODMgMTA0NCA0NzIgMTM4MCA2NjAgMzE3IDE3NyA1OTUgMzQ5IDgxMCA1MDMgMzk4IDI4MyA1MTAgMzc1IDg4MCA3MTkgNzA2IDY1NyAxMjI3IDE0MjggMTUwNiAyMjI5IDE0NCA0MTUgMjIyIDg0MyAyMzUgMTI5NiAyNiA5MTQgLTMxMCAxOTA1IC04ODEgMjU5NSAtMzQzIDQxNCAtNzcyIDczNCAtMTI2NSA5NDMgLTQyNCAxODAgLTc2NCAyNTkgLTEyODAgMjk3IC0yNTMgMTggLTI2NyAyMCAtNDE1IDU1IC0xNTQgMzYgLTI4OSA4NSAtNDQxIDE2MCAtMTE3IDU3IC0yOTIgMTY3IC0zNDQgMjE1IC0xNCAxMyAtNzcgNjcgLTE0MCAxMjEgLTYzIDUzIC0xOTQgMTcwIC0yOTAgMjU5IC0zMjUgMzAyIC01MzYgNDczIC02MzkgNTE4IC0yNSAxMSAtOTEgNTIgLTE0NiA5MiAtMTQ4IDEwNyAtMjMzIDE2MCAtMzU0IDIyMSAtMTI0IDYxIC0xNDYgNzAgLTIxNiA5MSAtMjQ0IDcxIC0zNDEgODMgLTYyOSA4MiAtMTIyIC0xIC0yMzQgLTQgLTI1MSAtNXoiPjwvcGF0aD48cGF0aCBjbGFzcz0iYm93bCIgZD0iTTI5OTYgMTM4NDUgYy01NCAtMTkgLTEwNiAtNjQgLTEzNCAtMTE2IC0yNCAtNDQgLTI0IC00NiAtMTggLTI1NCA3IC0yNTIgNDggLTcwOCA4NSAtOTM1IDUgLTMwIDEyIC04OSAxNiAtMTMwIDcgLTgxIDM4IC0yNjkgODYgLTUyNSAzNiAtMTkxIDEzNSAtNTg0IDIxNCAtODU1IDMxIC0xMDcgNjEgLTIxMSA2NiAtMjMwIDE5IC04MCAyMjEgLTU5NSAzMjkgLTg0MCA1MyAtMTIyIDIyNCAtNDUxIDMxMyAtNjA1IDc3IC0xMzIgMzI4IC01MTUgMzQ5IC01MzMgMTEgLTkgMjcgMCA3NSA0MSAxNzYgMTUwIDUzMCAzOTAgODA4IDU0NyAzMzggMTkxIDgzMiA0MzUgMTEyNSA1NTUgNTggMjQgMTc3IDczIDI2NSAxMTAgODggMzYgMTk4IDgxIDI0NSAxMDAgMTE1IDQ1IDU1NCAyMDYgNjYwIDI0MCA0NyAxNSAxMjYgNDMgMTc1IDYyIDExOCA0NSA5MjIgMzA1IDEzODUgNDQ4IDE3NTAgNTQxIDI4NDggMTAzMSAzNzU1IDE2NzYgNjEgNDMgMTMxIDEwMCAxNTcgMTI2IDQzIDQ0IDQ4IDU1IDYyIDEyOCAxOCA5MyA0MyAzOTggNTIgNjM1IDUgMTM2IDMgMTcyIC0xMCAyMDggLTI0IDY2IC01MyAxMDAgLTEwOSAxMzAgbC01MiAyNyAtNDkzMCAyIGMtNDE3NCAyIC00OTM2IDAgLTQ5NjkgLTEyeiI+PC9wYXRoPjxwYXRoIGNsYXNzPSJib3dsIiBkPSJNMTE5MzcgOTQwMCBjLTQ5IC0zMCAtMzcxIC0xNjAgLTg2MiAtMzQ3IC0yMzIgLTg4IC03OTEgLTI3MyAtMTE1OCAtMzg0IC00OTQgLTE0OCAtNTk5IC0xODAgLTY1NyAtMjAwIC0zMCAtMTAgLTg5IC0yNyAtMTMwIC0zOCAtNzQgLTE5IC0zMzcgLTk4IC01NjAgLTE2NyAtMTA1IC0zMyAtNTU2IC0xODIgLTgxMCAtMjY5IC0xMjIgLTQxIC0xNTkgLTU1IC0zMzUgLTEyNiAtNzEgLTI4IC0xNTEgLTYwIC0xNzcgLTcwIC00OSAtMTkgLTI3NSAtMTE3IC00NDMgLTE5MiAtMTMwIC01NyAtMzU1IC0xNzIgLTQ3NSAtMjQxIC01MiAtMzAgLTEyMSAtNjkgLTE1MiAtODYgLTMyIC0xNiAtNTggLTM0IC01OCAtMzggMCAtOSAxMSAtMTMgMTk1IC04MyA3MiAtMjcgMTg5IC02NSAyNjAgLTg1IDcyIC0yMCAxNDEgLTM5IDE1NSAtNDMgbDI1IC04IDMgLTIxMzIgYzEgLTExNzMgLTEgLTIxNDUgLTUgLTIxNjEgLTUgLTE1IC0zNyAtNTMgLTc1IC04NiAtMzYgLTMyIC0xMTcgLTEwNiAtMTgwIC0xNjMgLTQ2MCAtNDI0IC03NDQgLTY4NyAtODgxIC04MTYgLTg3IC04MiAtMTk4IC0xODYgLTI0NyAtMjMwIC00OCAtNDQgLTE4NyAtMTc0IC0zMTAgLTI5MCAtMTIyIC0xMTUgLTI5NSAtMjc4IC0zODQgLTM2MiAtMzMwIC0zMTAgLTQyOSAtNDEzIC00NjMgLTQ4MyAtNTMgLTEwOSAtNjkgLTI0MiAtMzMgLTI4NSAxMSAtMTMgNDI4IC0xNSAzNjQ2IC0xNSAzNTk0IDAgMzYzMyAwIDM2NDQgMjAgNiAxMCAxMyA0NiAxNiA3OCA2IDUwIDIgNzEgLTIwIDEyOCAtMzQgOTAgLTQ0IDEwNCAtMTY3IDIzNyAtMTExIDEyMCAtMTgzIDE5MSAtMTI5NCAxMjc3IC0zOTYgMzg3IC03ODQgNzY3IC04NjMgODQ1IGwtMTQyIDE0MSAyIDIxNDggMyAyMTQ5IDE2NSA0NyBjMTk0IDU2IDIyNiA2NyAzODUgMTMwIDEyMSA0OCA0MzAgMTk4IDU0MCAyNjIgMjE5IDEyOCA1NTIgMzYyIDcxOCA1MDMgMTkwIDE2MyA0NDAgNDIwIDYxOSA2MzkgMTk3IDIzOSA1NTAgNzY5IDUzNiA4MDQgLTEgNSAtMTYgMSAtMzEgLTh6Ij48L3BhdGg+PHBhdGggY2xhc3M9InNuYWtlIiBkPSJNOTQ0MyAzMzAzIGwyIC0zODggMTQwIC0xNDEgYzc3IC03OCAxNjkgLTE2NiAyMDUgLTE5NiA3MCAtNjAgMjI1IC0xNTggMjUxIC0xNTggOCAwIDE5IC00IDI1IC05IDkgLTEwIDIwNiAtOTIgMjU0IC0xMDYgNDkgLTE1IDMxOSAtMTM0IDUwNCAtMjI0IDEwNCAtNTAgMTkwIC05MSAxOTMgLTkxIDEwIDAgNDA3IC0yMDMgNDI2IC0yMTggNyAtNSA2MiAtMzUgMTIyIC02NyAxMzYgLTcyIDM0MyAtMTkwIDM2NCAtMjA4IDkgLTcgNzcgLTUxIDE1MSAtOTcgMTQ4IC05MSAyNTMgLTE2MyAzNzUgLTI1NSA0NCAtMzQgMTA3IC03OSAxNDAgLTEwMCA3OCAtNTEgMTY4IC0xMjEgMjg1IC0yMjAgNTIgLTQ1IDEyNyAtMTA4IDE2NSAtMTQwIDM5IC0zMiAxNjUgLTE1MyAyODIgLTI2OSAxNzUgLTE3NSAyMjQgLTIxNyAyODAgLTI0NiA2MSAtMzEgNzUgLTM1IDEzNyAtMzMgMTE3IDQgMTU2IDQ0IDE1NiAxNTUgMCA3MSAtMTkgMTQyIC02NyAyNTIgLTU5IDEzNSAtMTIzIDIyOSAtMjgzIDQxNiAtMzAgMzYgLTcyIDg1IC05MiAxMTAgLTU4IDczIC0zNjYgMzc5IC00NTggNDU2IC00NyAzOSAtMTE2IDEwMCAtMTU1IDEzNSAtMTkwIDE3NCAtNzQ2IDU3NCAtMTA5MCA3ODQgLTYwIDM3IC0xMzAgODIgLTE1NSA5OSAtMjUgMTggLTg1IDU2IC0xMzUgODUgLTQ5IDMwIC0xMTIgNjggLTE0MCA4NiAtMjcgMTggLTg0IDUxIC0xMjUgNzUgLTQxIDI0IC0xMTMgNjUgLTE2MCA5MyAtMzE3IDE4NiAtNzkxIDQzNiAtMTEyNSA1OTQgLTcxIDM0IC0xODMgODcgLTI0OSAxMTggLTEwNyA1MSAtMjEwIDk1IC0yMjEgOTUgLTIgMCAtMyAtMTc0IC0yIC0zODd6Ij48L3BhdGg+PC9nPjwvc3ZnPjwvc3ZnPg=="/>
+  <text x="170" y="122" font-family="'Space Grotesk', Inter, sans-serif" font-size="78" font-weight="600" letter-spacing="-1.5"><tspan fill="#201d18">Farma</tspan><tspan fill="#0f5d5c">Kit</tspan></text>
+  <text x="68" y="182" font-family="'IBM Plex Sans', Inter, sans-serif" font-size="25" font-weight="400" fill="#4a443b" text-anchor="start" letter-spacing="0" xml:space="preserve">Fills in Spanish pharmacy coupon sheets, in seconds.</text>
+  <text x="68" y="210" font-family="'IBM Plex Sans', Inter, sans-serif" font-size="15" font-weight="400" fill="#7a7266" text-anchor="start" letter-spacing="0" xml:space="preserve">The header of the hojas de cupones precinto, for the electronic prescription.</text>
+  <rect x="842" y="62" width="376" height="64" fill="#f3efe7" stroke="#a39a8b" stroke-width="1.2"/>
+  <line x1="842" y1="98.0" x2="1218" y2="98.0" stroke="#a39a8b"/>
+  <line x1="1010.0" y1="98.0" x2="1010.0" y2="126" stroke="#a39a8b"/>
+  <text x="852" y="76" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="8" font-weight="400" fill="#7a7266" text-anchor="start" letter-spacing="1.5" xml:space="preserve">PROJECT</text>
+  <text x="852" y="93" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="15" font-weight="600" fill="#201d18" text-anchor="start" letter-spacing="0" xml:space="preserve">farma-kit</text>
+  <text x="852.0" y="109" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="8" font-weight="400" fill="#7a7266" text-anchor="start" letter-spacing="1.5" xml:space="preserve">RUNS IN</text>
+  <text x="852.0" y="123" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="11.5" font-weight="400" fill="#201d18" text-anchor="start" letter-spacing="0" xml:space="preserve">your browser</text>
+  <text x="1020.0" y="109" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="8" font-weight="400" fill="#7a7266" text-anchor="start" letter-spacing="1.5" xml:space="preserve">OUTPUT</text>
+  <text x="1020.0" y="123" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="11.5" font-weight="400" fill="#0f5d5c" text-anchor="start" letter-spacing="0" xml:space="preserve">a PDF to print</text>
+  <text x="64" y="250" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="10" font-weight="600" fill="#0f5d5c" text-anchor="start" letter-spacing="2" xml:space="preserve">THE FORM</text>
+  <rect x="64" y="262" width="420" height="262" rx="8" fill="#fbf9f4" stroke="#a39a8b"/>
+  <text x="82" y="288" font-family="'IBM Plex Sans', Inter, sans-serif" font-size="11" font-weight="600" fill="#7a7266" text-anchor="start" letter-spacing="0" xml:space="preserve">Col·legi de farmacèutics</text>
+  <rect x="82" y="294" width="384" height="26" rx="4" fill="#ffffff" stroke="#a39a8b"/>
+  <text x="92" y="312" font-family="'IBM Plex Sans', Inter, sans-serif" font-size="12.5" font-weight="400" fill="#201d18" text-anchor="start" letter-spacing="0" xml:space="preserve">Girona</text>
+  <path d="M444,305 l5,5 l5,-5" fill="none" stroke="#4a443b" stroke-width="1.4"/>
+  <text x="82" y="342" font-family="'IBM Plex Sans', Inter, sans-serif" font-size="11" font-weight="600" fill="#7a7266" text-anchor="start" letter-spacing="0" xml:space="preserve">UP de la farmacia</text>
+  <rect x="82" y="348" width="186.0" height="26" rx="4" fill="#ffffff" stroke="#a39a8b"/>
+  <text x="258.0" y="366" font-family="'IBM Plex Sans', Inter, sans-serif" font-size="12.5" font-weight="400" fill="#201d18" text-anchor="end" letter-spacing="0" xml:space="preserve">12345</text>
+  <text x="280.0" y="342" font-family="'IBM Plex Sans', Inter, sans-serif" font-size="11" font-weight="600" fill="#7a7266" text-anchor="start" letter-spacing="0" xml:space="preserve">Mes y año</text>
+  <rect x="280.0" y="348" width="186.0" height="26" rx="4" fill="#ffffff" stroke="#a39a8b"/>
+  <text x="290.0" y="366" font-family="'IBM Plex Sans', Inter, sans-serif" font-size="12.5" font-weight="400" fill="#201d18" text-anchor="start" letter-spacing="0" xml:space="preserve">julio de 2026</text>
+  <text x="82" y="396" font-family="'IBM Plex Sans', Inter, sans-serif" font-size="11" font-weight="600" fill="#7a7266" text-anchor="start" letter-spacing="0" xml:space="preserve">Hojas</text>
+  <rect x="82" y="402" width="186.0" height="26" rx="4" fill="#ffffff" stroke="#a39a8b"/>
+  <text x="258.0" y="420" font-family="'IBM Plex Sans', Inter, sans-serif" font-size="12.5" font-weight="400" fill="#201d18" text-anchor="end" letter-spacing="0" xml:space="preserve">1 → 50</text>
+  <text x="280.0" y="396" font-family="'IBM Plex Sans', Inter, sans-serif" font-size="11" font-weight="600" fill="#7a7266" text-anchor="start" letter-spacing="0" xml:space="preserve">Titular</text>
+  <rect x="280.0" y="402" width="186.0" height="26" rx="4" fill="#ffffff" stroke="#a39a8b"/>
+  <text x="290.0" y="420" font-family="'IBM Plex Sans', Inter, sans-serif" font-size="12.5" font-weight="400" fill="#201d18" text-anchor="start" letter-spacing="0" xml:space="preserve">Rubinat i Perfumat</text>
+  <rect x="82" y="480" width="14" height="14" rx="3" fill="#0f5d5c"/>
+  <path d="M85.5,487.5 l2.6,2.6 l4.6,-5.4" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="104" y="492" font-family="'IBM Plex Sans', Inter, sans-serif" font-size="12.5" font-weight="400" fill="#201d18" text-anchor="start" letter-spacing="0" xml:space="preserve">Recuérdame</text>
+  <rect x="296" y="470" width="170" height="34" rx="6" fill="#0f5d5c"/>
+  <text x="381" y="492" font-family="'IBM Plex Sans', Inter, sans-serif" font-size="13" font-weight="600" fill="#ffffff" text-anchor="middle" letter-spacing="0" xml:space="preserve">Generar documento</text>
+  <line x1="494" y1="386" x2="532" y2="386" stroke="#0f5d5c" stroke-width="1.6" stroke-dasharray="5 3"/>
+  <path d="M540,352 h40 l14,14 v54 h-54 z" fill="#ffffff" stroke="#0f5d5c" stroke-width="1.6"/>
+  <path d="M580,352 v14 h14" fill="none" stroke="#0f5d5c" stroke-width="1.6"/>
+  <text x="567" y="402" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="12" font-weight="600" fill="#0f5d5c" text-anchor="middle" letter-spacing="0" xml:space="preserve">PDF</text>
+  <line x1="602" y1="386" x2="652" y2="386" stroke="#0f5d5c" stroke-width="1.6" stroke-dasharray="5 3"/>
+  <path d="M646,380 L654,386 L646,392" fill="none" stroke="#0f5d5c" stroke-width="1.6"/>
+  <text x="567" y="448" font-family="'IBM Plex Sans', Inter, sans-serif" font-size="11.5" font-weight="400" fill="#7a7266" text-anchor="middle" letter-spacing="0" xml:space="preserve">made in your</text>
+  <text x="567" y="464" font-family="'IBM Plex Sans', Inter, sans-serif" font-size="11.5" font-weight="400" fill="#7a7266" text-anchor="middle" letter-spacing="0" xml:space="preserve">browser</text>
+  <text x="684" y="250" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="10" font-weight="600" fill="#0f5d5c" text-anchor="start" letter-spacing="2" xml:space="preserve">THE COUPON SHEET</text>
+  <rect x="704" y="278" width="300" height="262" fill="#ffffff" stroke="#a39a8b"/>
+  <rect x="684" y="270" width="300" height="262" fill="#ffffff" stroke="#a39a8b"/>
+  <rect x="664" y="262" width="300" height="262" fill="#ffffff" stroke="#a39a8b"/>
+  <rect x="676" y="274" width="276" height="66" fill="none" stroke="#a39a8b" stroke-width="0.8"/>
+  <line x1="850" y1="274" x2="850" y2="340" stroke="#a39a8b" stroke-width="0.8"/>
+  <rect x="676.0" y="352" width="49" height="34" rx="2" fill="none" stroke="#cfc7b8" stroke-dasharray="3 2"/>
+  <rect x="731.2" y="352" width="49" height="34" rx="2" fill="none" stroke="#cfc7b8" stroke-dasharray="3 2"/>
+  <rect x="786.4" y="352" width="49" height="34" rx="2" fill="none" stroke="#cfc7b8" stroke-dasharray="3 2"/>
+  <rect x="841.6" y="352" width="49" height="34" rx="2" fill="none" stroke="#cfc7b8" stroke-dasharray="3 2"/>
+  <rect x="896.8" y="352" width="49" height="34" rx="2" fill="none" stroke="#cfc7b8" stroke-dasharray="3 2"/>
+  <rect x="676.0" y="392" width="49" height="34" rx="2" fill="none" stroke="#cfc7b8" stroke-dasharray="3 2"/>
+  <rect x="731.2" y="392" width="49" height="34" rx="2" fill="none" stroke="#cfc7b8" stroke-dasharray="3 2"/>
+  <rect x="786.4" y="392" width="49" height="34" rx="2" fill="none" stroke="#cfc7b8" stroke-dasharray="3 2"/>
+  <rect x="841.6" y="392" width="49" height="34" rx="2" fill="none" stroke="#cfc7b8" stroke-dasharray="3 2"/>
+  <rect x="896.8" y="392" width="49" height="34" rx="2" fill="none" stroke="#cfc7b8" stroke-dasharray="3 2"/>
+  <rect x="676.0" y="432" width="49" height="34" rx="2" fill="none" stroke="#cfc7b8" stroke-dasharray="3 2"/>
+  <rect x="731.2" y="432" width="49" height="34" rx="2" fill="none" stroke="#cfc7b8" stroke-dasharray="3 2"/>
+  <rect x="786.4" y="432" width="49" height="34" rx="2" fill="none" stroke="#cfc7b8" stroke-dasharray="3 2"/>
+  <rect x="841.6" y="432" width="49" height="34" rx="2" fill="none" stroke="#cfc7b8" stroke-dasharray="3 2"/>
+  <rect x="896.8" y="432" width="49" height="34" rx="2" fill="none" stroke="#cfc7b8" stroke-dasharray="3 2"/>
+  <rect x="676.0" y="472" width="49" height="34" rx="2" fill="none" stroke="#cfc7b8" stroke-dasharray="3 2"/>
+  <rect x="731.2" y="472" width="49" height="34" rx="2" fill="none" stroke="#cfc7b8" stroke-dasharray="3 2"/>
+  <rect x="786.4" y="472" width="49" height="34" rx="2" fill="none" stroke="#cfc7b8" stroke-dasharray="3 2"/>
+  <rect x="841.6" y="472" width="49" height="34" rx="2" fill="none" stroke="#cfc7b8" stroke-dasharray="3 2"/>
+  <rect x="896.8" y="472" width="49" height="34" rx="2" fill="none" stroke="#cfc7b8" stroke-dasharray="3 2"/>
+  <text x="686" y="294" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="12" font-weight="600" fill="#0f5d5c" text-anchor="start" letter-spacing="0" xml:space="preserve">UP 12345</text>
+  <text x="686" y="312" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="12" font-weight="600" fill="#0f5d5c" text-anchor="start" letter-spacing="0" xml:space="preserve">07/2026</text>
+  <text x="686" y="330" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="12" font-weight="600" fill="#0f5d5c" text-anchor="start" letter-spacing="0" xml:space="preserve">Hoja 1 de 50</text>
+  <text x="856" y="294" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="8.4" font-weight="400" fill="#0f5d5c" text-anchor="start" letter-spacing="0" xml:space="preserve">Rubinat i Perfumat</text>
+  <text x="856" y="310" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="8.4" font-weight="400" fill="#0f5d5c" text-anchor="start" letter-spacing="0" xml:space="preserve">C/ Poltergeist, 5</text>
+  <text x="856" y="326" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="8.4" font-weight="400" fill="#0f5d5c" text-anchor="start" letter-spacing="0" xml:space="preserve">17001 Girona</text>
+  <line x1="1014" y1="306" x2="1064" y2="306" stroke="#0f5d5c" stroke-width="1.2"/>
+  <circle cx="1014" cy="306" r="3" fill="#0f5d5c"/>
+  <text x="1072" y="302" font-family="'IBM Plex Sans', Inter, sans-serif" font-size="12" font-weight="600" fill="#0f5d5c" text-anchor="start" letter-spacing="0" xml:space="preserve">printed by</text>
+  <text x="1072" y="318" font-family="'IBM Plex Sans', Inter, sans-serif" font-size="12" font-weight="600" fill="#0f5d5c" text-anchor="start" letter-spacing="0" xml:space="preserve">FarmaKit</text>
+  <line x1="964" y1="432" x2="1064" y2="432" stroke="#7a7266" stroke-width="1.2"/>
+  <circle cx="964" cy="432" r="3" fill="#7a7266"/>
+  <text x="1072" y="428" font-family="'IBM Plex Sans', Inter, sans-serif" font-size="12" font-weight="400" fill="#7a7266" text-anchor="start" letter-spacing="0" xml:space="preserve">the official</text>
+  <text x="1072" y="444" font-family="'IBM Plex Sans', Inter, sans-serif" font-size="12" font-weight="400" fill="#7a7266" text-anchor="start" letter-spacing="0" xml:space="preserve">sheet, from</text>
+  <text x="1072" y="460" font-family="'IBM Plex Sans', Inter, sans-serif" font-size="12" font-weight="400" fill="#7a7266" text-anchor="start" letter-spacing="0" xml:space="preserve">your wholesaler</text>
+  <rect x="64" y="556" width="376" height="40" rx="4" fill="#fbf9f4" stroke="#a39a8b" stroke-width="0.8"/>
+  <rect x="64" y="556" width="4" height="40" rx="2" fill="#0f5d5c"/>
+  <text x="80" y="581" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="12.5" font-weight="600" fill="#0f5d5c" text-anchor="start" letter-spacing="0" xml:space="preserve">private</text>
+  <text x="144.6" y="581" font-family="'IBM Plex Sans', Inter, sans-serif" font-size="12.5" font-weight="400" fill="#4a443b" text-anchor="start" letter-spacing="0" xml:space="preserve">nothing uploaded, no cookies</text>
+  <rect x="449" y="556" width="376" height="40" rx="4" fill="#fbf9f4" stroke="#a39a8b" stroke-width="0.8"/>
+  <rect x="449" y="556" width="4" height="40" rx="2" fill="#0f5d5c"/>
+  <text x="465" y="581" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="12.5" font-weight="600" fill="#0f5d5c" text-anchor="start" letter-spacing="0" xml:space="preserve">per col·legi</text>
+  <text x="568.6" y="581" font-family="'IBM Plex Sans', Inter, sans-serif" font-size="12.5" font-weight="400" fill="#4a443b" text-anchor="start" letter-spacing="0" xml:space="preserve">each layout traced from a real sheet</text>
+  <rect x="834" y="556" width="376" height="40" rx="4" fill="#fbf9f4" stroke="#a39a8b" stroke-width="0.8"/>
+  <rect x="834" y="556" width="4" height="40" rx="2" fill="#0f5d5c"/>
+  <text x="850" y="581" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" font-size="12.5" font-weight="600" fill="#0f5d5c" text-anchor="start" letter-spacing="0" xml:space="preserve">remembers</text>
+  <text x="930.2" y="581" font-family="'IBM Plex Sans', Inter, sans-serif" font-size="12.5" font-weight="400" fill="#4a443b" text-anchor="start" letter-spacing="0" xml:space="preserve">your data stays in this browser</text>
+</svg>

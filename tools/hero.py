@@ -334,9 +334,10 @@ def torn(x: float, y: float, w: float, h: float, curl: float) -> str:
     return f"M{x},{y} H{x + w - curl} L{x + w},{y + curl} V{y + h} {edge} L{x},{y + h} Z"
 
 
-def sheets() -> list[str]:
-    """A pad of coupon sheets on the desk, tilted; the top sheet is cut short."""
-    x, y, w = 704, 282, 334
+def pad(x: float, y: float, w: float) -> tuple[list[str], float, float, float]:
+    """A pad of coupon sheets on the desk, tilted; the top sheet is cut short.
+
+    Returns the drawing, the PDF-point scale k, and the tilt centre."""
     data, pw, ph = tinted_sheet()
     k = w / 594.96  # PDF points to sheet pixels on the hero
     h = w * ph / pw
@@ -344,7 +345,6 @@ def sheets() -> list[str]:
     curl = 20
     outline = torn(x, y, w, h, curl)
     out = [
-        caption(668, 248, "LA HOJA DE CUPONES · BARCELONA"),
         "<defs>"
         '<filter id="shadow" x="-10%" y="-10%" width="125%" height="135%">'
         '<feDropShadow dx="2" dy="8" stdDeviation="8" flood-color="#3b3227" '
@@ -380,6 +380,13 @@ def sheets() -> list[str]:
     ]
     out += printed(x, y, k)
     out.append("</g>")
+    return out, k, cx, cy
+
+
+def sheets() -> list[str]:
+    x, y, w, tilt = 704, 282, 334, 3.0
+    drawing, k, cx, cy = pad(x, y, w)
+    out = [caption(668, 248, "LA HOJA DE CUPONES · BARCELONA"), *drawing]
     # Leaders, from points on the tilted sheet to labels on the right.
     lx = 1110
     sx, sy = rotated(x + 553 * k + 2, y + 52, cx, cy, tilt)
@@ -449,14 +456,29 @@ def chromium() -> str:
     sys.exit("hero: no Chromium found; set CHROMIUM=/path/to/chrome")
 
 
-def main() -> None:
-    OUT_SVG.write_text(svg())
+#: The sheet alone, for the app's own page (a faded corner illustration).
+APP_PNG = ROOT / "src" / "assets" / "sheet-sample.png"
+APP_W, APP_H = 460, 380
+
+
+def sheet_only() -> str:
+    drawing, _, _, _ = pad(36, 52, 380)
+    body = "\n  ".join(drawing)
+    return (
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{APP_W}" height="{APP_H}" '
+        f'viewBox="0 0 {APP_W} {APP_H}">\n  {body}\n</svg>\n'
+    )
+
+
+def render(markup: str, width: int, height: int, out: Path, *, transparent: bool) -> None:
+    """Rasterise an SVG at 2x with headless Chromium, in the app's own fonts."""
     with tempfile.TemporaryDirectory() as tmp:
-        page = Path(tmp) / "hero.html"
+        page = Path(tmp) / "page.html"
         page.write_text(
-            f"<html><head><style>{font_css()}</style></head>"
-            f'<body style="margin:0;overflow:hidden">{svg()}</body></html>'
+            f"<html><head><style>{font_css()}html,body{{background:transparent}}</style></head>"
+            f'<body style="margin:0;overflow:hidden">{markup}</body></html>'
         )
+        flags = ["--default-background-color=00000000"] if transparent else []
         subprocess.run(
             [
                 chromium(),
@@ -465,8 +487,9 @@ def main() -> None:
                 "--allow-file-access-from-files",
                 "--hide-scrollbars",
                 "--force-device-scale-factor=2",
-                f"--window-size={W},{H + 200}",
-                f"--screenshot={OUT_PNG}",
+                *flags,
+                f"--window-size={width},{height + 200}",
+                f"--screenshot={out}",
                 page.as_uri(),
             ],
             check=True,
@@ -475,9 +498,20 @@ def main() -> None:
     # Headless Chromium's viewport is shorter than its window: shoot tall, then crop.
     from PIL import Image  # type: ignore[import-not-found, unused-ignore]
 
-    with Image.open(OUT_PNG) as shot:
-        shot.crop((0, 0, W * 2, H * 2)).save(OUT_PNG, optimize=True)
-    print(f"wrote {OUT_SVG.relative_to(ROOT)} and {OUT_PNG.relative_to(ROOT)}")
+    with Image.open(out) as shot:
+        frame = shot.crop((0, 0, width * 2, height * 2))
+    if transparent:
+        # A web asset: a 256-colour palette keeps it a fraction of the size.
+        frame = frame.quantize(256, method=Image.Quantize.FASTOCTREE)
+    frame.save(out, optimize=True)
+
+
+def main() -> None:
+    OUT_SVG.write_text(svg())
+    render(svg(), W, H, OUT_PNG, transparent=False)
+    render(sheet_only(), APP_W, APP_H, APP_PNG, transparent=True)
+    for out in (OUT_SVG, OUT_PNG, APP_PNG):
+        print(f"wrote {out.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":

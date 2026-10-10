@@ -1334,3 +1334,26 @@ select[aria-invalid='true']:focus {
   opacity: 1;
   transform: translate(-50%, 0);
 }
+
+/* The coupon sheet FarmaKit fills, with the values it prints in teal, as a quiet
+   corner illustration: what the tool is for, in one look. Only on screens wide
+   enough that it sits in the margin beside the 940px column, never under the form.
+   Decorative, so it is a pseudo-element: nothing for a screen reader to announce.
+   Drawn by tools/hero.py (`make hero`), the same pad as the README banner. */
+@media (min-width: 1600px) {
+  body::after {
+    content: '';
+    position: fixed;
+    right: 28px;
+    bottom: 64px;
+    z-index: -1;
+    width: 300px;
+    aspect-ratio: 460 / 380;
+    background: url('../assets/sheet-sample.png') no-repeat center / contain;
+    opacity: 0.45;
+    pointer-events: none;
+  }
+  [data-theme='dark'] body::after {
+    opacity: 0.18;
+  }
+}

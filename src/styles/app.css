@@ -844,7 +844,7 @@ select[aria-invalid='true']:focus {
   transition: opacity 0.2s ease;
 }
 .opt-fields[data-off='true'] {
-  opacity: 0.5;
+  opacity: 0.58;
 }
 
 .two-up {
@@ -1163,7 +1163,7 @@ select[aria-invalid='true']:focus {
 }
 .privacy-msg .dot {
   margin: 0 6px;
-  opacity: 0.5;
+  opacity: 0.58;
 }
 .bar-x {
   position: absolute;
@@ -1335,25 +1335,38 @@ select[aria-invalid='true']:focus {
   transform: translate(-50%, 0);
 }
 
-/* The coupon sheet FarmaKit fills, with the values it prints in teal, as a quiet
-   corner illustration: what the tool is for, in one look. Only on screens wide
-   enough that it sits in the margin beside the 940px column, never under the form.
-   Decorative, so it is a pseudo-element: nothing for a screen reader to announce.
-   Drawn by tools/hero.py (`make hero`), the same pad as the README banner. */
-@media (min-width: 1600px) {
-  body::after {
-    content: '';
-    position: fixed;
-    right: 28px;
-    bottom: 64px;
-    z-index: -1;
-    width: 300px;
-    aspect-ratio: 460 / 380;
-    background: url('../assets/sheet-sample.png') no-repeat center / contain;
-    opacity: 0.45;
-    pointer-events: none;
+/* The coupon sheet FarmaKit fills, with the values it prints in teal: what the
+   tool is for, in one look. Big and faded behind the title and the description,
+   to the right, where it never covers a field (the form's boxes are opaque and
+   sit above it). Decorative, so it is a pseudo-element: nothing for a screen
+   reader to announce. Drawn by tools/hero.py (`make hero`), the same pad as the
+   README banner. Hidden on phones, where there is no room beside the text. */
+.wrap > header {
+  position: relative;
+}
+.wrap > header::after {
+  content: '';
+  position: absolute;
+  top: -18px;
+  right: -36px;
+  z-index: -1;
+  width: 360px;
+  aspect-ratio: 460 / 380;
+  background: url('../assets/sheet-sample.png') no-repeat center / contain;
+  opacity: 0.58;
+  pointer-events: none;
+}
+[data-theme='dark'] .wrap > header::after {
+  opacity: 0.22;
+}
+@media (max-width: 980px) {
+  .wrap > header::after {
+    width: 280px;
+    right: -12px;
   }
-  [data-theme='dark'] body::after {
-    opacity: 0.18;
+}
+@media (max-width: 640px) {
+  .wrap > header::after {
+    display: none;
   }
 }

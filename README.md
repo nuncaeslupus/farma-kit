@@ -1,5 +1,9 @@
 # FarmaKit
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/nuncaeslupus/farma-kit/main/docs/hero.png" width="100%" alt="FarmaKit: el formulario (colegio, UP, mes y año, hojas, titular) se convierte en un PDF hecho en el navegador, que imprime la cabecera sobre la hoja oficial de cupones precinto de Barcelona; privado, una plantilla por colegio, y recuerda tus datos">
+</p>
+
 Fills in the header of Spanish pharmacy **coupon sheets** (*fulls de cupons precinte* / *hojas de cupones precinto*) for the electronic prescription system.
 
 **→ [nuncaeslupus.github.io/farma-kit](https://nuncaeslupus.github.io/farma-kit/)**

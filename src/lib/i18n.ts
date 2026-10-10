@@ -9,7 +9,7 @@ export const I18N: { ca: Dict; es: Dict; eu: Dict; gl: Dict } = {
     appTitle:
       'Emplenador de <span class="lo">fulls de cupons precinte</span><br>per a la recepta electrònica',
     intro:
-      "Aquesta utilitat et permetrà omplir de manera senzilla, ràpida i econòmica la capçalera dels fulls de cupons precinte de la teva farmàcia. Només s'imprimiran les dades de la farmàcia sobre els fulls oficials de cupons, disponibles a través del majorista.",
+      "Imprimeix les dades de la teva farmàcia a la capçalera dels fulls oficials de cupons precinte, disponibles al majorista.",
     chooseFirst: 'Tria el teu Col·legi de Farmacèutics',
     gateHint: 'Selecciona un col·legi amb plantilla disponible per continuar.',
     cnLabel: 'Codi Nacional dels fulls',
@@ -119,7 +119,7 @@ export const I18N: { ca: Dict; es: Dict; eu: Dict; gl: Dict } = {
     appTitle:
       'Rellenador de <span class="lo">hojas de cupones precinto</span><br>para la receta electrónica',
     intro:
-      'Esta utilidad te permitirá rellenar de forma sencilla, rápida y económica la cabecera de las hojas de cupones precinto de tu farmacia. Solo se imprimirán los datos de la farmacia sobre las hojas oficiales de cupones, disponibles a través del mayorista.',
+      'Imprime los datos de tu farmacia en la cabecera de las hojas oficiales de cupones precinto, disponibles en el mayorista.',
     chooseFirst: 'Elige tu Colegio de Farmacéuticos',
     gateHint: 'Selecciona un colegio con plantilla disponible para continuar.',
     cnLabel: 'Código nacional de las hojas',
@@ -225,7 +225,7 @@ export const I18N: { ca: Dict; es: Dict; eu: Dict; gl: Dict } = {
     appTitle:
       '<span class="lo">Zigilu-kupoien orriak</span> betetzeko tresna<br>errezeta elektronikorako',
     intro:
-      'Tresna honek zure farmaziako zigilu-kupoien orrien goiburua modu erraz, azkar eta ekonomikoan betetzeko aukera emango dizu. Farmaziaren datuak baino ez dira inprimatuko kupoien orri ofizialen gainean, handizkariaren bidez eskuragarri daudenak.',
+      'Inprimatu zure farmaziaren datuak zigilu-kupoien orri ofizialen goiburuan; handizkariaren bidez eskuragarri daude.',
     chooseFirst: 'Aukeratu zure Farmazialarien Elkargoa',
     gateHint: 'Aurrera egiteko, hautatu txantiloia eskuragarri duen elkargo bat.',
     cnLabel: 'Orrien kode nazionala',
@@ -327,7 +327,7 @@ export const I18N: { ca: Dict; es: Dict; eu: Dict; gl: Dict } = {
     appTitle:
       'Enchedor de <span class="lo">follas de cupóns precinto</span><br>para a receita electrónica',
     intro:
-      'Esta utilidade permitirache encher de forma sinxela, rápida e económica a cabeceira das follas de cupóns precinto da túa farmacia. Só se imprimirán os datos da farmacia sobre as follas oficiais de cupóns, dispoñibles a través do distribuidor.',
+      'Imprime os datos da túa farmacia na cabeceira das follas oficiais de cupóns precinto, dispoñibles no distribuidor.',
     chooseFirst: 'Escolle o teu Colexio de Farmacéuticos',
     gateHint: 'Selecciona un colexio con modelo dispoñible para continuar.',
     cnLabel: 'Código nacional das follas',

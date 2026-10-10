@@ -1348,7 +1348,7 @@ select[aria-invalid='true']:focus {
 .wrap > header::after {
   content: '';
   position: absolute;
-  top: -70px;
+  top: -40px;
   right: -40px;
   z-index: -1;
   width: 390px;
@@ -1384,10 +1384,10 @@ select[aria-invalid='true']:focus {
   }
   .util-bar {
     padding-bottom: 8px;
-    margin-bottom: 10px;
+    margin-bottom: 18px;
   }
   .lead {
-    margin: 4px 0 4px;
+    margin: 12px 0 14px;
     max-width: calc(100% - 340px);
   }
   .colegi-pick {

@@ -23,6 +23,8 @@ describe('scanner configuration codes', () => {
         'code128+fnc3:4b4244434153332e', // KBDCAS3.
         'code128+fnc3:4b4244434153322e', // KBDCAS2.
         'code128+fnc3:4b4244434153302e', // KBDCAS0.
+        'code128+fnc3:4245504c564c312e', // BEPLVL1. (user guide)
+        'code128+fnc3:4245504c564c332e', // BEPLVL3. (user guide)
         'code128+fnc3:5041504848462e', // PAPHHF.
       ],
       'tera-d5100': [

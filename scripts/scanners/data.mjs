@@ -29,6 +29,9 @@ export const SCANNERS = [
     options: [
       { bcid: 'code128', fnc3: true, data: 'KBDCAS2.', key: 'gsHoneywellAlt' },
       { bcid: 'code128', fnc3: true, data: 'KBDCAS0.', key: 'gsHoneywellUndo' },
+      // Volume: from the Voyager 1470/1472 User Guide (Beeper Volume – Good Read).
+      { bcid: 'code128', fnc3: true, data: 'BEPLVL1.', key: 'lowBeep' },
+      { bcid: 'code128', fnc3: true, data: 'BEPLVL3.', key: 'volumeNormal' },
       { bcid: 'code128', fnc3: true, data: 'PAPHHF.', key: 'trigger' },
     ],
     links: [

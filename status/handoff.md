@@ -257,8 +257,9 @@ per scanner and language in `public/lectores/pdf/`.
   *Lectores de códigos*. The coupon FAQ stays at `/faq/`; the scanner FAQ is a
   section of `/lectores/` (footer FAQ link points at `#faq` there).
 - **Adding a scanner:** append it to `SCANNERS` with its decoded payloads,
-  add step copy keys in all four languages, drop an image in
-  `public/lectores/img/`, regenerate, add its URLs to `public/sitemap.xml`.
+  add step copy keys in all four languages, add a product photo to
+  `public/lectores/img/` (white 640×640 WebP, scanner trimmed to 560 px tall
+  and centred, nose to the left, so the cards match), regenerate, add its URLs to `public/sitemap.xml`.
 
 ## Status
 

@@ -15,7 +15,7 @@ export const SCANNERS = [
     brand: 'Honeywell',
     model: 'Voyager 1472g',
     partNo: '1472G2D-2-R-INT',
-    img: 'honeywell-voyager-1472g.svg',
+    img: 'honeywell-voyager-1472g.webp',
     // Honeywell menu codes are plain Code 128 with the command as text.
     steps: [
       { bcid: 'code128', data: 'DEFALT.', key: 'factory' },
@@ -46,7 +46,7 @@ export const SCANNERS = [
     brand: 'Tera',
     model: 'D5100',
     partNo: 'D5100',
-    img: 'tera-d5100.svg',
+    img: 'tera-d5100.webp',
     steps: [
       { bcid: 'code128', data: '%%SpecCode93', key: 'factory' },
       { bcid: 'code128', data: '%%SpecCode43', key: 'kbdEs' },

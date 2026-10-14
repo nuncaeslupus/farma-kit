@@ -113,7 +113,7 @@ function indexHtml(lang) {
   const t = T[lang];
   const cards = SCANNERS.map(
     (s) => `        <a class="scanCard" href="${s.slug}/">
-          <img class="scanCard-img" src="/lectores/img/${s.img}" alt="" width="360" height="260" />
+          <img class="scanCard-img" src="/lectores/img/${s.img}" alt="" width="640" height="640" />
           <span class="scanCard-body">
             <span class="scanCard-brand">${esc(s.brand)}</span>
             <span class="scanCard-model">${esc(s.model)}</span>
@@ -194,7 +194,7 @@ ${s.options.map((c) => stepHtml(c, '·', t)).join('\n')}
     }) +
     shell(`        <a class="faqBack" href="../">${esc(t.back)}</a>
         <div class="scanHero">
-          <img src="/lectores/img/${s.img}" alt="${esc(`${s.brand} ${s.model}`)}" width="360" height="260" />
+          <img src="/lectores/img/${s.img}" alt="${esc(`${s.brand} ${s.model}`)}" width="640" height="640" />
           <div>
             <h1>${esc(t.pageTitle(s))}</h1>
             <p class="scanId">${esc(t.identifyLabel)} <code>${esc(s.partNo)}</code></p>

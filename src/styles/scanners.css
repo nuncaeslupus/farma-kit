@@ -64,10 +64,14 @@
   outline-offset: 2px;
 }
 .scanCard-img {
+  display: block;
   width: 100%;
   height: auto;
-  background: var(--surface-2);
-  padding: 8px 16px 0;
+  aspect-ratio: 1;
+  object-fit: contain;
+  /* photos are on white; keep them on white in both themes */
+  background: #fff;
+  border-bottom: 1px solid var(--line);
 }
 .scanCard-body {
   display: flex;
@@ -113,10 +117,14 @@
   margin: 8px 0 8px;
 }
 .scanHero img {
-  width: 260px;
+  width: 200px;
   max-width: 40%;
   height: auto;
+  aspect-ratio: 1;
   flex: none;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
 }
 .scanHero h1 {
   margin: 0 0 8px;
@@ -236,7 +244,7 @@
     align-items: flex-start;
   }
   .scanHero img {
-    max-width: 70%;
+    max-width: 60%;
   }
   .scanStep {
     flex-direction: column;

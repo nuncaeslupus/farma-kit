@@ -62,7 +62,18 @@ export const SCANNERS = [
       { bcid: 'code128', data: '%%SpecCode97', key: 'volumeNormal' },
       { bcid: 'qrcode', data: '\x80WSM02000000.', key: 'trigger' },
     ],
-    links: [{ key: 'teraSite', href: 'https://tera-digital.com/products/2d-barcode-scanner-d5100' }],
+    // Tera's official manuals page lists these PDFs (on its Shopify CDN) under D5100.
+    links: [
+      {
+        key: 'teraManualEs',
+        href: 'https://cdn.shopify.com/s/files/1/0144/3482/8374/files/TR-UM017-ES-ZQ-Ver.02.1.05-2022.9.1-S02.pdf?v=1679586443',
+      },
+      {
+        key: 'teraManualEn',
+        href: 'https://cdn.shopify.com/s/files/1/0144/3482/8374/files/TR-UM017-EN-ZQ-Ver.02.1.05-2022.9.16-S02.pdf?v=1679586443',
+      },
+      { key: 'teraManuals', href: 'https://tera-digital.com/es/pages/user-manual' },
+    ],
   },
 ];
 
@@ -119,7 +130,9 @@ export const T = {
       quickStart: 'Guía rápida (Honeywell, PDF, inglés)',
       userGuide: 'Manual de usuario completo (PDF, inglés)',
       ctrlX: 'Artículo de Honeywell sobre el modo Ctrl+X (inglés)',
-      teraSite: 'Página del producto en Tera',
+      teraManualEs: 'Manual de usuario de Tera (PDF, español)',
+      teraManualEn: 'Manual de usuario de Tera (PDF, inglés)',
+      teraManuals: 'Todos los manuales en la web de Tera',
     },
     s: {
       factory: ['Volver a la configuración de fábrica', 'Parte siempre de un estado conocido.'],
@@ -189,7 +202,9 @@ export const T = {
       quickStart: 'Guia ràpida (Honeywell, PDF, anglès)',
       userGuide: "Manual d'usuari complet (PDF, anglès)",
       ctrlX: 'Article de Honeywell sobre el mode Ctrl+X (anglès)',
-      teraSite: 'Pàgina del producte a Tera',
+      teraManualEs: "Manual d'usuari de Tera (PDF, castellà)",
+      teraManualEn: "Manual d'usuari de Tera (PDF, anglès)",
+      teraManuals: 'Tots els manuals al web de Tera',
     },
     s: {
       factory: ['Tornar a la configuració de fàbrica', 'Parteix sempre d’un estat conegut.'],
@@ -259,7 +274,9 @@ export const T = {
       quickStart: 'Gida azkarra (Honeywell, PDF, ingelesez)',
       userGuide: 'Erabiltzailearen eskuliburu osoa (PDF, ingelesez)',
       ctrlX: 'Honeywellen artikulua Ctrl+X moduari buruz (ingelesez)',
-      teraSite: 'Produktuaren orria Teran',
+      teraManualEs: 'Teraren erabiltzailearen eskuliburua (PDF, gaztelaniaz)',
+      teraManualEn: 'Teraren erabiltzailearen eskuliburua (PDF, ingelesez)',
+      teraManuals: 'Eskuliburu guztiak Teraren webgunean',
     },
     s: {
       factory: ['Fabrikako konfiguraziora itzuli', 'Beti egoera ezagun batetik abiatzeko.'],
@@ -329,7 +346,9 @@ export const T = {
       quickStart: 'Guía rápida (Honeywell, PDF, inglés)',
       userGuide: 'Manual de usuario completo (PDF, inglés)',
       ctrlX: 'Artigo de Honeywell sobre o modo Ctrl+X (inglés)',
-      teraSite: 'Páxina do produto en Tera',
+      teraManualEs: 'Manual de usuario de Tera (PDF, castelán)',
+      teraManualEn: 'Manual de usuario de Tera (PDF, inglés)',
+      teraManuals: 'Todos os manuais na web de Tera',
     },
     s: {
       factory: ['Volver á configuración de fábrica', 'Parte sempre dun estado coñecido.'],

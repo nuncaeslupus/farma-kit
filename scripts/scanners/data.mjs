@@ -50,14 +50,18 @@ export const SCANNERS = [
     steps: [
       { bcid: 'code128', data: '%%SpecCode93', key: 'factory' },
       { bcid: 'code128', data: '%%SpecCode43', key: 'kbdEs' },
-      { bcid: 'code128', data: '%%SpecCode95', key: 'lowBeep' },
       { bcid: 'code128', data: '%%SpecCode9C', key: 'enter' },
       { bcid: 'qrcode', data: '\x80WSM02000003.', key: 'presentation' },
       // Not in the manual: sent by Tera support (14/10/2026). Makes GS1
       // DataMatrix output FNC1 as GS instead of "(01)…(21)…" parentheses.
       { bcid: 'qrcode', data: '@WSM07063100;07152100;', key: 'gsTera' },
     ],
-    options: [],
+    // From the D5100 manual (codes decoded from it, not retyped).
+    options: [
+      { bcid: 'code128', data: '%%SpecCode95', key: 'lowBeep' },
+      { bcid: 'code128', data: '%%SpecCode97', key: 'volumeNormal' },
+      { bcid: 'qrcode', data: '\x80WSM02000000.', key: 'trigger' },
+    ],
     links: [{ key: 'teraSite', href: 'https://tera-digital.com/products/2d-barcode-scanner-d5100' }],
   },
 ];
@@ -122,7 +126,8 @@ export const T = {
       kbdEs: ['Teclado en español', 'Para que los símbolos y las letras salgan bien en Windows.'],
       presentation: ['Leer sin apretar el botón', 'El lector lee solo al acercarle un código.'],
       enter: ['Intro al final', 'Cada lectura termina con un Intro, como espera Farmatic.'],
-      lowBeep: ['Pitido bajo', 'Menos ruido en el mostrador.'],
+      lowBeep: ['Pitido bajo', 'Menos ruido; útil si avisa a menudo de batería baja.'],
+      volumeNormal: ['Volver al volumen normal', 'Deshace el pitido bajo.'],
       gsHoneywell: ['Separador GS para Farmatic', 'Modo Ctrl+X para Windows, conservando prefijo y sufijo.'],
       gsTera: [
         'Separador GS para Farmatic',
@@ -130,7 +135,7 @@ export const T = {
       ],
       gsHoneywellAlt: ['Paso 5 alternativo', 'Solo si el paso 5 deja de funcionar (Ctrl+X para Windows sin prefijo ni sufijo).'],
       gsHoneywellUndo: ['Deshacer el paso 5', 'Devuelve el separador al valor de fábrica.'],
-      trigger: ['Leer apretando el botón', 'Desactiva el paso 3.'],
+      trigger: ['Leer apretando el botón', 'Deshace «Leer sin apretar el botón».'],
     },
   },
   ca: {
@@ -191,7 +196,8 @@ export const T = {
       kbdEs: ['Teclat en espanyol', 'Perquè els símbols i les lletres surtin bé a Windows.'],
       presentation: ['Llegir sense prémer el botó', 'El lector llegeix sol quan hi acostes un codi.'],
       enter: ['Intro al final', 'Cada lectura acaba amb un Intro, com espera Farmatic.'],
-      lowBeep: ['Xiulet baix', 'Menys soroll al taulell.'],
+      lowBeep: ['Xiulet baix', 'Menys soroll; útil si avisa sovint de bateria baixa.'],
+      volumeNormal: ['Tornar al volum normal', 'Desfà el xiulet baix.'],
       gsHoneywell: ['Separador GS per a Farmatic', 'Mode Ctrl+X per a Windows, conservant prefix i sufix.'],
       gsTera: [
         'Separador GS per a Farmatic',
@@ -199,7 +205,7 @@ export const T = {
       ],
       gsHoneywellAlt: ['Pas 5 alternatiu', 'Només si el pas 5 deixa de funcionar (Ctrl+X per a Windows sense prefix ni sufix).'],
       gsHoneywellUndo: ['Desfer el pas 5', 'Torna el separador al valor de fàbrica.'],
-      trigger: ['Llegir prement el botó', 'Desactiva el pas 3.'],
+      trigger: ['Llegir prement el botó', 'Desfà «Llegir sense prémer el botó».'],
     },
   },
   eu: {
@@ -260,7 +266,8 @@ export const T = {
       kbdEs: ['Teklatua espainieraz', 'Ikurrak eta letrak Windowsen ondo ager daitezen.'],
       presentation: ['Botoia sakatu gabe irakurri', 'Irakurgailuak berak irakurtzen du kode bat hurbiltzean.'],
       enter: ['Intro amaieran', 'Irakurketa bakoitza Intro batekin amaitzen da, Farmaticek espero duen bezala.'],
-      lowBeep: ['Txistu-hots baxua', 'Zarata gutxiago mostradorean.'],
+      lowBeep: ['Txistu-hots baxua', 'Zarata gutxiago; baliagarria bateria baxuaz maiz ohartarazten badu.'],
+      volumeNormal: ['Bolumen normalera itzuli', 'Txistu-hots baxua desegiten du.'],
       gsHoneywell: ['GS bereizlea Farmaticerako', 'Ctrl+X modua Windowserako, aurrizkia eta atzizkia mantenduz.'],
       gsTera: [
         'GS bereizlea Farmaticerako',
@@ -268,7 +275,7 @@ export const T = {
       ],
       gsHoneywellAlt: ['5. urratsaren ordezkoa', '5. urratsak funtzionatzeari uzten badio bakarrik (Ctrl+X Windowserako, aurrizki eta atzizkirik gabe).'],
       gsHoneywellUndo: ['5. urratsa desegin', 'Bereizlea fabrikako baliora itzultzen du.'],
-      trigger: ['Botoia sakatuta irakurri', '3. urratsa desaktibatzen du.'],
+      trigger: ['Botoia sakatuta irakurri', '«Botoia sakatu gabe irakurri» desegiten du.'],
     },
   },
   gl: {
@@ -329,7 +336,8 @@ export const T = {
       kbdEs: ['Teclado en español', 'Para que os símbolos e as letras saian ben en Windows.'],
       presentation: ['Ler sen premer o botón', 'O lector le só ao achegarlle un código.'],
       enter: ['Intro ao final', 'Cada lectura remata cun Intro, como espera Farmatic.'],
-      lowBeep: ['Pitido baixo', 'Menos ruído no mostrador.'],
+      lowBeep: ['Pitido baixo', 'Menos ruído; útil se avisa a miúdo de batería baixa.'],
+      volumeNormal: ['Volver ao volume normal', 'Desfai o pitido baixo.'],
       gsHoneywell: ['Separador GS para Farmatic', 'Modo Ctrl+X para Windows, conservando prefixo e sufixo.'],
       gsTera: [
         'Separador GS para Farmatic',
@@ -337,7 +345,7 @@ export const T = {
       ],
       gsHoneywellAlt: ['Paso 5 alternativo', 'Só se o paso 5 deixa de funcionar (Ctrl+X para Windows sen prefixo nin sufixo).'],
       gsHoneywellUndo: ['Desfacer o paso 5', 'Devolve o separador ao valor de fábrica.'],
-      trigger: ['Ler premendo o botón', 'Desactiva o paso 3.'],
+      trigger: ['Ler premendo o botón', 'Desfai «Ler sen premer o botón».'],
     },
   },
 };

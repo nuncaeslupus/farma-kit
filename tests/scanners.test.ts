@@ -28,10 +28,12 @@ describe('scanner configuration codes', () => {
       'tera-d5100': [
         'code128:252553706563436f64653933',
         'code128:252553706563436f64653433',
-        'code128:252553706563436f64653935',
         'code128:252553706563436f64653943',
         'qrcode:8057534d30323030303030332e',
         'qrcode:4057534d30373036333130303b30373135323130303b',
+        'code128:252553706563436f64653935', // low beep (manual)
+        'code128:252553706563436f64653937', // high/normal beep (manual)
+        'qrcode:8057534d30323030303030302e', // manual trigger mode (manual)
       ],
     });
   });

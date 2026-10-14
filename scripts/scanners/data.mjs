@@ -16,18 +16,20 @@ export const SCANNERS = [
     model: 'Voyager 1472g',
     partNo: '1472G2D-2-R-INT',
     img: 'honeywell-voyager-1472g.webp',
-    // Honeywell menu codes are plain Code 128 with the command as text.
+    // Honeywell menu codes are Code 128 with an FNC3 symbol before the command
+    // (`fnc3: true`). Readers like zxing drop FNC3 silently, so it is easy to
+    // miss: the tested codes measure 123 modules for DEFALT., not 112.
     steps: [
-      { bcid: 'code128', data: 'DEFALT.', key: 'factory' },
-      { bcid: 'code128', data: 'KBDCTY10.', key: 'kbdEs' },
-      { bcid: 'code128', data: 'PAPTPR.', key: 'presentation' },
-      { bcid: 'code128', data: 'VSUFCR.', key: 'enter' },
-      { bcid: 'code128', data: 'KBDCAS3.', key: 'gsHoneywell' },
+      { bcid: 'code128', fnc3: true, data: 'DEFALT.', key: 'factory' },
+      { bcid: 'code128', fnc3: true, data: 'KBDCTY10.', key: 'kbdEs' },
+      { bcid: 'code128', fnc3: true, data: 'PAPTPR.', key: 'presentation' },
+      { bcid: 'code128', fnc3: true, data: 'VSUFCR.', key: 'enter' },
+      { bcid: 'code128', fnc3: true, data: 'KBDCAS3.', key: 'gsHoneywell' },
     ],
     options: [
-      { bcid: 'code128', data: 'KBDCAS2.', key: 'gsHoneywellAlt' },
-      { bcid: 'code128', data: 'KBDCAS0.', key: 'gsHoneywellUndo' },
-      { bcid: 'code128', data: 'PAPHHF.', key: 'trigger' },
+      { bcid: 'code128', fnc3: true, data: 'KBDCAS2.', key: 'gsHoneywellAlt' },
+      { bcid: 'code128', fnc3: true, data: 'KBDCAS0.', key: 'gsHoneywellUndo' },
+      { bcid: 'code128', fnc3: true, data: 'PAPHHF.', key: 'trigger' },
     ],
     links: [
       {

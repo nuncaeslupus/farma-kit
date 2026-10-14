@@ -243,8 +243,11 @@ per scanner and language in `public/lectores/pdf/`.
   `scripts/scanners/data.mjs` (codes + all copy). Edit the data, run
   `npm run gen:scanners`, commit the output. CI fails if the output is stale.
 - **Payloads are exact bytes decoded from the codes scanned on the real
-  devices** (Honeywell: Code 128 menu commands; Tera: Code 128 + QR, one with a
-  raw `\x80` byte, which the generator passes to bwip-js as `^128`).
+  devices** (Honeywell: Code 128 menu commands **preceded by an FNC3 symbol** —
+  `fnc3: true`; zxing and most readers drop FNC3 silently, so check the module
+  count: DEFALT. is 123 modules with it, 112 without. Tera: plain Code 128 + QR,
+  one with a raw `\x80` byte, passed to bwip-js as `^128`). Both were checked
+  bar by bar against the tested codes / the maker's manual.
   `tests/scanners.test.ts` pins them; change one only after re-testing it on
   the scanner. The Tera GS code came from Tera support and is not in the manual.
 - Barcodes are inline SVG on the pages (black on white in both themes) and

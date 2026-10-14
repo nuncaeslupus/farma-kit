@@ -38,6 +38,11 @@ function barcodeSvg(code) {
     opts.text = code.data.replace(/[\^\x80-\xff]/g, (c) => `^${String(c.charCodeAt(0)).padStart(3, '0')}`);
     opts.parse = true;
   }
+  if (code.fnc3) {
+    // Honeywell programming codes: FNC3 first, then the command.
+    opts.text = `^FNC3${opts.text}`;
+    opts.parsefnc = true;
+  }
   if (code.bcid === 'code128') opts.height = 12; // mm-ish at scale 1 → 35 units
   return bwipjs.toSVG(opts);
 }

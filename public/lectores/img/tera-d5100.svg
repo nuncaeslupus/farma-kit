@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 300" role="img" aria-label="Tera D5100">
+  <!-- Drawing (not a photo) of the Tera D5100 from the maker's product shot:
+       black body, orange band around the head, orange nose bumper, trigger
+       and grip end, blue battery LEDs and the Tera plate on top. -->
+  <defs>
+    <linearGradient id="tb" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3b3d41"/><stop offset=".55" stop-color="#1c1d20"/><stop offset="1" stop-color="#0d0e10"/>
+    </linearGradient>
+    <linearGradient id="tg" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#151618"/><stop offset=".45" stop-color="#2c2e32"/><stop offset="1" stop-color="#101113"/>
+    </linearGradient>
+    <linearGradient id="to" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ff8640"/><stop offset="1" stop-color="#e05a17"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="200" cy="288" rx="78" ry="7" fill="#000" opacity=".12"/>
+  <!-- grip: long, angled back, ending in an orange cap -->
+  <path d="M150 128 L226 104 Q246 160 262 236 Q266 262 246 268 L214 274 Q196 276 192 258 Q180 196 150 128 Z" fill="url(#tg)"/>
+  <path d="M176 150 Q200 200 210 252" stroke="#3a3c40" stroke-width="2" fill="none"/>
+  <path d="M190 258 Q194 278 214 278 L250 272 Q270 268 266 246 L264 238 Q262 262 240 264 L210 268 Q194 270 190 258 Z" fill="url(#to)"/>
+  <path d="M188 252 Q190 282 216 284 L252 278 Q272 272 268 244 L262 232 Q262 258 244 262 L212 266 Q194 266 188 252 Z" fill="url(#to)"/>
+  <!-- orange trigger -->
+  <path d="M142 128 Q128 150 136 176 Q142 188 156 182 Q150 160 162 136 Z" fill="url(#to)"/>
+  <!-- head -->
+  <path d="M36 70 Q40 46 70 42 L214 30 Q250 28 262 56 Q272 84 258 102 Q244 118 214 122 L64 140 Q40 142 36 118 Z" fill="url(#tb)"/>
+  <!-- recessed front window -->
+  <path d="M36 72 L58 68 L60 138 Q42 140 36 118 Z" fill="#0b0b0c"/>
+  <circle cx="47" cy="100" r="7" fill="#3c4146"/><circle cx="47" cy="100" r="3" fill="#c9a24a"/>
+  <!-- orange band wrapping the head, and the nose bumper -->
+  <path d="M40 120 L232 92 Q258 88 268 66 L272 76 Q262 104 234 108 L44 136 Z" fill="url(#to)"/>
+  <path d="M28 66 Q30 52 44 50 L48 50 L50 84 L32 86 Q28 80 28 66 Z" fill="url(#to)"/>
+  <!-- top: LED window with blue lights -->
+  <rect x="120" y="44" width="96" height="16" rx="5" transform="rotate(-5 168 52)" fill="#0f1012" stroke="#46484c"/>
+  <g fill="#2fa6ff" transform="rotate(-5 168 52)">
+    <rect x="126" y="50" width="11" height="4" rx="1"/><rect x="141" y="50" width="11" height="4" rx="1"/>
+    <rect x="156" y="50" width="11" height="4" rx="1"/><rect x="171" y="50" width="11" height="4" rx="1"/>
+    <path d="M186 50 L208 47 L208 54 L186 54 Z"/>
+  </g>
+  <!-- Tera plate -->
+  <rect x="72" y="52" width="36" height="20" rx="5" transform="rotate(-5 90 62)" fill="#141517" stroke="#55585d"/>
+  <text x="90" y="67" text-anchor="middle" transform="rotate(-5 90 62)" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="12" fill="#cfd2d6">Tera</text>
+  <path d="M74 46 L210 35" stroke="#fff" stroke-opacity=".14" stroke-width="3" stroke-linecap="round"/>
+</svg>

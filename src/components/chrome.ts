@@ -5,6 +5,7 @@
  * the caller (it queries `.seg a` / `#themeBtn` in the DOM), and the footer's
  * actions are passed in so each page supplies its own. */
 import { html, type TemplateResult } from 'lit';
+import { ifDefined } from 'lit/directives/if-defined.js';
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -15,7 +16,11 @@ export function headerTemplate(opts: {
   /** The brand links to the tool in the current language (tool page → self;
    * FAQ page → its tool). */
   homeHref: string;
+  /** Site sections menu. Hrefs are passed in (the tool uses relative ones so
+   * they follow an in-place language switch; static pages use absolute). */
+  nav: { couponsHref: string; scannersHref: string; active: 'coupons' | 'scanners' };
 }): TemplateResult {
+  const cur = (s: string) => (opts.nav.active === s ? 'page' : undefined);
   return html`
     <div class="util-bar">
       <a class="app-brand" href="${opts.homeHref}">
@@ -29,6 +34,10 @@ export function headerTemplate(opts: {
           <span class="app-tag" data-i18n="tagline">Eines per a la farmàcia</span>
         </div>
       </a>
+      <nav class="site-nav" aria-label="FarmaKit">
+        <a href="${opts.nav.couponsHref}" aria-current=${ifDefined(cur('coupons'))} data-i18n="navCoupons">Hojas de cupones</a>
+        <a href="${opts.nav.scannersHref}" aria-current=${ifDefined(cur('scanners'))} data-i18n="navScanners">Lectores de códigos</a>
+      </nav>
       <div class="util-controls">
         <div class="seg" role="group" aria-label="Idioma">
           <a href="${opts.langHref('es')}" data-lang="es">Español</a>

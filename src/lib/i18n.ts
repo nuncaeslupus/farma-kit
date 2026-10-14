@@ -3,6 +3,8 @@ type Dict = Record<string, string | ((...a: string[]) => string)>;
 
 export const I18N: { ca: Dict; es: Dict; eu: Dict; gl: Dict } = {
   ca: {
+    navCoupons: 'Fulls de cupons',
+    navScanners: 'Lectors de codis',
     // Keyword-first (people search «cupons precinte» / «recepta electrònica»,
     // not the brand). Must stay in sync with ca/index.html's <title>.
     docTitle: 'Emplenar fulls de cupons precinte per a la recepta electrònica — FarmaKit',
@@ -113,6 +115,8 @@ export const I18N: { ca: Dict; es: Dict; eu: Dict; gl: Dict } = {
       "Avui hi ha disponibles els fulls dels col·legis de Barcelona, Girona, Lleida i Tarragona, que comparteixen un mateix model. Si el teu col·legi encara no hi apareix, demana'l des de la mateixa aplicació i n'afegirem la plantilla.",
   },
   es: {
+    navCoupons: 'Hojas de cupones',
+    navScanners: 'Lectores de códigos',
     // Keyword-first (people search «cupones precinto» / «receta electrónica»,
     // not the brand). Must stay in sync with index.html's <title>.
     docTitle: 'Rellenar hojas de cupones precinto para la receta electrónica — FarmaKit',
@@ -221,6 +225,8 @@ export const I18N: { ca: Dict; es: Dict; eu: Dict; gl: Dict } = {
   // Machine-drafted against those sources — get a native-speaker pass before a
   // wide launch. Keys mirror es exactly (tests/i18n.test.ts enforces this).
   eu: {
+    navCoupons: 'Kupoi-orriak',
+    navScanners: 'Kode-irakurgailuak',
     docTitle: 'Zigilu-kupoien orriak bete errezeta elektronikorako — FarmaKit',
     appTitle:
       '<span class="lo">Zigilu-kupoien orriak</span> betetzeko tresna<br>errezeta elektronikorako',
@@ -323,6 +329,8 @@ export const I18N: { ca: Dict; es: Dict; eu: Dict; gl: Dict } = {
   // Machine-drafted against those sources — get a native-speaker pass before a
   // wide launch. Keys mirror es exactly (tests/i18n.test.ts enforces this).
   gl: {
+    navCoupons: 'Follas de cupóns',
+    navScanners: 'Lectores de códigos',
     docTitle: 'Encher follas de cupóns precinto para a receita electrónica — FarmaKit',
     appTitle:
       'Enchedor de <span class="lo">follas de cupóns precinto</span><br>para a receita electrónica',
@@ -424,10 +432,11 @@ export const I18N: { ca: Dict; es: Dict; eu: Dict; gl: Dict } = {
 export type Lang = 'ca' | 'es' | 'eu' | 'gl';
 
 /** Apply translations to [data-i18n] / [data-i18n-ph] under `root`. */
-export function applyLang(root: ParentNode, lang: Lang): void {
+export function applyLang(root: ParentNode, lang: Lang, opts: { title?: boolean } = {}): void {
   const d = I18N[lang];
   document.documentElement.lang = lang;
-  if (typeof d.docTitle === 'string') document.title = d.docTitle;
+  // Static pages (FAQ, scanners) keep their own baked <title>; docTitle is the tool's.
+  if (opts.title !== false && typeof d.docTitle === 'string') document.title = d.docTitle;
   root.querySelectorAll<HTMLElement>('[data-i18n]').forEach((el) => {
     const k = el.getAttribute('data-i18n')!;
     const v = d[k];

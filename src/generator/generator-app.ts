@@ -1209,6 +1209,8 @@ export class GeneratorApp extends LitElement {
           // Relative to the current tool URL, so the brand stays on the current
           // language even after an in-place switch (no re-render — see faqHref).
           homeHref: './',
+          // Relative too (the tool URL always ends in a slash), for the same reason.
+          nav: { couponsHref: './', scannersHref: 'lectores/', active: 'coupons' },
         })}
         <header>
           <div class="brand">

@@ -10,6 +10,7 @@ Vite + Lit + TypeScript. No backend, no state management, no router library.
 
 ```
 src/main.ts            entry
+src/lectores.ts        scanner pages entry (generated shells, see below)
 src/app-root.ts        hash router: default → generator, #editor → editor (dev only)
 src/generator/         the pharmacy-facing form (light DOM, global app.css)
 src/editor/            the template editor (shadow DOM components)
@@ -231,6 +232,33 @@ gate before deploying, so a red suite cannot reach the live site.
   FarmaKit»): nobody searches the brand, they search the task. The shell
   `<title>` must match `docTitle` in `src/lib/i18n.ts`, or the title flickers
   on load.
+
+## Barcode scanners (`/lectores/`)
+
+Configuration codes for scanners tested with Farmatic on Windows, per language
+at `{,ca/,eu/,gl/}lectores/` (index + one page per scanner) plus a printable PDF
+per scanner and language in `public/lectores/pdf/`.
+
+- **Everything is generated** by `scripts/gen-scanners.mjs` from
+  `scripts/scanners/data.mjs` (codes + all copy). Edit the data, run
+  `npm run gen:scanners`, commit the output. CI fails if the output is stale.
+- **Payloads are exact bytes decoded from the codes scanned on the real
+  devices** (Honeywell: Code 128 menu commands; Tera: Code 128 + QR, one with a
+  raw `\x80` byte, which the generator passes to bwip-js as `^128`).
+  `tests/scanners.test.ts` pins them; change one only after re-testing it on
+  the scanner. The Tera GS code came from Tera support and is not in the manual.
+- Barcodes are inline SVG on the pages (black on white in both themes) and
+  vector rectangles/paths in the PDFs (pdf-lib, IBM Plex fonts). PDFs are
+  byte-stable (fixed dates) so regenerating without changes is a no-op.
+- Pages are new Vite inputs, discovered on disk by `scannerInputs()` in
+  `vite.config.ts`; entry `src/lectores.ts`. The shared chrome bootstrap for
+  static pages (FAQ + scanners) lives in `src/lib/static-page.ts`.
+- Site menu (`.site-nav`, own row under the top bar): *Hojas de cupones* ·
+  *Lectores de códigos*. The coupon FAQ stays at `/faq/`; the scanner FAQ is a
+  section of `/lectores/` (footer FAQ link points at `#faq` there).
+- **Adding a scanner:** append it to `SCANNERS` with its decoded payloads,
+  add step copy keys in all four languages, drop an image in
+  `public/lectores/img/`, regenerate, add its URLs to `public/sitemap.xml`.
 
 ## Status
 

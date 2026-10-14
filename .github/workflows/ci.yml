@@ -20,4 +20,6 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm test
+      # The scanner pages/PDFs are generated and committed: fail if stale.
+      - run: npm run gen:scanners && git diff --exit-code
       - run: npm run build

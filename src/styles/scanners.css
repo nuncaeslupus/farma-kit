@@ -204,16 +204,20 @@
   background: #fff;
   border: 1px solid var(--line);
   border-radius: 8px;
-  padding: 14px 18px 8px;
+  /* one box size for every code, bars or QR */
+  width: 320px;
+  max-width: 100%;
+  height: 156px;
+  padding: 14px 18px 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  justify-content: center;
+  gap: 6px;
 }
 .code-svg {
   display: block;
   max-width: 100%;
-  height: auto;
 }
 .scanMain .code-text {
   background: none;

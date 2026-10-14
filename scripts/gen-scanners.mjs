@@ -45,13 +45,15 @@ function barcodeSvg(code) {
 /** Inline SVG for the page: drop the fixed size, keep the viewBox, size by CSS. */
 function inlineBarcode(code) {
   const svg = barcodeSvg(code);
-  const [, w, h] = /viewBox="0 0 (\d+) (\d+)"/.exec(svg);
-  // ~2 px per module for linear codes; QR codes get a fixed square.
-  const width = code.bcid === 'qrcode' ? 168 : Math.round(+w * 2.1);
+  // Every code gets the same box: linear codes are stretched to one fixed
+  // width × height (only the module width changes, ≥1.6 px), QR codes to one
+  // fixed square — so all steps line up regardless of payload length.
+  const qr = code.bcid === 'qrcode';
+  const [width, height] = qr ? [120, 120] : [280, 80];
   return svg.replace(
     '<svg ',
-    `<svg class="code-svg" width="${width}" height="${Math.round((width * +h) / +w)}" role="img" aria-label="${esc(
-      code.bcid === 'code128' ? code.data : 'QR',
+    `<svg class="code-svg${qr ? ' code-svg--qr' : ''}" width="${width}" height="${height}" preserveAspectRatio="none" role="img" aria-label="${esc(
+      qr ? 'QR' : code.data,
     )}" shape-rendering="crispEdges" `,
   );
 }
@@ -244,11 +246,12 @@ function wrap(text, font, size, width) {
   return lines;
 }
 
-/** Draw a bwip-js SVG at (x, top) with the given width; returns its height. */
-function drawBarcode(page, code, x, top, width) {
+/** Draw a bwip-js SVG into the box (x, top, width, height). */
+function drawBarcode(page, code, x, top, width, height) {
   const svg = barcodeSvg(code);
   const [, w, h] = /viewBox="0 0 (\d+) (\d+)"/.exec(svg).map(Number);
   const k = width / w;
+  const ky = height / h;
   for (const m of svg.matchAll(/<path ([^>]*?)d="([^"]+)"/g)) {
     const sw = /stroke-width="([\d.]+)"/.exec(m[1]);
     if (sw) {
@@ -259,9 +262,9 @@ function drawBarcode(page, code, x, top, width) {
         const y2 = Math.max(+bar[2], +bar[3]);
         page.drawRectangle({
           x: x + (cx - +sw[1] / 2) * k,
-          y: top - y2 * k,
+          y: top - y2 * ky,
           width: +sw[1] * k,
-          height: (y2 - y1) * k,
+          height: (y2 - y1) * ky,
           color: rgb(0, 0, 0),
         });
       }
@@ -269,7 +272,6 @@ function drawBarcode(page, code, x, top, width) {
       page.drawSvgPath(m[2], { x, y: top, scale: k, color: rgb(0, 0, 0) });
     }
   }
-  return h * k;
 }
 
 async function buildPdf(lang, s, fonts) {
@@ -310,11 +312,13 @@ async function buildPdf(lang, s, fonts) {
   const row = (code, n) => {
     const [title, desc] = t.s[code.key];
     const isQr = code.bcid === 'qrcode';
-    const bw = isQr ? 96 : Math.min(210, barcodeSvg(code).match(/viewBox="0 0 (\d+)/)[1] * 0.9);
+    // Same frame for every code (see inlineBarcode): fixed-size bars or square.
+    const FW = 200;
+    const FH = 92;
     const titleLines = wrap(title, bold, 12, textW - 30);
     const descLines = wrap(desc, reg, 9.5, textW - 30);
     const textH = titleLines.length * 16 + descLines.length * 13;
-    const codeH = isQr ? 96 : 32 + 14;
+    const codeH = FH;
     const h = Math.max(textH, codeH) + 24;
     if (y - h < M + 10) newPage();
     page.drawLine({ start: { x: M, y }, end: { x: A4[0] - M, y }, thickness: 0.6, color: LINE });
@@ -328,11 +332,18 @@ async function buildPdf(lang, s, fonts) {
       page.drawText(l, { x: M + 30, y: ty - 10, size: 9.5, font: reg, color: MUTED });
       ty -= 13;
     }
-    const cx = A4[0] - M - bw;
-    const bh = drawBarcode(page, code, cx, y - 12, bw);
-    if (!isQr) {
+    const fx = A4[0] - M - FW;
+    const fy = y - 12;
+    page.drawRectangle({ x: fx, y: fy - FH, width: FW, height: FH, borderColor: LINE, borderWidth: 0.8 });
+    if (isQr) {
+      const q = 74;
+      drawBarcode(page, code, fx + (FW - q) / 2, fy - (FH - q) / 2, q, q);
+    } else {
+      const bw = 176;
+      const bh = 52;
+      drawBarcode(page, code, fx + (FW - bw) / 2, fy - 12, bw, bh);
       const tw = mono.widthOfTextAtSize(code.data, 8);
-      page.drawText(code.data, { x: cx + (bw - tw) / 2, y: y - 12 - bh - 11, size: 8, font: mono, color: MUTED });
+      page.drawText(code.data, { x: fx + (FW - tw) / 2, y: fy - 12 - bh - 13, size: 8, font: mono, color: MUTED });
     }
     y -= h;
   };

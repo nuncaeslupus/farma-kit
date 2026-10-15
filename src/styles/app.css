@@ -276,6 +276,38 @@ h1 .lo {
   outline-offset: 1px;
 }
 
+/* site sections menu: its own row under the brand + controls, so adding a
+   section never squeezes the language segment */
+.site-nav {
+  order: 3;
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.site-nav a {
+  font-weight: 500;
+  font-size: 13px;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.site-nav a:hover {
+  color: var(--ink);
+  background: var(--surface-2);
+}
+.site-nav a[aria-current='page'] {
+  color: var(--accent-ink);
+  background: var(--accent-soft);
+}
+.site-nav a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
 /* theme switch */
 .theme-btn {
   display: inline-flex;

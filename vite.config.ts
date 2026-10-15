@@ -1,5 +1,22 @@
 /// <reference types="vitest/config" />
+import { existsSync, readdirSync } from 'node:fs';
 import { defineConfig } from 'vite';
+
+// Every generated scanner page ({,ca/,eu/,gl/}lectores/**/index.html, from
+// scripts/gen-scanners.mjs) is its own HTML entry, found on disk so adding a
+// scanner needs no change here.
+function scannerInputs(): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const pre of ['', 'ca/', 'eu/', 'gl/']) {
+    const dir = `${pre}lectores`;
+    if (!existsSync(dir)) continue;
+    out[`${pre}lectores`] = `${dir}/index.html`;
+    for (const d of readdirSync(dir, { withFileTypes: true })) {
+      if (d.isDirectory()) out[`${pre}lectores/${d.name}`] = `${dir}/${d.name}/index.html`;
+    }
+  }
+  return out;
+}
 
 // Absolute base for the GitHub Pages project site so runtime fetches
 // (fonts, templates) resolve correctly even when the URL has no trailing
@@ -22,6 +39,7 @@ export default defineConfig({
         caFaq: 'ca/faq/index.html',
         euFaq: 'eu/faq/index.html',
         glFaq: 'gl/faq/index.html',
+        ...scannerInputs(),
       },
     },
   },

@@ -61,8 +61,9 @@ fix that:
 
 - **One page per scanner model**, tested in real pharmacies with Farmatic on Windows —
   currently Honeywell Voyager 1472g and Tera D5100.
-- **Configuration codes in order**: factory reset, Spanish keyboard, Enter suffix,
-  presentation mode, GS separator, plus optional tweaks (quieter beep, trigger mode).
+- **Configuration codes to scan in the order the page gives** (it varies by model):
+  factory reset, Spanish keyboard, Enter suffix, presentation mode and GS separator, plus
+  optional tweaks (quieter beep, trigger mode).
 - **Scan from the screen or print the PDF**, and a final check: read a DataMatrix in
   Farmatic and confirm lot, expiry and serial number come through.
 - Links to the manufacturer manuals, and a FAQ on the GS separator, undoing a bad setup,
@@ -88,8 +89,8 @@ gotchas and current status — lives in **[`status/handoff.md`](status/handoff.m
 npm install
 npm run dev        # dev server → localhost:5173/farma-kit/
 npm test           # Vitest, once
-npm run build      # typecheck + production build → dist/
 npm run gen:scanners  # regenerate the scanner pages and PDFs
+npm run build      # typecheck + production build → dist/
 ```
 
 Vite + Lit + TypeScript, no backend. Pushes to `main` deploy automatically via GitHub

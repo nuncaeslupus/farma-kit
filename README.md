@@ -10,6 +10,10 @@
 pharmacy's data, never the sheet itself. It replaces filling those headers by hand, in the
 browser, with your data kept local.
 
+It also has **barcode-scanner setup guides for Farmatic**: step-by-step configuration codes
+you scan from the screen or a printed PDF, so a scanner reads medicine DataMatrix codes
+(lot, expiry, serial number) without errors.
+
 **→ [nuncaeslupus.github.io/farma-kit](https://nuncaeslupus.github.io/farma-kit/)**
 
 ## Quick start
@@ -48,6 +52,27 @@ not selectable — the app offers to request it instead. Currently the Catalan *
 
 Available in Catalan, Spanish, Basque and Galician.
 
+## Barcode scanner setup
+
+Out of the box, many scanners don't send the invisible GS separator that Farmatic needs
+between the fields of a medicine's DataMatrix code, so Farmatic rejects the read or mixes
+up lot, expiry and serial number. The **[scanner pages](https://nuncaeslupus.github.io/farma-kit/lectores/)**
+fix that:
+
+- **One page per scanner model**, tested in real pharmacies with Farmatic on Windows —
+  currently Honeywell Voyager 1472g and Tera D5100.
+- **Configuration codes to scan in the order the page gives** (it varies by model):
+  factory reset, Spanish keyboard, Enter suffix, presentation mode and GS separator, plus
+  optional tweaks (quieter beep, trigger mode).
+- **Scan from the screen or print the PDF**, and a final check: read a DataMatrix in
+  Farmatic and confirm lot, expiry and serial number come through.
+- Links to the manufacturer manuals, and a FAQ on the GS separator, undoing a bad setup,
+  and requesting a model that isn't listed.
+
+The pages are static and available in the same four languages. They are generated from
+[`scripts/scanners/data.mjs`](scripts/scanners/data.mjs) by `npm run gen:scanners`, which
+also builds each printable PDF.
+
 ## Privacy
 
 Everything runs in your browser. The pharmacy data you type is never uploaded: the PDF is
@@ -64,6 +89,7 @@ gotchas and current status — lives in **[`status/handoff.md`](status/handoff.m
 npm install
 npm run dev        # dev server → localhost:5173/farma-kit/
 npm test           # Vitest, once
+npm run gen:scanners  # regenerate the scanner pages and PDFs
 npm run build      # typecheck + production build → dist/
 ```
 

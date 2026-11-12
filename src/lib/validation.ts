@@ -63,6 +63,9 @@ export function isNif(v: string): boolean {
   if ((m = v.match(/^(\d{8})([A-Z])$/))) return L[+m[1] % 23] === m[2];
   if ((m = v.match(/^([XYZ])(\d{7})([A-Z])$/)))
     return L[+(NIE_PREFIX[m[1]] + m[2]) % 23] === m[3];
+  // K/L/M: minors and residents without DNI/NIE; the check letter is the DNI
+  // algorithm over the 7 digits (AEAT).
+  if ((m = v.match(/^[KLM](\d{7})([A-Z])$/))) return L[+m[1] % 23] === m[2];
   return false;
 }
 

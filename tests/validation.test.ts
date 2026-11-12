@@ -42,6 +42,9 @@ describe('isNif (DNI/NIE checksum)', () => {
     ['12345678A', false], // wrong check letter
     ['X1234567L', true],
     ['X1234567A', false],
+    ['K1234567L', true], // K/L/M prefixes: check letter over the 7 digits
+    ['M1234567L', true],
+    ['K1234567A', false],
     ['Z1234567', false], // missing check letter
     ['ABC', false],
     ['', false],

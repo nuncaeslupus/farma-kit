@@ -897,6 +897,13 @@ select[aria-invalid='true']:focus {
   margin-top: 14px;
   flex-wrap: wrap;
 }
+.print-hint {
+  margin: 10px 2px 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  text-align: right;
+}
 .btn {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 600;
@@ -1114,7 +1121,7 @@ select[aria-invalid='true']:focus {
    .modal-msg margin gives gen-error — otherwise the success modal is just a title
    stacked straight onto the buttons. */
 .gen-result .modal-actions {
-  margin-top: 30px;
+  margin-top: 12px;
 }
 .gen-error .modal-actions {
   margin-top: 4px;

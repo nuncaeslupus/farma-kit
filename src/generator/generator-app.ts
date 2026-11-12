@@ -3,7 +3,7 @@ import { customElement } from 'lit/decorators.js';
 import { headerTemplate, footerTemplate } from '../components/chrome';
 import { COLEGIOS } from '../lib/colegios';
 import { I18N, applyLang, type Lang } from '../lib/i18n';
-import { slug, type Template } from '../lib/template';
+import { slug, validateTemplate, type Template } from '../lib/template';
 import { CP2PROV, titleCase, VAL, langFromPath, pageRangeExceeds } from '../lib/validation';
 import { applyStoredTheme, toggleTheme } from '../lib/theme';
 
@@ -57,6 +57,7 @@ export class GeneratorApp extends LitElement {
   private provManual = false;
   private activeIdx = -1;
   private monthNative?: boolean; // cached: does this browser implement type="month"?
+  private autoMonth = ''; // the month defaultMonth() chose, which must not trigger the 'month ahead' warning
   private pdfUrl: string | null = null; // last generated blob URL, revoked on the next run
   private cpCitiesP: Promise<Record<string, string[]>> | null = null; // memoized postal fetch
   private shareTimer?: ReturnType<typeof setTimeout>; // clears the "copied" flash on the share button
@@ -529,6 +530,10 @@ export class GeneratorApp extends LitElement {
       const res = await fetch(`${import.meta.env.BASE_URL}templates/${file}.json`);
       if (!res.ok) throw new Error(String(res.status));
       tpl = (await res.json()) as Template;
+      // Same check the editor runs: a malformed template must fail here, as a load
+      // error with a retry, not later inside generate() as the generic PDF error.
+      const problems = validateTemplate(tpl);
+      if (problems.length) throw new Error(`template ${file}: ${problems.join('; ')}`);
     } catch {
       // A superseded call must not report; a same-colegio retry may have succeeded.
       if (this.tplFetchId !== fetchId) return;
@@ -673,7 +678,8 @@ export class GeneratorApp extends LitElement {
         y++;
       }
     }
-    this.i('mes').value = `${y}-${String(m + 1).padStart(2, '0')}`;
+    this.autoMonth = `${y}-${String(m + 1).padStart(2, '0')}`;
+    this.i('mes').value = this.autoMonth;
   }
 
   // ---------- input filtering ----------
@@ -914,7 +920,7 @@ export class GeneratorApp extends LitElement {
     const lastDay = new Date(cy, cm + 1, 0).getDate();
     const nearEnd = now.getDate() >= lastDay - 2;
     const t = I18N[this.uiLang];
-    if (sel > cur) return (t.warnAhead as (m: string) => string)(this.mesPhrase(sy, sm));
+    if (sel > cur && mv !== this.autoMonth) return (t.warnAhead as (m: string) => string)(this.mesPhrase(sy, sm));
     if (sel === cur && full === 1 && nearEnd)
       return (t.warnCurrent as (m: string) => string)(this.mesPhrase(cy, cm));
     return null;
@@ -1151,10 +1157,17 @@ export class GeneratorApp extends LitElement {
       this.setGenTitle('genDone');
       result.hidden = false;
       (this.q('#genDownload') as HTMLElement).focus();
-    } catch {
+    } catch (err) {
+      console.error('PDF generation failed', err);
       this.q('#genProgress').hidden = true;
       this.setGenTitle('genErrTitle');
-      this.q('#genErrMsg').textContent = I18N[this.uiLang].genErrGeneric as string;
+      // Characters the font cannot draw get their own message naming them: a
+      // retry will never fix that, and printing blanks would be silent.
+      const chars = (err as { chars?: string[] } | null)?.chars;
+      const t = I18N[this.uiLang];
+      this.q('#genErrMsg').textContent = Array.isArray(chars)
+        ? (t.genErrChars as (c: string) => string)(chars.join(' '))
+        : (t.genErrGeneric as string);
       error.hidden = false;
       (this.q('#genErrClose') as HTMLElement).focus();
     }
@@ -1326,6 +1339,7 @@ export class GeneratorApp extends LitElement {
             <label class="check"><input type="checkbox" id="remember" /><span data-i18n="remember">Recorda'm</span></label>
             <button type="submit" form="form" class="btn" data-i18n="generar">Generar Document</button>
           </div>
+          <p class="print-hint" data-i18n="printHint">Imprimeix al 100 % / mida real.</p>
         </div>
 
         ${footerTemplate({
@@ -1345,6 +1359,7 @@ export class GeneratorApp extends LitElement {
             <div class="modal-title gen" id="genTitle" role="status" data-i18n="genTitle">Generant el document…</div>
             <div class="gen-progress" id="genProgress" aria-busy="true"><div class="progress-track"><div class="progress-fill" id="genBar"></div></div></div>
             <div class="gen-result" id="genResult" hidden>
+              <p class="modal-msg" data-i18n="printHint">Imprimeix al 100 % / mida real.</p>
               <div class="modal-actions">
                 <a class="btn" id="genDownload" href="#" target="_blank" rel="noopener" data-i18n="genDownload">Obrir / Descarregar PDF</a>
                 <button type="button" class="btn-ghost" data-i18n="genClose" @click=${() => this.closeGenModal()}>Tancar</button>

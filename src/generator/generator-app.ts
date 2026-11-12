@@ -1163,10 +1163,16 @@ export class GeneratorApp extends LitElement {
       this.setGenTitle('genErrTitle');
       // Characters the font cannot draw get their own message naming them: a
       // retry will never fix that, and printing blanks would be silent.
-      const chars = (err as { chars?: string[] } | null)?.chars;
+      const { chars, field } = (err ?? {}) as { chars?: string[]; field?: string };
       const t = I18N[this.uiLang];
+      // Template field key -> the form labels the user can recognise.
+      const labels: Record<string, string[]> = {
+        titular: ['cognoms', 'nom'], nif: ['nif'], address: ['adreca'],
+        cpCity: ['cp', 'poblacio'], province: ['provincia'],
+      };
+      const where = (labels[field ?? ''] ?? []).map((k) => t[k] as string).join(' / ');
       this.q('#genErrMsg').textContent = Array.isArray(chars)
-        ? (t.genErrChars as (c: string) => string)(chars.join(' '))
+        ? (t.genErrChars as (c: string) => string)((where ? where + ': ' : '') + chars.join(' '))
         : (t.genErrGeneric as string);
       error.hidden = false;
       (this.q('#genErrClose') as HTMLElement).focus();

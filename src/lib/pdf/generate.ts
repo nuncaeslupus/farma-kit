@@ -9,6 +9,27 @@ import { wrapLines, wrapTitular, fitWrapped } from './wrap';
 const MIN_FONT_SIZE = 4;
 
 /**
+ * A value contains characters the (vendored, latin-subset) font has no glyph for.
+ * pdf-lib would draw .notdef silently, printing a wrong name/address on an
+ * official sheet, so we refuse and say which field and which characters.
+ */
+export class UnsupportedCharsError extends Error {
+  constructor(
+    readonly field: string,
+    readonly chars: string[],
+  ) {
+    super(`Field "${field}" has characters the font cannot print: ${chars.join(' ')}`);
+    this.name = 'UnsupportedCharsError';
+  }
+}
+
+function assertPrintable(font: PDFFont, key: string, value: string): void {
+  const have = new Set(font.getCharacterSet());
+  const missing = [...new Set([...value])].filter((c) => /\S/.test(c) && !have.has(c.codePointAt(0)!));
+  if (missing.length) throw new UnsupportedCharsError(key, missing);
+}
+
+/**
  * Build the filled PDF entirely client-side — one page per entry in `pages`
  * (each a key→value map). When `basePdf` is given the data is drawn over the
  * official sheet (a visual test); for real printing pass none and print the
@@ -39,7 +60,9 @@ export async function generatePdf(
       // so a field the caller omitted — the stamp data when the user did not ask
       // for it — would print a stranger's name, NIF and address onto a real
       // official sheet. Callers wanting samples pass them in; the editor does.
-      drawField(page, tpl.sheet.h, font, f, pageData[f.key] ?? '');
+      const value = pageData[f.key] ?? '';
+      assertPrintable(font, f.key, value);
+      drawField(page, tpl.sheet.h, font, f, value);
     }
   }
   return doc.save();

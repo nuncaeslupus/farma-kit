@@ -91,6 +91,9 @@ export const I18N: { ca: Dict; es: Dict; eu: Dict; gl: Dict } = {
     genClose: 'Tancar',
     genDownload: 'Obrir / Descarregar PDF',
     genErrGeneric: 'Hi ha hagut un error generant el document. Torna-ho a provar d’aquí una estona.',
+    printHint: 'Imprimeix al 100 % / mida real (no «Ajusta a la pàgina»): si s\'escala, les dades no cauran dins les caselles.',
+    genErrChars: (c: string) =>
+      `El text conté caràcters que no es poden imprimir (${c}). Substitueix-los per equivalents (p. ex. sense diacrítics) i torna-ho a provar.`,
     pages_fmt: (a: string, b: string, n: string) =>
       'Del full ' + a + ' al ' + b + ' <span class="dim">· ' + n + ' fulls</span>',
     // Static about/FAQ section — lives pre-rendered in the HTML shells (outside
@@ -199,6 +202,9 @@ export const I18N: { ca: Dict; es: Dict; eu: Dict; gl: Dict } = {
     genClose: 'Cerrar',
     genDownload: 'Abrir / Descargar PDF',
     genErrGeneric: 'Ha ocurrido un error generando el documento. Inténtalo de nuevo dentro de un rato.',
+    printHint: 'Imprime al 100 % / tamaño real (no «Ajustar a la página»): si se escala, los datos no caerán dentro de las casillas.',
+    genErrChars: (c: string) =>
+      `El texto contiene caracteres que no se pueden imprimir (${c}). Sustitúyelos por equivalentes (p. ej. sin diacríticos) e inténtalo de nuevo.`,
     pages_fmt: (a: string, b: string, n: string) =>
       'De la hoja ' + a + ' a la ' + b + ' <span class="dim">· ' + n + ' hojas</span>',
     // See the note on the Catalan seo* block.
@@ -304,6 +310,9 @@ export const I18N: { ca: Dict; es: Dict; eu: Dict; gl: Dict } = {
     genClose: 'Itxi',
     genDownload: 'PDFa ireki / deskargatu',
     genErrGeneric: 'Errore bat gertatu da dokumentua sortzean. Saiatu berriro handik gutxira.',
+    printHint: 'Inprimatu %100ean / benetako tamainan (ez «Doitu orrira»): eskalatzen bada, datuak ez dira laukien barruan geldituko.',
+    genErrChars: (c: string) =>
+      `Testuak inprimatu ezin diren karaktereak ditu (${c}). Ordezkatu itzazu baliokideekin (adib. diakritikorik gabe) eta saiatu berriro.`,
     pages_fmt: (a: string, b: string, n: string) =>
       a + '. orritik ' + b + '. orrira <span class="dim">· ' + n + ' orri</span>',
     seoTitle: 'Ohiko galderak',
@@ -408,6 +417,9 @@ export const I18N: { ca: Dict; es: Dict; eu: Dict; gl: Dict } = {
     genClose: 'Pechar',
     genDownload: 'Abrir / Descargar PDF',
     genErrGeneric: 'Produciuse un erro ao xerar o documento. Téntao de novo dentro dun anaco.',
+    printHint: 'Imprime ao 100 % / tamaño real (non «Axustar á páxina»): se se escala, os datos non caerán dentro das caixas.',
+    genErrChars: (c: string) =>
+      `O texto contén caracteres que non se poden imprimir (${c}). Substitúeos por equivalentes (p. ex. sen diacríticos) e téntao de novo.`,
     pages_fmt: (a: string, b: string, n: string) =>
       'Da folla ' + a + ' á ' + b + ' <span class="dim">· ' + n + ' follas</span>',
     seoTitle: 'Preguntas frecuentes',

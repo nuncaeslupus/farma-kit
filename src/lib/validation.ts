@@ -54,6 +54,10 @@ export const titleCase = (s: string): string =>
     })
     .join(' ');
 
+/** Escape text for interpolation into innerHTML (element text or a quoted attribute). */
+export const escapeHtml = (s: string): string =>
+  s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
+
 const NIE_PREFIX: Record<string, string> = { X: '0', Y: '1', Z: '2' };
 
 export function isNif(v: string): boolean {
@@ -63,8 +67,10 @@ export function isNif(v: string): boolean {
   if ((m = v.match(/^(\d{8})([A-Z])$/))) return L[+m[1] % 23] === m[2];
   if ((m = v.match(/^([XYZ])(\d{7})([A-Z])$/)))
     return L[+(NIE_PREFIX[m[1]] + m[2]) % 23] === m[3];
-  // K/L/M: minors and residents without DNI/NIE; the check letter is the DNI
-  // algorithm over the 7 digits (AEAT).
+  // K/L/M: minors and residents without DNI/NIE. UNVERIFIED: the check letter is
+  // assumed to be the DNI algorithm over the 7 digits. That rule comes from
+  // memory of AEAT's NIF definition, not from a source checked against the
+  // official text; confirm before relying on it to reject real NIFs.
   if ((m = v.match(/^[KLM](\d{7})([A-Z])$/))) return L[+m[1] % 23] === m[2];
   return false;
 }

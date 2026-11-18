@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { CP2PROV, titleCase, isNif, VAL, langFromPath, pageRangeExceeds } from '../src/lib/validation';
+import { CP2PROV, titleCase, isNif, VAL, langFromPath, pageRangeExceeds, escapeHtml } from '../src/lib/validation';
 
 // The path is the ONLY language signal (/ = es, /ca/, /eu/, /gl/ the others) —
 // there is no stored preference or navigator.language detection anymore: both
@@ -163,5 +163,11 @@ describe('pageRangeExceeds', () => {
   test('respects other cell counts', () => {
     expect(pageRangeExceeds(1, 99, 2)).toBe(false);
     expect(pageRangeExceeds(1, 100, 2)).toBe(true);
+  });
+});
+
+describe('escapeHtml', () => {
+  test('neutralises markup and quotes so data cannot break out of an attribute', () => {
+    expect(escapeHtml(`a"b<c>&'d`)).toBe('a&quot;b&lt;c&gt;&amp;&#39;d');
   });
 });

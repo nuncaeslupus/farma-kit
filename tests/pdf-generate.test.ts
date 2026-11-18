@@ -2,7 +2,7 @@
 import { readFileSync } from 'node:fs';
 import { beforeAll, describe, expect, test, vi } from 'vitest';
 import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
-import { generatePdf, UnsupportedCharsError } from '../src/lib/pdf/generate';
+import { generatePdf, TextTooLongError, UnsupportedCharsError } from '../src/lib/pdf/generate';
 import type { Field, Template } from '../src/lib/template';
 
 // Real fonts and the shipped template, read from disk: the layout arithmetic is
@@ -99,6 +99,14 @@ describe('generatePdf layout', () => {
 
   test('a value that does not fit the cells throws instead of truncating', async () => {
     await expect(generatePdf(tpl, [{ page: '12345' }])).rejects.toThrow(/does not fit the 4 cells/);
+  });
+});
+
+describe('values too long for their box', () => {
+  test('are refused naming the field, not shrunk to 4pt and overflowed', async () => {
+    const err = await generatePdf(tpl, [{ address: 'Carrer del Nom Molt Llarg '.repeat(40) }]).catch((e) => e);
+    expect(err).toBeInstanceOf(TextTooLongError);
+    expect(err.field).toBe('address');
   });
 });
 

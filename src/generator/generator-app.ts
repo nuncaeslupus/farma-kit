@@ -4,7 +4,7 @@ import { headerTemplate, footerTemplate } from '../components/chrome';
 import { COLEGIOS } from '../lib/colegios';
 import { I18N, applyLang, type Lang } from '../lib/i18n';
 import { slug, validateTemplate, type Template } from '../lib/template';
-import { CP2PROV, titleCase, VAL, langFromPath, pageRangeExceeds } from '../lib/validation';
+import { CP2PROV, titleCase, VAL, langFromPath, pageRangeExceeds, escapeHtml } from '../lib/validation';
 import { applyStoredTheme, toggleTheme } from '../lib/theme';
 
 /* Base64 only to keep the address out of the bundle and the public repo as a
@@ -206,15 +206,15 @@ export class GeneratorApp extends LitElement {
         for (const name of g.colegios) {
           const sup = this.supported.has(slug(name));
           h +=
-            `<div class="combo-opt${sup ? '' : ' unsupported'}" role="option" id="copt-${slug(name)}" aria-selected="false" data-val="${name}">` +
-            `<span class="combo-opt-name">${name}</span>` +
+            `<div class="combo-opt${sup ? '' : ' unsupported'}" role="option" id="copt-${slug(name)}" aria-selected="false" data-val="${escapeHtml(name)}">` +
+            `<span class="combo-opt-name">${escapeHtml(name)}</span>` +
             (sup
               ? ''
               : `<span class="combo-req-status" data-i18n="reqStatus">Encara no disponible</span>` +
                 // AT/keyboard users cannot reach this nested control (role=option
                 // containing a button is invalid ARIA) — they go through
                 // #colegiNoteReq instead once the unsupported colegio is selected.
-                `<button type="button" class="combo-req" data-colegi="${name}" data-i18n="reqBtn" aria-hidden="true" tabindex="-1">Demanar</button>`) +
+                `<button type="button" class="combo-req" data-colegi="${escapeHtml(name)}" data-i18n="reqBtn" aria-hidden="true" tabindex="-1">Demanar</button>`) +
             `</div>`;
         }
       }
@@ -574,10 +574,6 @@ export class GeneratorApp extends LitElement {
   /** Enable/disable everything below the colegio picker (native `inert`). */
   private setGate(open: boolean) {
     const gated = this.q('#gated');
-    // The form just became fillable, so the CP field is a few seconds away:
-    // warm the postal data now instead of on the 5th digit, where the user
-    // waits on it.
-    if (open) void this.loadCpCities();
     gated.inert = !open;
     gated.toggleAttribute('data-locked', !open);
     this.q('#gateHint').hidden = open;
@@ -601,6 +597,9 @@ export class GeneratorApp extends LitElement {
     };
     segell.addEventListener('change', () => {
       sync();
+      // The postal list (328 KB) is only useful with the stamp section, so it is
+      // fetched here rather than for every visitor.
+      if (segell.checked) void this.loadCpCities();
       Object.values(VAL).forEach((r) => {
         if (!r.segell) return;
         this.q('#err-' + r.id).style.display = 'none';
@@ -734,8 +733,8 @@ export class GeneratorApp extends LitElement {
   /* Fetch the CP→cities map once. Memoizing the *promise* rather than the result
      dedupes callers that race while it is in flight, and clearing it on failure
      lets the next keystroke retry — caching {} left autofill dead for the whole
-     session after one blip. Prefetched from setGate(), so it is normally warm
-     long before the user reaches the CP field. */
+     session after one blip. Prefetched when the stamp section is ticked, so it is
+     normally warm before the user reaches the CP field. */
   private loadCpCities(): Promise<Record<string, string[]>> {
     this.cpCitiesP ??= fetch(`${import.meta.env.BASE_URL}postal/cp-cities.json`)
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
@@ -753,9 +752,12 @@ export class GeneratorApp extends LitElement {
     const cp = (this.i('cp').value || '').replace(/\D/g, '');
     if (cp.length !== 5) return;
     const cities = (await this.loadCpCities())[cp];
+    // The postal code may have been edited while the list was loading: a result
+    // for the old code must not overwrite suggestions or the city of the new one.
+    if ((this.i('cp').value || '').replace(/\D/g, '') !== cp) return;
     // Rewrite unconditionally: an unknown CP must clear the previous CP's
     // suggestions, not leave them on offer.
-    this.q('#pobles').innerHTML = (cities ?? []).map((c) => `<option value="${c}"></option>`).join('');
+    this.q('#pobles').innerHTML = (cities ?? []).map((c) => `<option value="${escapeHtml(c)}"></option>`).join('');
     if (!fillField) return;
     if (!cities || !cities.length) return; // unknown CP: we know nothing, leave the field alone
     const pob = this.i('poblacio');
@@ -920,6 +922,7 @@ export class GeneratorApp extends LitElement {
     const lastDay = new Date(cy, cm + 1, 0).getDate();
     const nearEnd = now.getDate() >= lastDay - 2;
     const t = I18N[this.uiLang];
+    if (sy < cy) return (t.warnPast as (m: string) => string)(this.mesPhrase(sy, sm));
     if (sel > cur && mv !== this.autoMonth) return (t.warnAhead as (m: string) => string)(this.mesPhrase(sy, sm));
     if (sel === cur && full === 1 && nearEnd)
       return (t.warnCurrent as (m: string) => string)(this.mesPhrase(cy, cm));
@@ -1164,6 +1167,7 @@ export class GeneratorApp extends LitElement {
       // Characters the font cannot draw get their own message naming them: a
       // retry will never fix that, and printing blanks would be silent.
       const { chars, field } = (err ?? {}) as { chars?: string[]; field?: string };
+      const tooLong = (err as Error | null)?.name === 'TextTooLongError';
       const t = I18N[this.uiLang];
       // Template field key -> the form labels the user can recognise.
       const labels: Record<string, string[]> = {
@@ -1173,7 +1177,9 @@ export class GeneratorApp extends LitElement {
       const where = (labels[field ?? ''] ?? []).map((k) => t[k] as string).join(' / ');
       this.q('#genErrMsg').textContent = Array.isArray(chars)
         ? (t.genErrChars as (c: string) => string)((where ? where + ': ' : '') + chars.join(' '))
-        : (t.genErrGeneric as string);
+        : tooLong
+          ? (t.genErrLong as (c: string) => string)(where || (field ?? ''))
+          : (t.genErrGeneric as string);
       error.hidden = false;
       (this.q('#genErrClose') as HTMLElement).focus();
     }

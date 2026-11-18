@@ -76,7 +76,11 @@ also builds each printable PDF.
 ## Privacy
 
 Everything runs in your browser. The pharmacy data you type is never uploaded: the PDF is
-generated locally. There is no backend, no analytics, and no cookies.
+generated locally. There is no backend, no analytics, and no cookies. The only network
+requests are for the app's own files (page, fonts, templates, postal-code list). Tick
+*Recuérdame* and the form data is kept in this browser's `localStorage` only; the colegio you
+pick is always remembered there too (it is not personal data). The *Demanar* / *Contactar*
+buttons just open your own mail program with a prefilled message when you click them.
 
 ## Documentation
 

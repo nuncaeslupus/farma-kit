@@ -94,6 +94,12 @@ export const I18N: { ca: Dict; es: Dict; eu: Dict; gl: Dict } = {
     printHint: 'Imprimeix al 100 % / mida real (no «Ajusta a la pàgina»): si s\'escala, les dades no cauran dins les caselles.',
     genErrChars: (c: string) =>
       `El text conté caràcters que no es poden imprimir (${c}). Substitueix-los per equivalents (p. ex. sense diacrítics) i torna-ho a provar.`,
+    genErrLong: (c: string) =>
+      `${c}: el valor és massa llarg per a la casella del full i no es pot imprimir sencer. Escurça’l i torna-ho a provar.`,
+    warnPast: (mes: string) =>
+      'Hi ha pàgines per al mes <strong>' +
+      mes +
+      '</strong>, d’un any ja passat. És correcte?',
     pages_fmt: (a: string, b: string, n: string) =>
       'Del full ' + a + ' al ' + b + ' <span class="dim">· ' + n + ' fulls</span>',
     // Static about/FAQ section — lives pre-rendered in the HTML shells (outside
@@ -112,7 +118,7 @@ export const I18N: { ca: Dict; es: Dict; eu: Dict; gl: Dict } = {
       'Sí: és una eina gratuïta i de codi obert (llicència MIT, <a href="https://github.com/nuncaeslupus/farma-kit" target="_blank" rel="noopener">codi a GitHub</a>). No hi ha registre, no hi ha comptes i el lloc no fa servir cookies.',
     seoQ4: 'Què passa amb les dades de la meva farmàcia?',
     seoA4:
-      "No surten del teu ordinador: el PDF es genera localment, al teu propi navegador, i no s'envia res a cap servidor. L'opció «Recorda'm» desa les dades únicament al teu navegador per a la propera visita.",
+      "No surten del teu ordinador: el PDF es genera localment, al teu propi navegador, i no s'envia res a cap servidor. L'opció «Recorda'm» desa les dades del formulari únicament al teu navegador per a la propera visita; el col·legi triat es recorda sempre, també al navegador (no és cap dada personal).",
     seoQ5: 'Amb quins col·legis de farmacèutics funciona?',
     seoA5:
       "Avui hi ha disponibles els fulls dels col·legis de Barcelona, Girona, Lleida i Tarragona, que comparteixen un mateix model. Si el teu col·legi encara no hi apareix, demana'l des de la mateixa aplicació i n'afegirem la plantilla.",
@@ -205,6 +211,12 @@ export const I18N: { ca: Dict; es: Dict; eu: Dict; gl: Dict } = {
     printHint: 'Imprime al 100 % / tamaño real (no «Ajustar a la página»): si se escala, los datos no caerán dentro de las casillas.',
     genErrChars: (c: string) =>
       `El texto contiene caracteres que no se pueden imprimir (${c}). Sustitúyelos por equivalentes (p. ej. sin diacríticos) e inténtalo de nuevo.`,
+    genErrLong: (c: string) =>
+      `${c}: el valor es demasiado largo para la casilla de la hoja y no se puede imprimir entero. Acórtalo e inténtalo de nuevo.`,
+    warnPast: (mes: string) =>
+      'Se están generando páginas para el mes <strong>' +
+      mes +
+      '</strong>, de un año ya pasado. ¿Es correcto?',
     pages_fmt: (a: string, b: string, n: string) =>
       'De la hoja ' + a + ' a la ' + b + ' <span class="dim">· ' + n + ' hojas</span>',
     // See the note on the Catalan seo* block.
@@ -220,7 +232,7 @@ export const I18N: { ca: Dict; es: Dict; eu: Dict; gl: Dict } = {
       'Sí: es una herramienta gratuita y de código abierto (licencia MIT, <a href="https://github.com/nuncaeslupus/farma-kit" target="_blank" rel="noopener">código en GitHub</a>). No hay registro, no hay cuentas y el sitio no usa cookies.',
     seoQ4: '¿Qué pasa con los datos de mi farmacia?',
     seoA4:
-      'No salen de tu ordenador: el PDF se genera localmente, en tu propio navegador, y no se envía nada a ningún servidor. La opción «Recuérdame» guarda los datos únicamente en tu navegador para la próxima visita.',
+      'No salen de tu ordenador: el PDF se genera localmente, en tu propio navegador, y no se envía nada a ningún servidor. La opción «Recuérdame» guarda los datos del formulario únicamente en tu navegador para la próxima visita; el colegio elegido se recuerda siempre, también en el navegador (no es ningún dato personal).',
     seoQ5: '¿Con qué colegios de farmacéuticos funciona?',
     seoA5:
       'Hoy están disponibles las hojas de los colegios de Barcelona, Girona, Lleida y Tarragona, que comparten un mismo modelo. Si tu colegio todavía no aparece, pídelo desde la propia aplicación y añadiremos su plantilla.',
@@ -313,6 +325,12 @@ export const I18N: { ca: Dict; es: Dict; eu: Dict; gl: Dict } = {
     printHint: 'Inprimatu %100ean / benetako tamainan (ez «Doitu orrira»): eskalatzen bada, datuak ez dira laukien barruan geldituko.',
     genErrChars: (c: string) =>
       `Testuak inprimatu ezin diren karaktereak ditu (${c}). Ordezkatu itzazu baliokideekin (adib. diakritikorik gabe) eta saiatu berriro.`,
+    genErrLong: (c: string) =>
+      `${c}: balioa luzeegia da orriaren laukirako eta ezin da osorik inprimatu. Laburtu eta saiatu berriro.`,
+    warnPast: (mes: string) =>
+      '<strong>' +
+      mes +
+      '</strong> hilabeterako orrialdeak sortzen ari dira, iragandako urte batekoa. Zuzena da?',
     pages_fmt: (a: string, b: string, n: string) =>
       a + '. orritik ' + b + '. orrira <span class="dim">· ' + n + ' orri</span>',
     seoTitle: 'Ohiko galderak',
@@ -327,7 +345,7 @@ export const I18N: { ca: Dict; es: Dict; eu: Dict; gl: Dict } = {
       'Bai: doako eta kode irekiko tresna bat da (MIT lizentzia, <a href="https://github.com/nuncaeslupus/farma-kit" target="_blank" rel="noopener">kodea GitHuben</a>). Ez dago izen-ematerik, ez dago konturik, eta guneak ez du cookierik erabiltzen.',
     seoQ4: 'Zer gertatzen da nire farmaziaren datuekin?',
     seoA4:
-      'Ez dira zure ordenagailutik ateratzen: PDFa lokalki sortzen da, zure nabigatzailean bertan, eta ez da ezer inongo zerbitzarira bidaltzen. «Gogoratu ni» aukerak datuak zure nabigatzailean bakarrik gordetzen ditu, hurrengo bisitarako.',
+      'Ez dira zure ordenagailutik ateratzen: PDFa lokalki sortzen da, zure nabigatzailean bertan, eta ez da ezer inongo zerbitzarira bidaltzen. «Gogoratu ni» aukerak formularioko datuak zure nabigatzailean bakarrik gordetzen ditu, hurrengo bisitarako; aukeratutako elkargoa beti gogoratzen da, nabigatzailean bertan (ez da datu pertsonala).',
     seoQ5: 'Zein farmazialarien elkargorekin funtzionatzen du?',
     seoA5:
       'Gaur egun Barcelona, Girona, Lleida eta Tarragonako elkargoen orriak daude eskuragarri, eredu bera partekatzen dutenak. Zure elkargoa oraindik ez bada agertzen, eskatu aplikazioan bertan, eta haren txantiloia gehituko dugu.',
@@ -420,6 +438,12 @@ export const I18N: { ca: Dict; es: Dict; eu: Dict; gl: Dict } = {
     printHint: 'Imprime ao 100 % / tamaño real (non «Axustar á páxina»): se se escala, os datos non caerán dentro das caixas.',
     genErrChars: (c: string) =>
       `O texto contén caracteres que non se poden imprimir (${c}). Substitúeos por equivalentes (p. ex. sen diacríticos) e téntao de novo.`,
+    genErrLong: (c: string) =>
+      `${c}: o valor é demasiado longo para a caixa da folla e non se pode imprimir enteiro. Acórtao e téntao de novo.`,
+    warnPast: (mes: string) =>
+      'Estanse a xerar páxinas para o mes <strong>' +
+      mes +
+      '</strong>, dun ano xa pasado. É correcto?',
     pages_fmt: (a: string, b: string, n: string) =>
       'Da folla ' + a + ' á ' + b + ' <span class="dim">· ' + n + ' follas</span>',
     seoTitle: 'Preguntas frecuentes',
@@ -434,7 +458,7 @@ export const I18N: { ca: Dict; es: Dict; eu: Dict; gl: Dict } = {
       'Si: é unha ferramenta gratuíta e de código aberto (licenza MIT, <a href="https://github.com/nuncaeslupus/farma-kit" target="_blank" rel="noopener">código en GitHub</a>). Non hai rexistro, non hai contas e o sitio non usa cookies.',
     seoQ4: 'Que pasa cos datos da miña farmacia?',
     seoA4:
-      'Non saen do teu ordenador: o PDF xérase localmente, no teu propio navegador, e non se envía nada a ningún servidor. A opción «Lémbrame» garda os datos unicamente no teu navegador para a próxima visita.',
+      'Non saen do teu ordenador: o PDF xérase localmente, no teu propio navegador, e non se envía nada a ningún servidor. A opción «Lémbrame» garda os datos do formulario unicamente no teu navegador para a próxima visita; o colexio escollido lémbrase sempre, tamén no navegador (non é ningún dato persoal).',
     seoQ5: 'Con que colexios de farmacéuticos funciona?',
     seoA5:
       'Hoxe están dispoñibles as follas dos colexios de Barcelona, Girona, Lleida e Tarragona, que comparten un mesmo modelo. Se o teu colexio aínda non aparece, pídeo desde a propia aplicación e engadiremos o seu modelo.',

@@ -4,8 +4,8 @@ import type { Field, Template } from '../template';
 import { embedFont, registerFonts } from './fonts';
 import { wrapLines, wrapTitular, fitWrapped } from './wrap';
 
-// Font floor for shrink-to-fit: below this a coupon sheet is unreadable anyway,
-// so we stop shrinking and accept minimal overflow rather than vanishing text.
+// Font floor for shrink-to-fit: below this a coupon sheet is unreadable, so a
+// value that still does not fit at this size is refused (TextTooLongError).
 const MIN_FONT_SIZE = 4;
 
 /**
@@ -20,6 +20,18 @@ export class UnsupportedCharsError extends Error {
   ) {
     super(`Field "${field}" has characters the font cannot print: ${chars.join(' ')}`);
     this.name = 'UnsupportedCharsError';
+  }
+}
+
+/**
+ * A value does not fit its box even at the minimum font size. Printing it would
+ * mean clipped or overflowing text on an official sheet, so we refuse and name
+ * the field instead.
+ */
+export class TextTooLongError extends Error {
+  constructor(readonly field: string) {
+    super(`Field "${field}" is too long to fit its box on the sheet`);
+    this.name = 'TextTooLongError';
   }
 }
 
@@ -152,6 +164,7 @@ function drawSingleCellField(
     lineHeightAt: (sz) => font.heightAtSize(sz),
   });
   if (lines.length === 0) return;
+  if (lines.length * font.heightAtSize(fitSize) > f.box.h) throw new TextTooLongError(f.key);
 
   const ascent = font.heightAtSize(fitSize, { descender: false });
   const full = font.heightAtSize(fitSize);

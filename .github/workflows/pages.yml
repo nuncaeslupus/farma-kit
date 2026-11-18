@@ -1,7 +1,12 @@
 name: Deploy to GitHub Pages
 
+# Deploys only after the CI workflow succeeded on main (CI already runs typecheck,
+# tests, the generated-files check and the build), so a red or stale main never
+# reaches production. workflow_dispatch stays as a manual escape hatch.
 on:
-  push:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
     branches: [main]
   workflow_dispatch:
 
@@ -16,18 +21,22 @@ concurrency:
 
 jobs:
   deploy:
+    # workflow_run fires for pull_request runs too: deploy only a green push to main.
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The exact commit CI approved, not whatever main has moved to since.
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
       - run: npm ci
-      - run: npm test
       - run: npm run build
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

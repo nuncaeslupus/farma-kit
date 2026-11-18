@@ -2,7 +2,12 @@ name: Deploy to GitHub Pages
 
 # Deploys only after the CI workflow succeeded on main (CI already runs typecheck,
 # tests, the generated-files check and the build), so a red or stale main never
-# reaches production. workflow_dispatch stays as a manual escape hatch.
+# reaches production. workflow_dispatch stays as a manual escape hatch (it runs the
+# tests itself, since no CI result gates it).
+#
+# workflow_run is normally risky because it runs with write permissions after
+# untrusted code; here it is restricted to push events on main (never pull
+# requests, never forks), and it checks out main's own commit.
 on:
   workflow_run:
     workflows: [CI]
@@ -12,17 +17,42 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: true
 
 jobs:
+  # A slower CI run for an older commit must not overwrite a newer deployment.
+  fresh:
+    runs-on: ubuntu-latest
+    outputs:
+      ok: ${{ steps.check.outputs.ok }}
+    steps:
+      - id: check
+        env:
+          EVENT: ${{ github.event_name }}
+          CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          RUN_EVENT: ${{ github.event.workflow_run.event }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ok=false
+          if [ "$EVENT" = workflow_dispatch ]; then
+            ok=true
+          elif [ "$CONCLUSION" = success ] && [ "$RUN_EVENT" = push ]; then
+            main=$(gh api "repos/$GITHUB_REPOSITORY/commits/main" --jq .sha)
+            if [ "$main" = "$HEAD_SHA" ]; then ok=true; else echo "::notice::main moved past $HEAD_SHA; skipping"; fi
+          fi
+          echo "ok=$ok" >> "$GITHUB_OUTPUT"
+
   deploy:
-    # workflow_run fires for pull_request runs too: deploy only a green push to main.
-    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
+    needs: fresh
+    if: needs.fresh.outputs.ok == 'true'
+    # Per job, so a skipped deploy never cancels one that is running.
+    concurrency:
+      group: pages
+      cancel-in-progress: true
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -32,11 +62,15 @@ jobs:
         with:
           # The exact commit CI approved, not whatever main has moved to since.
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
       - run: npm ci
+      - name: Test (manual runs only; automatic runs were gated by CI)
+        if: github.event_name == 'workflow_dispatch'
+        run: npm test
       - run: npm run build
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

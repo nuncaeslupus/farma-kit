@@ -118,7 +118,7 @@ export const I18N: { ca: Dict; es: Dict; eu: Dict; gl: Dict } = {
       'Sí: és una eina gratuïta i de codi obert (llicència MIT, <a href="https://github.com/nuncaeslupus/farma-kit" target="_blank" rel="noopener">codi a GitHub</a>). No hi ha registre, no hi ha comptes i el lloc no fa servir cookies.',
     seoQ4: 'Què passa amb les dades de la meva farmàcia?',
     seoA4:
-      "No surten del teu ordinador: el PDF es genera localment, al teu propi navegador, i no s'envia res a cap servidor. L'opció «Recorda'm» desa les dades del formulari únicament al teu navegador per a la propera visita; el col·legi triat es recorda sempre, també al navegador (no és cap dada personal).",
+      "No surten del teu ordinador: el PDF es genera localment, al teu propi navegador, i no s'envia res a cap servidor. L'opció «Recorda'm» desa les dades del formulari únicament al teu navegador per a la propera visita; el col·legi triat es desa a part, també al navegador i independentment de «Recorda'm» (si el navegador permet emmagatzemar dades).",
     seoQ5: 'Amb quins col·legis de farmacèutics funciona?',
     seoA5:
       "Avui hi ha disponibles els fulls dels col·legis de Barcelona, Girona, Lleida i Tarragona, que comparteixen un mateix model. Si el teu col·legi encara no hi apareix, demana'l des de la mateixa aplicació i n'afegirem la plantilla.",
@@ -232,7 +232,7 @@ export const I18N: { ca: Dict; es: Dict; eu: Dict; gl: Dict } = {
       'Sí: es una herramienta gratuita y de código abierto (licencia MIT, <a href="https://github.com/nuncaeslupus/farma-kit" target="_blank" rel="noopener">código en GitHub</a>). No hay registro, no hay cuentas y el sitio no usa cookies.',
     seoQ4: '¿Qué pasa con los datos de mi farmacia?',
     seoA4:
-      'No salen de tu ordenador: el PDF se genera localmente, en tu propio navegador, y no se envía nada a ningún servidor. La opción «Recuérdame» guarda los datos del formulario únicamente en tu navegador para la próxima visita; el colegio elegido se recuerda siempre, también en el navegador (no es ningún dato personal).',
+      'No salen de tu ordenador: el PDF se genera localmente, en tu propio navegador, y no se envía nada a ningún servidor. La opción «Recuérdame» guarda los datos del formulario únicamente en tu navegador para la próxima visita; el colegio elegido se guarda aparte, también en el navegador y con independencia de «Recuérdame» (si el navegador permite almacenar datos).',
     seoQ5: '¿Con qué colegios de farmacéuticos funciona?',
     seoA5:
       'Hoy están disponibles las hojas de los colegios de Barcelona, Girona, Lleida y Tarragona, que comparten un mismo modelo. Si tu colegio todavía no aparece, pídelo desde la propia aplicación y añadiremos su plantilla.',
@@ -345,7 +345,7 @@ export const I18N: { ca: Dict; es: Dict; eu: Dict; gl: Dict } = {
       'Bai: doako eta kode irekiko tresna bat da (MIT lizentzia, <a href="https://github.com/nuncaeslupus/farma-kit" target="_blank" rel="noopener">kodea GitHuben</a>). Ez dago izen-ematerik, ez dago konturik, eta guneak ez du cookierik erabiltzen.',
     seoQ4: 'Zer gertatzen da nire farmaziaren datuekin?',
     seoA4:
-      'Ez dira zure ordenagailutik ateratzen: PDFa lokalki sortzen da, zure nabigatzailean bertan, eta ez da ezer inongo zerbitzarira bidaltzen. «Gogoratu ni» aukerak formularioko datuak zure nabigatzailean bakarrik gordetzen ditu, hurrengo bisitarako; aukeratutako elkargoa beti gogoratzen da, nabigatzailean bertan (ez da datu pertsonala).',
+      'Ez dira zure ordenagailutik ateratzen: PDFa lokalki sortzen da, zure nabigatzailean bertan, eta ez da ezer inongo zerbitzarira bidaltzen. «Gogoratu ni» aukerak formularioko datuak zure nabigatzailean bakarrik gordetzen ditu, hurrengo bisitarako; aukeratutako elkargoa bereizita gordetzen da, nabigatzailean bertan eta «Gogoratu ni»-tik aparte (nabigatzaileak biltegiratzea onartzen badu).',
     seoQ5: 'Zein farmazialarien elkargorekin funtzionatzen du?',
     seoA5:
       'Gaur egun Barcelona, Girona, Lleida eta Tarragonako elkargoen orriak daude eskuragarri, eredu bera partekatzen dutenak. Zure elkargoa oraindik ez bada agertzen, eskatu aplikazioan bertan, eta haren txantiloia gehituko dugu.',
@@ -458,7 +458,7 @@ export const I18N: { ca: Dict; es: Dict; eu: Dict; gl: Dict } = {
       'Si: é unha ferramenta gratuíta e de código aberto (licenza MIT, <a href="https://github.com/nuncaeslupus/farma-kit" target="_blank" rel="noopener">código en GitHub</a>). Non hai rexistro, non hai contas e o sitio non usa cookies.',
     seoQ4: 'Que pasa cos datos da miña farmacia?',
     seoA4:
-      'Non saen do teu ordenador: o PDF xérase localmente, no teu propio navegador, e non se envía nada a ningún servidor. A opción «Lémbrame» garda os datos do formulario unicamente no teu navegador para a próxima visita; o colexio escollido lémbrase sempre, tamén no navegador (non é ningún dato persoal).',
+      'Non saen do teu ordenador: o PDF xérase localmente, no teu propio navegador, e non se envía nada a ningún servidor. A opción «Lémbrame» garda os datos do formulario unicamente no teu navegador para a próxima visita; o colexio escollido gárdase á parte, tamén no navegador e con independencia de «Lémbrame» (se o navegador permite almacenar datos).',
     seoQ5: 'Con que colexios de farmacéuticos funciona?',
     seoA5:
       'Hoxe están dispoñibles as follas dos colexios de Barcelona, Girona, Lleida e Tarragona, que comparten un mesmo modelo. Se o teu colexio aínda non aparece, pídeo desde a propia aplicación e engadiremos o seu modelo.',

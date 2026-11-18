@@ -164,7 +164,13 @@ function drawSingleCellField(
     lineHeightAt: (sz) => font.heightAtSize(sz),
   });
   if (lines.length === 0) return;
-  if (lines.length * font.heightAtSize(fitSize) > f.box.h) throw new TextTooLongError(f.key);
+  // Height: wrapping + shrinking could not fit it. Width: a single glyph wider than
+  // the box is kept on its own line by wrapLines and fitWrapped never shrinks for it.
+  if (
+    lines.length * font.heightAtSize(fitSize) > f.box.h ||
+    lines.some((l) => font.widthOfTextAtSize(l, fitSize) > f.box.w + 0.01)
+  )
+    throw new TextTooLongError(f.key);
 
   const ascent = font.heightAtSize(fitSize, { descender: false });
   const full = font.heightAtSize(fitSize);

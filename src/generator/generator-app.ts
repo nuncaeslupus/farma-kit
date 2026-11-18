@@ -752,6 +752,9 @@ export class GeneratorApp extends LitElement {
     const cp = (this.i('cp').value || '').replace(/\D/g, '');
     if (cp.length !== 5) return;
     const cities = (await this.loadCpCities())[cp];
+    // The postal code may have been edited while the list was loading: a result
+    // for the old code must not overwrite suggestions or the city of the new one.
+    if ((this.i('cp').value || '').replace(/\D/g, '') !== cp) return;
     // Rewrite unconditionally: an unknown CP must clear the previous CP's
     // suggestions, not leave them on offer.
     this.q('#pobles').innerHTML = (cities ?? []).map((c) => `<option value="${escapeHtml(c)}"></option>`).join('');

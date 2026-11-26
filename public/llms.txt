@@ -1,0 +1,35 @@
+# FarmaKit
+
+> Browser tool for Spanish pharmacies. It fills in the header of the coupon sheets for electronic
+> prescriptions (fulls de cupons precinte / hojas de cupones precinto) as a PDF the user prints on
+> top of the official sheets, and it has barcode-scanner setup guides for Farmatic. Free, open
+> source, no backend: the pharmacy's data never leaves the browser.
+
+- Spanish: https://nuncaeslupus.github.io/farma-kit/
+- Catalan: https://nuncaeslupus.github.io/farma-kit/ca/
+- Basque: https://nuncaeslupus.github.io/farma-kit/eu/
+- Galician: https://nuncaeslupus.github.io/farma-kit/gl/
+
+The page is for a person and has no API, so do not try to drive it or send it data.
+
+## Coupon-sheet headers
+
+The user picks their colegio de farmacéuticos, fills in the pharmacy's data and prints the PDF
+onto the official sheets from the wholesaler; FarmaKit prints only the pharmacy's data, never the
+sheet. Templates exist for the Catalan colegios (Barcelona, Girona, Lleida, Tarragona). Other
+colegios are listed but cannot be selected yet; the page offers to request one.
+
+## Barcode scanners for Farmatic
+
+Many scanners do not send the GS separator Farmatic needs between the fields of a medicine's
+DataMatrix code, so lot, expiry and serial number are rejected or mixed up. Each scanner page
+gives the configuration codes to scan, in order, and a final check:
+
+- [All scanners](https://nuncaeslupus.github.io/farma-kit/lectores/)
+- [Honeywell Voyager 1472g](https://nuncaeslupus.github.io/farma-kit/lectores/honeywell-voyager-1472g/)
+- [Tera D5100](https://nuncaeslupus.github.io/farma-kit/lectores/tera-d5100/)
+
+## Links
+
+- [FAQ](https://nuncaeslupus.github.io/farma-kit/faq/)
+- [Source code](https://github.com/nuncaeslupus/farma-kit)

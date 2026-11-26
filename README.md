@@ -107,6 +107,8 @@ Actions.
 - [doc-control](https://github.com/nuncaeslupus/doc-control) — lets AI agents edit Word documents as tracked changes.
 - [literary-critic](https://github.com/nuncaeslupus/literary-critic) — LLM manuscript analysis the way a professional editor would.
 - [integral-job-search](https://github.com/nuncaeslupus/integral-job-search) — candidate-centred job search run in Claude Code.
+- [numerador-facturas](https://github.com/nuncaeslupus/numerador-facturas) — numbers PDF invoices in batch, in the browser.
+- [pdf-password-breaker](https://github.com/nuncaeslupus/pdf-password-breaker) — recovers the password of your own PDF from hints, in the browser.
 
 ## License
 
